@@ -1,39 +1,52 @@
 package demo;
 
 public class UserBoundary {
-    private String id;
-    private String name;
-    private String email;
+	
+    private UserID userID;
+    private String role;//can change to enum
+    private String username;
+    private String avatar;
 
     public UserBoundary() {}
-
-    public UserBoundary(String id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
+    
+    public UserBoundary(String email) {
+    	this.userID = new UserID(email);
+    	
+    	//get from DB
+    	role = "Student";
+    	username = "username";
+    	avatar = "avater.url"; 
     }
 
-    public String getId() {
-        return id;
-    }
+	public UserID getUserId() {
+		return userID;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setUserId(UserID userID) {
+		this.userID = userID;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getRole() {
+		return role;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setRole(String role) {
+		this.role = role;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
 }

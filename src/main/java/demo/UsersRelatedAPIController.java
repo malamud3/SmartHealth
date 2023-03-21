@@ -16,7 +16,7 @@ public class UsersRelatedAPIController {
 		
 		public UserBoundary validuser(@PathVariable("email") String email)
 		{
-			return new UserBoundary("323","liwaa",email);
+			return new UserBoundary(email);
 			
 		}
 		
