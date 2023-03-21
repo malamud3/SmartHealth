@@ -17,6 +17,15 @@ public class UserBoundary {
     	username = "username";
     	avatar = "avater.url"; 
     }
+    
+    public UserBoundary(String superapp, String email) {
+    	this.userID = new UserID(superapp, email);
+    	
+    	//get from DB
+    	role = "Student";
+    	username = "username";
+    	avatar = "avater.url"; 
+    }
 
 	public UserID getUserId() {
 		return userID;

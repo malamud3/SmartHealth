@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsersRelatedAPIController {
 	
 		@RequestMapping(
-				path = {"/superapp/{email}"},
+				path = {"/superapp/users/login/{superapp}/{email}"},
 				method = {RequestMethod.GET},
 				produces = {MediaType.APPLICATION_JSON_VALUE})
 		
-		public UserBoundary validuser(@PathVariable("email") String email)
+		public UserBoundary validuser(@PathVariable("superapp") String superapp,
+				@PathVariable("email") String email)
 		{
-			return new UserBoundary(email);
+			return new UserBoundary(superapp, email);
 			
 		}
 		
