@@ -2,6 +2,8 @@ package demo;
 
 import java.util.Date;
 
+import demo.Model.UserID;
+
 public class ObjectBoundary {
 	
     private ObjectID objectId;

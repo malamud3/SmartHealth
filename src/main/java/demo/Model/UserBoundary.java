@@ -1,4 +1,6 @@
-package demo;
+package demo.Model;
+
+
 
 public class UserBoundary {
 	

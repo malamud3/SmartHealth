@@ -1,4 +1,5 @@
-package demo;
+package demo.Model;
+
 
 public class UserID {
 	private String superApp;
