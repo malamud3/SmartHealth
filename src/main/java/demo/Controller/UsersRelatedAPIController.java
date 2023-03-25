@@ -33,14 +33,7 @@ public class UsersRelatedAPIController {
 		return new UserBoundary(superapp,email);
 	}
 
-	// GET: ALL USERS
-	@RequestMapping(
-			path = {"/superapp/users/{superapp}"},
-			method = {RequestMethod.GET},
-			produces = {MediaType.APPLICATION_JSON_VALUE})
-	public List<UserBoundary> getAllUsers() {
-		return new ArrayList<UserBoundary>();
-	}
+
 
 
 	//PUT: Update USER
@@ -62,7 +55,7 @@ public class UsersRelatedAPIController {
 
 	// POST: Create USER
 	@RequestMapping(
-			path = {"/user"},
+			path = {"/lisuperapp/users"},
 			method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public UserBoundary createUser(@PathVariable("superapp") String superapp, @RequestBody UserBoundary user) {
@@ -80,4 +73,10 @@ public class UsersRelatedAPIController {
 		// Return the new UserBoundary object
 		return newUser;
 	}
+
+
+
+
+
+
 }

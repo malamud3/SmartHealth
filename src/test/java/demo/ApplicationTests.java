@@ -1,6 +1,7 @@
 package demo;
 
 
+import demo.Controller.AdminRelatedAPIController;
 import demo.Controller.HelloController;
 import demo.Controller.SuperAppObjectsAPIController;
 import demo.Controller.UsersRelatedAPIController;
@@ -64,7 +65,7 @@ class ApplicationTests {
     @Test
     public void TestGetAllUsers() throws Exception{
         int expected = 0;
-        int actual = usersRelatedAPIController.getAllUsers().size();
+        int actual = AdminRelatedAPIController.getAllUsers().size();
         assertEquals(expected, actual);
     }
 
@@ -76,4 +77,5 @@ class ApplicationTests {
         UserBoundary actual = usersRelatedAPIController.createUser(superApp, expected);
         assertEquals(expected, actual);
     }
+
 }
