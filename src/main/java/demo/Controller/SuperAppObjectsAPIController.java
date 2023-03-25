@@ -1,12 +1,14 @@
 package demo.Controller;
 
+import demo.ObjectBoundary;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.ObjectBoundary;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class SuperAppObjectsAPIController {
@@ -22,19 +24,16 @@ public class SuperAppObjectsAPIController {
 		return new ObjectBoundary(superapp,internalObjectId);
 		
 	}
-	
-	
+
+	//GET: all objects from DB
 	@RequestMapping(
 			path = {"/superapp/objects"},
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
-	
-	public ObjectBoundary getAllObjects()
+
+	public List<ObjectBoundary> getAllObjects()
 	{
-		//TODO - get all objects from DB
-		return new ObjectBoundary();
-		
+		return new ArrayList<ObjectBoundary>();
 	}
-	
 
 }

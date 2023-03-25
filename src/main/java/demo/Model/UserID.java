@@ -1,15 +1,15 @@
 package demo.Model;
 
 
+import demo.ObjectID;
+
 public class UserID {
 	private String superApp;
 	private String email;
 	
 	public UserID() {
 	}
-	
-	
-	
+
 	public UserID(String email) {
 		super();
 		this.email = email;
@@ -38,4 +38,9 @@ public class UserID {
 		this.email = email;
 	}
 
+	@Override
+	public boolean equals(Object obj){
+		UserID other = (UserID) obj;
+		return this.email.equals(other.email) && this.superApp.equals(other.superApp);
+	}
 }

@@ -60,4 +60,10 @@ public class UserBoundary {
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
+
+	@Override
+	public boolean equals(Object obj){
+		UserBoundary other = (UserBoundary) obj;
+		return this.userID.equals(other.userID);
+	}
 }

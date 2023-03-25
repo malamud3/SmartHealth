@@ -23,8 +23,11 @@ public class ObjectID {
 	}
 	public void setInternalObjectId(String internalObjectId) {
 		this.internalObjectId = internalObjectId;
-	} 
-	
-	
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		ObjectID other = (ObjectID) obj;
+		return other.superapp.equals(this.superapp) && other.internalObjectId.equals(this.internalObjectId);
+	}
 }

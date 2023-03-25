@@ -24,4 +24,10 @@ public class Message {
 	public String toString() {
 		return "Message [message=" + message + "]";
 	}
+
+	@Override
+	public boolean equals(Object obj){
+		Message other = (Message) obj;
+		return this.message.equals(other.message);
+	}
 }

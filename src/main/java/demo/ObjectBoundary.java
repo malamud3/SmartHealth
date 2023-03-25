@@ -1,8 +1,8 @@
 package demo;
 
-import java.util.Date;
-
 import demo.Model.UserID;
+
+import java.util.Date;
 
 public class ObjectBoundary {
 	
@@ -70,9 +70,11 @@ public class ObjectBoundary {
 	}
 	public void setOurObject(OurObject ourObject) {
 		this.ourObject = ourObject;
-	} 
-    
-    
-    
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		ObjectBoundary other = (ObjectBoundary) obj;
+		return objectId.equals(other.objectId);
+	}
 }
