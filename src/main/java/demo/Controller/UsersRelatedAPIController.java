@@ -49,7 +49,7 @@ public class UsersRelatedAPIController {
 		UserBoundary user = retrieveUser(superapp, email);
 		user.setRole(updatedUser.getRole());
 		user.setUsername(updatedUser.getUsername());
-		user.setAvatar(updatedUser.getAvatar());
+//		user.setAvatar(updatedUser.getAvatar());
 		return user;
 	}
 

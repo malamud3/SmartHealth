@@ -68,23 +68,4 @@ public class AdminRelatedAPIController
     {
         return new MiniAppCommandBoundary[2];
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
