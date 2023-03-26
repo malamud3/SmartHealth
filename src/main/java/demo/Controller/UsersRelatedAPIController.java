@@ -49,23 +49,23 @@ public class UsersRelatedAPIController {
 		UserBoundary user = retrieveUser(superapp, email);
 		user.setRole(updatedUser.getRole());
 		user.setUsername(updatedUser.getUsername());
-//		user.setAvatar(updatedUser.getAvatar());
+		user.setAvatar(updatedUser.getAvatar());
 		return user;
 	}
 
 	// POST: Create USER
 	@RequestMapping(
-			path = {"/lisuperapp/users"},
+			path = {"/superapp/users"},
 			method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public UserBoundary createUser(@PathVariable("superapp") String superapp, @RequestBody UserBoundary user) {
+	public UserBoundary createUser(@RequestBody UserBoundary user) {
 		// TODO - create the new user in the database and return the new UserBoundary object
 		String email = user.getUserId().getEmail();
 		String role = user.getRole();
 		String username = user.getUsername();
 		String avatar = user.getAvatar();
 		UserBoundary newUser = new UserBoundary();
-		newUser.setUserId(new UserID(superapp, email));
+		newUser.setUserId(new UserID("superapp", email));
 		newUser.setRole(role);
 		newUser.setUsername(username);
 		newUser.setAvatar(avatar);

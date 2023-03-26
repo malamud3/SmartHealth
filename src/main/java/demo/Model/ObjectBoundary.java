@@ -1,6 +1,4 @@
-package demo;
-
-import demo.Model.UserID;
+package demo.Model;
 
 import java.util.Date;
 

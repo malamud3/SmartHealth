@@ -1,8 +1,5 @@
 package demo.Model;
 
-import demo.CommandId;
-import demo.ObjectID;
-
 import java.util.Date;
 import java.util.Map;
 
@@ -20,6 +17,12 @@ public class MiniAppCommandBoundary
     }
 
     public MiniAppCommandBoundary() {
+    }
+
+    public MiniAppCommandBoundary(String miniapp_name){
+        this.commandId.setMiniApp(miniapp_name);
+        this.commandId.setSuperapp("12");
+        this.commandId.setInternalCommandId("231");
     }
 
     public MiniAppCommandBoundary(CommandId commandId, String command, ObjectID targetObject, Date invocationTimestamp,

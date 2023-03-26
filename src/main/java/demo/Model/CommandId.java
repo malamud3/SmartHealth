@@ -1,4 +1,4 @@
-package demo;
+package demo.Model;
 
 public class CommandId {
     private String superapp;
@@ -8,8 +8,8 @@ public class CommandId {
     public CommandId() {
     }
 
-    public CommandId(String superapp, String miniApp, String internalCommandId) {
-        super();
+    public CommandId(String superapp, String miniApp, String internalCommandId)
+    {
         this.superapp = superapp;
         this.miniApp = miniApp;
         this.internalCommandId = internalCommandId;

@@ -1,8 +1,6 @@
 package demo.Model;
 
 
-import demo.ObjectID;
-
 public class UserID {
 	private String superApp;
 	private String email;

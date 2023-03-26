@@ -1,15 +1,13 @@
 package demo.Controller;
 
-import demo.Location;
-import demo.Model.UserBoundary;
+import demo.Model.Location;
 import demo.Model.UserID;
-import demo.ObjectBoundary;
-import demo.ObjectID;
-import demo.OurObject;
+import demo.Model.ObjectBoundary;
+import demo.Model.ObjectID;
+import demo.Model.OurObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 @RestController
@@ -33,9 +31,9 @@ public class SuperAppObjectsAPIController {
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
-	public ArrayList<UserBoundary> getAllObjects()
+	public  ObjectBoundary[] getAllObjects()
 	{
-		return new ArrayList<UserBoundary>();
+		return  new ObjectBoundary[2];
 	}
 
 
@@ -60,6 +58,27 @@ public class SuperAppObjectsAPIController {
 		// Return the created object to the client
 		return createdObject;
 	}
+
+
+	// PUT: Update Object
+	@RequestMapping(
+			path = {"/superapp/objects/{superapp}/{internalObjectid}"},
+			method = {RequestMethod.PUT},
+			consumes = {MediaType.APPLICATION_JSON_VALUE},
+			produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ObjectBoundary updateObject(@PathVariable("superapp") String superapp,
+									   @PathVariable("internalObjectid") String internalObjectid,
+									   @RequestBody ObjectBoundary objectBoundary) {
+		// Set the updated data in the ObjectBoundary object
+		objectBoundary.setObjectId(new ObjectID(superapp, internalObjectid));
+		objectBoundary.setAlias("updated-alias");
+		objectBoundary.setActive(false);
+		objectBoundary.setLocation(new Location(4.5678, 9.1234));
+
+		// Return the updated ObjectBoundary object to the client
+		return objectBoundary;
+	}
+
 }
 
 

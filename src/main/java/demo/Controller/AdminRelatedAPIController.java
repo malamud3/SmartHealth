@@ -3,12 +3,13 @@ package demo.Controller;
 import demo.Model.MiniAppCommandBoundary;
 import demo.Model.UserBoundary;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+@RestController
+
 
 public class AdminRelatedAPIController
 {
@@ -45,6 +46,8 @@ public class AdminRelatedAPIController
     }
 
 
+
+
     // GET: ALL MINI-APPS COMMANDS HISTORY
 
     @RequestMapping(
@@ -56,15 +59,15 @@ public class AdminRelatedAPIController
         return new MiniAppCommandBoundary[5];
     }
 
-
     // GET: Specific MINI-APPS COMMANDS HISTORY
 
     @RequestMapping(
             path ={"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},
-            produces = {MediaType.APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE}
+            ,consumes = {MediaType.APPLICATION_JSON_VALUE})
 
-    public MiniAppCommandBoundary[] getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp)
+    public MiniAppCommandBoundary[] getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp  )
     {
         return new MiniAppCommandBoundary[2];
     }

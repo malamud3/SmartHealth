@@ -2,10 +2,9 @@ package demo;
 
 
 import demo.Controller.AdminRelatedAPIController;
-import demo.Controller.HelloController;
 import demo.Controller.SuperAppObjectsAPIController;
 import demo.Controller.UsersRelatedAPIController;
-import demo.Model.Message;
+import demo.Model.ObjectBoundary;
 import demo.Model.UserBoundary;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class ApplicationTests {
 
-    @Autowired
-    private HelloController helloController;
+
     @Autowired
     private SuperAppObjectsAPIController superAppObjectsAPIController;
     @Autowired
     private UsersRelatedAPIController usersRelatedAPIController;
 
-    @Test
-    public void TestHelloRequest() throws Exception{
-        Message expected = new Message("lions");
-        Message actual = helloController.hello();
-        assertEquals(expected, actual);
-    }
+
     @Test
     public void TestRetrieveObject() throws Exception{
         String superapp = "2023b.Gil.Azani";
@@ -40,7 +33,7 @@ class ApplicationTests {
     @Test
     public void TestGetAllObjects() throws Exception{
         int expected = 0;
-        int actual = superAppObjectsAPIController.getAllObjects().size();
+        int actual = superAppObjectsAPIController.getAllObjects().length;
         assertEquals(expected, actual);
     }
     @Test
@@ -73,8 +66,8 @@ class ApplicationTests {
     public void TestCreateUser(){
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
-        UserBoundary expected = new UserBoundary(superApp, email);
-        UserBoundary actual = usersRelatedAPIController.createUser(superApp, expected);
+        UserBoundary expected = new UserBoundary("superapp", email);
+        UserBoundary actual = usersRelatedAPIController.createUser(expected);
         assertEquals(expected, actual);
     }
 
