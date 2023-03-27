@@ -19,7 +19,7 @@ public class MiniAppCommandApiController
             method = {RequestMethod.POST},
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Object invokeMiniApp(@PathVariable("miniappname") String miniAppName, @RequestBody MiniAppCommandBoundary miniAppCommand) {
+    public Map<String, Object> invokeMiniApp(@PathVariable("miniappname") String miniAppName, @RequestBody MiniAppCommandBoundary miniAppCommand) {
         if (miniAppName.equals("sample-miniapp")) {
             Map<String, Object> output = new HashMap<>();
             output.put("result", "success");

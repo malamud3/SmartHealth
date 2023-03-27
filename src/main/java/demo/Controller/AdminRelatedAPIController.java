@@ -41,7 +41,7 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/users"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public static List<UserBoundary> getAllUsers() {
+    public List<UserBoundary> getAllUsers() {
         return new ArrayList<UserBoundary>();
     }
 

@@ -12,9 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +26,11 @@ class ApplicationTests {
     @Autowired
     private UsersRelatedAPIController usersRelatedAPIController;
 
+    @Autowired
+    private MiniAppCommandApiController miniAppCommandApiController;
+
+    @Autowired
+    private AdminRelatedAPIController adminRelatedAPIController;
 
     @Test
     public void TestRetrieveObject() throws Exception{
@@ -65,7 +68,7 @@ class ApplicationTests {
     @Test
     public void TestGetAllUsers() throws Exception{
         int expected = 0;
-        int actual = AdminRelatedAPIController.getAllUsers().size();
+        int actual = adminRelatedAPIController.getAllUsers().size();
         assertEquals(expected, actual);
     }
 
@@ -73,12 +76,25 @@ class ApplicationTests {
     public void TestCreateUser(){
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
-        UserBoundary expected = new UserBoundary("superapp", email);
+        UserBoundary expected = new UserBoundary(superApp, email);
         UserBoundary actual = usersRelatedAPIController.createUser(expected);
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void TestExportAllMiniAppsHistory() {
 
+        int expected = 5;
+        int actual = adminRelatedAPIController.ExportAllMiniAppsHistory().length;
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void TestGetSpecificMiniAppHistory(){
+        String minApp = "sample-miniapp";
+        int expected = 2;
+        int actual = adminRelatedAPIController.getSpecificMiniAppHistory(minApp).length;
+        assertEquals(expected, actual);
+    }
     @Test
     public void TestDeleteAllUsers() {
         UsersRelatedAPIController controller = new UsersRelatedAPIController();
@@ -107,4 +123,22 @@ class ApplicationTests {
         controller.deleteAllObjects();
         assertEquals(0, actualObjects.size());
     }
+    @Test
+    public void TestUpdateObject() throws Exception{
+        String superApp = "2023b.Gil.Azani";
+        String internalObjectId = "object1";
+        String expected = "object2";
+        ObjectBoundary obj1 = new ObjectBoundary(superApp, internalObjectId);
+        ObjectBoundary actual = superAppObjectsAPIController.updateObject(superApp, expected, obj1);
+        assertEquals(expected, actual.getObjectId().getInternalObjectId());
+    }
+    @Test
+    public void TestInvokeMiniApp() throws Exception{
+        String miniAppName = "sample-miniapp";
+        MiniAppCommandBoundary miniAppCommand = new MiniAppCommandBoundary();
+        Map<String, Object> actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
+        assertEquals("success", actual.get("result"));
+    }
+
+
 }
