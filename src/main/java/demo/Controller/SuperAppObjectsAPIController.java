@@ -1,14 +1,12 @@
 package demo.Controller;
 
-import demo.Model.Location;
-import demo.Model.UserID;
-import demo.Model.ObjectBoundary;
-import demo.Model.ObjectID;
-import demo.Model.OurObject;
+import demo.Model.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 public class SuperAppObjectsAPIController {
@@ -31,11 +29,10 @@ public class SuperAppObjectsAPIController {
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
-	public  ObjectBoundary[] getAllObjects()
+	public  static List<ObjectBoundary> getAllObjects()
 	{
-		return  new ObjectBoundary[2];
+		return  new ArrayList<ObjectBoundary>();
 	}
-
 
 
 	//POST : Create an object
