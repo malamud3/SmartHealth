@@ -59,18 +59,15 @@ public class UsersRelatedAPIController {
 			method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public UserBoundary createUser(@RequestBody UserBoundary user) {
-		// TODO - create the new user in the database and return the new UserBoundary object
 		String email = user.getUserId().getEmail();
 		String role = user.getRole();
 		String username = user.getUsername();
 		String avatar = user.getAvatar();
 		UserBoundary newUser = new UserBoundary();
-		newUser.setUserId(new UserID("superapp", email));
+		newUser.setUserId(new UserID(user.getUserId().getSuperApp(), email));
 		newUser.setRole(role);
 		newUser.setUsername(username);
 		newUser.setAvatar(avatar);
-
-		// Return the new UserBoundary object
 		return newUser;
 	}
 
