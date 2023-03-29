@@ -1,13 +1,13 @@
-package demo;
+package SuperApp;
 
 
-import demo.Controller.AdminRelatedAPIController;
-import demo.Controller.MiniAppCommandApiController;
-import demo.Controller.SuperAppObjectsAPIController;
-import demo.Controller.UsersRelatedAPIController;
-import demo.Model.MiniAppCommandBoundary;
-import demo.Model.ObjectBoundary;
-import demo.Model.UserBoundary;
+import SuperApp.Controller.AdminRelatedAPIController;
+import SuperApp.Controller.MiniAppCommandApiController;
+import SuperApp.Controller.SuperAppObjectsAPIController;
+import SuperApp.Controller.UsersRelatedAPIController;
+import SuperApp.Model.MiniAppCommandBoundary;
+import SuperApp.Model.ObjectBoundary;
+import SuperApp.Model.UserBoundary;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

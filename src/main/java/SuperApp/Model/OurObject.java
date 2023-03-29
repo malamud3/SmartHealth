@@ -1,4 +1,4 @@
-package demo.Model;
+package SuperApp.Model;
 
 public class OurObject {
 	

@@ -1,7 +1,7 @@
-package demo.Controller;
+package SuperApp.Controller;
 
-import demo.Model.MiniAppCommandBoundary;
-import demo.Model.UserBoundary;
+import SuperApp.Model.MiniAppCommandBoundary;
+import SuperApp.Model.UserBoundary;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 

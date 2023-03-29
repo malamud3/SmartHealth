@@ -1,4 +1,4 @@
-package demo.Model;
+package SuperApp.Model;
 
 import java.util.Date;
 import java.util.Map;

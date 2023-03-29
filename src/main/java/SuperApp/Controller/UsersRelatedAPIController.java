@@ -1,12 +1,9 @@
-package demo.Controller;
+package SuperApp.Controller;
 
-import demo.Model.UserBoundary;
-import demo.Model.UserID;
+import SuperApp.Model.UserBoundary;
+import SuperApp.Model.UserID;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class UsersRelatedAPIController {

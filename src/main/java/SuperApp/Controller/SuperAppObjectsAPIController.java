@@ -1,6 +1,6 @@
-package demo.Controller;
+package SuperApp.Controller;
 
-import demo.Model.*;
+import SuperApp.Model.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
