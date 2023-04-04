@@ -35,13 +35,13 @@ public class UsersRelatedAPIController {
 
 	//PUT: Update USER
 	@RequestMapping(
-			path = {"/superapp/users/update/{superapp}/{email}"},
+			path = {"/superapp/users/{superapp}/{useremail}"},
 			method = {RequestMethod.PUT},
 			consumes = {MediaType.APPLICATION_JSON_VALUE},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
 	public UserBoundary updateUser(@PathVariable("superapp") String superapp,
-								   @PathVariable("email") String email,
+								   @PathVariable("useremail") String email,
 								   @RequestBody UserBoundary updatedUser) {
 		UserBoundary user = retrieveUser(superapp, email);
 		user.setRole(updatedUser.getRole());
