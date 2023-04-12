@@ -37,7 +37,7 @@ public class UsersRelatedAPIController {
 	@RequestMapping(
 			path = {"/superapp/users/{superapp}/{useremail}"},
 			method = {RequestMethod.PUT},
-			consumes = {MediaType.APPLICATION_JSON_VALUE},
+//			consumes = {MediaType.APPLICATION_JSON_VALUE},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
 	public UserBoundary updateUser(@PathVariable("superapp") String superapp,
