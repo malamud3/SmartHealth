@@ -14,10 +14,10 @@ public class ObjectServiceMockup implements ObjectsService
     private Map<String,SuperAppObjectEntity> dbMockup;
     private  String springAppName;
 
-    @Value("2023b.gil.azani")
-    public  void setSpringAppName(String springAppName)
-    {
-        this.springAppName = springAppName;
+    // this method injects a configuration value of spring
+    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
+    public void setSpringApplicationName(String springApplicationName) {
+        this.springAppName = springApplicationName;
     }
 
     @PostConstruct

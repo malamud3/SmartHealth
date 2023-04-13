@@ -1,12 +1,15 @@
 package SuperApp.Model;
 
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class UserID {
 	private String superApp;
 	private String email;
 	
 	public UserID() {
 	}
+
 
 	public UserID(String email) {
 		super();
