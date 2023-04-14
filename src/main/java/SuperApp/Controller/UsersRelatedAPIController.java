@@ -61,7 +61,7 @@ public class UsersRelatedAPIController {
 		String username = user.getUsername();
 		String avatar = user.getAvatar();
 		UserBoundary newUser = new UserBoundary();
-		newUser.setUserId(new UserID(user.getUserId().getSuperApp(), email));
+		newUser.setUserId(new UserID(user.getUserId().getSuperapp(), email));
 		newUser.setRole(role);
 		newUser.setUsername(username);
 		newUser.setAvatar(avatar);
