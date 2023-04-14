@@ -11,6 +11,7 @@ public class UserBoundary {
 
     public UserBoundary() {}
     
+    //check if constructor needed here
     public UserBoundary(String email) {
     	this.userID = new UserID(email);
     	
@@ -20,6 +21,7 @@ public class UserBoundary {
     	avatar = "avater.url"; 
     }
     
+  //check if constructor needed here
     public UserBoundary(String superapp, String email) {
     	this.userID = new UserID(superapp, email);
     	

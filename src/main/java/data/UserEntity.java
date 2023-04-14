@@ -1,7 +1,5 @@
 package data;
 
-import java.util.UUID;
-
 
 import SuperApp.Model.UserID;
 
@@ -10,36 +8,48 @@ import java.util.Optional;
 
 public class UserEntity {
 	
-	private UUID user_ID;
-	private UserRole role;//can change to enum
+	private String superapp;
+	private String email;
+	//private UserRole role;//can change to enum ?
+	private String role;
     private String username;
     private String avatar;
-    private UserType userType;
+    //private UserType userType; we don't have user type in boundary
     
     private List<UserEntity> connections; //TODO - check optional condition
 	
     
-    public UserEntity() {
+    public String getSuperapp() {
+		return superapp;
+	}
+
+
+	public void setSuperapp(String superapp) {
+		this.superapp = superapp;
+	}
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+	public UserEntity() {
 		super();
 	}
 
 
-	public UUID getUser_ID() {
-		return user_ID;
-	}
-
-
-	public void setUser_ID(UUID user_ID) {
-		this.user_ID = user_ID;
-	}
-
-
-	public UserRole getRole() {
+	public String getRole() {
 		return role;
 	}
 
 
-	public void setRole(UserRole role) {
+	public void setRole(String role) {
 		this.role = role;
 	}
 

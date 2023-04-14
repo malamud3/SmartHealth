@@ -8,7 +8,7 @@ public class RecipeEntity {
 	
 	private HashMap<IngridientEntity, AmountEntity> ingridients;
 	
-	private List<GenreEntity> genres;
+	//private List<GenreEntity> genres; - Genre deleted
 
 	public RecipeEntity() {
 		super();
@@ -38,13 +38,15 @@ public class RecipeEntity {
 		this.ingridients = ingridients;
 	}
 
-	public List<GenreEntity> getGenres() {
-		return genres;
-	}
-
-	public void setGenres(List<GenreEntity> genres) {
-		this.genres = genres;
-	}	
+	
+	//Genre deleted
+//	public List<GenreEntity> getGenres() {
+//		return genres;
+//	}
+//
+//	public void setGenres(List<GenreEntity> genres) {
+//		this.genres = genres;
+//	}	
 	
 	
 	

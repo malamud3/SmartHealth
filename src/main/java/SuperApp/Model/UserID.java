@@ -1,10 +1,7 @@
 package SuperApp.Model;
 
-
-import org.springframework.beans.factory.annotation.Value;
-
 public class UserID {
-	private String superApp;
+	private String superapp;
 	private String email;
 	
 	public UserID() {
@@ -14,21 +11,21 @@ public class UserID {
 	public UserID(String email) {
 		super();
 		this.email = email;
-		this.superApp = "2023b.Gil.Azani"; //TODO change to constant!
+		this.superapp = "2023b.Gil.Azani"; //TODO change to constant!
 	}
 	
 	public UserID(String superapp, String email) {
 		super();
 		this.email = email;
-		this.superApp = superapp;
+		this.superapp = superapp;
 	}
 
-	public String getSuperApp() {
-		return superApp;
+	public String getSuperapp() {
+		return superapp;
 	}
 	
-	public void setSuperApp(String superApp) {
-		this.superApp = superApp;
+	public void setSuperapp(String superapp) {
+		this.superapp = superapp;
 	}
 	
 	public String getEmail() {
@@ -42,6 +39,6 @@ public class UserID {
 	@Override
 	public boolean equals(Object obj){
 		UserID other = (UserID) obj;
-		return this.email.equals(other.email) && this.superApp.equals(other.superApp);
+		return this.email.equals(other.email) && this.superapp.equals(other.superapp);
 	}
 }
