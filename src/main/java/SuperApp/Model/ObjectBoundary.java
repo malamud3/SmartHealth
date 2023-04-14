@@ -1,6 +1,7 @@
 package SuperApp.Model;
 
 import java.util.Date;
+import java.util.Map;
 
 public class ObjectBoundary {
 	
@@ -10,8 +11,21 @@ public class ObjectBoundary {
     private Boolean active;
     private Date creationTimestamp;
     private Location location;
-    private UserID createdBy; 
-    private OurObject ourObject;
+    private UserID createdBy;
+
+	private Map<String , ObjectBoundary> allObjects;
+
+	public Map<String, ObjectBoundary> getAllObjects() {
+		return allObjects;
+	}
+
+	public void setAllObjects(Map<String, ObjectBoundary> allObjects) {
+		this.allObjects = allObjects;
+	}
+
+	private OurObject ourObject;
+
+
   
     
 	public ObjectBoundary(String superapp,String internalObjectId) {

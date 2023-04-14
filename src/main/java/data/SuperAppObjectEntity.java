@@ -3,6 +3,7 @@ package data;
 import SuperApp.Model.*;
 
 import java.util.Date;
+import java.util.Map;
 
 public class SuperAppObjectEntity{
 
@@ -13,13 +14,31 @@ public class SuperAppObjectEntity{
     private Date creationTimestamp;
     private Location location;
     private UserID createdBy;
+
+
+    private Map <String , ObjectBoundary> allObjects;
+
+    public void setAllObjects(Map<String, ObjectBoundary> allObjects) {
+        this.allObjects = allObjects;
+    }
+
+    public Map<String, ObjectBoundary> getAllObjects() {
+        return allObjects;
+    }
+
     private OurObject ourObject;
+
 
 
     public SuperAppObjectEntity(String superapp,String internalObjectId) {
         objectId = new ObjectID(superapp, internalObjectId);
 
     }
+
+    public SuperAppObjectEntity() {
+
+    }
+
     public void SuperAppObjectEntity() {
 
     }
