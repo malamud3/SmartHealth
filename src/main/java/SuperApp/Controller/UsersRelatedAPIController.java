@@ -1,21 +1,18 @@
 package SuperApp.Controller;
 
 import SuperApp.Model.UserBoundary;
-import SuperApp.Model.UserID;
-
 import SuperApp.Model.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import SuperApp.Mockup.UsersServiceMockup;
 
 @RestController
 public class UsersRelatedAPIController {
 	private UsersService usersService;
 	
 	@Autowired
-	public UsersRelatedAPIController(UsersServiceMockup usersService) {
+	public UsersRelatedAPIController(UsersService usersService) {
 		super();
 		this.usersService = usersService;
 	}
@@ -34,33 +31,19 @@ public class UsersRelatedAPIController {
 
 	}
 
-	// GET: USER
-	@RequestMapping(
-			path = {"/superapp/users/{superapp}/{email}"},
-			method = {RequestMethod.GET},
-			produces = {MediaType.APPLICATION_JSON_VALUE})
-	public UserBoundary retrieveUser(@PathVariable("superapp") String superapp,@PathVariable("email") String email) {
-		return new UserBoundary(superapp,email);
-	}
-
-
-
 
 	//PUT: Update USER
 	@RequestMapping(
-			path = {"/superapp/users/{superapp}/{useremail}"},
+			path = {"/superapp/users/{superapp}/{userEmail}"},
 			method = {RequestMethod.PUT},
-//			consumes = {MediaType.APPLICATION_JSON_VALUE},
+			consumes = {MediaType.APPLICATION_JSON_VALUE},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
 	public UserBoundary updateUser(@PathVariable("superapp") String superapp,
-								   @PathVariable("useremail") String email,
+								   @PathVariable("userEmail") String email,
 								   @RequestBody UserBoundary updatedUser) {
-		UserBoundary user = retrieveUser(superapp, email);
-		user.setRole(updatedUser.getRole());
-		user.setUsername(updatedUser.getUsername());
-		user.setAvatar(updatedUser.getAvatar());
-		return user;
+		
+		return usersService.updateUser(superapp, email, updatedUser);
 	}
 
 	// POST: Create USER
@@ -69,16 +52,8 @@ public class UsersRelatedAPIController {
 			method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public UserBoundary createUser(@RequestBody UserBoundary user) {
-		String email = user.getUserId().getEmail();
-		String role = user.getRole();
-		String username = user.getUsername();
-		String avatar = user.getAvatar();
-		UserBoundary newUser = new UserBoundary();
-		newUser.setUserId(new UserID(user.getUserId().getSuperapp(), email));
-		newUser.setRole(role);
-		newUser.setUsername(username);
-		newUser.setAvatar(avatar);
-		return newUser;
+		
+		return usersService.createUser(user);
 	}
 
 }

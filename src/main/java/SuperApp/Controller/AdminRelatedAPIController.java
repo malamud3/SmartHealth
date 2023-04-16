@@ -30,15 +30,18 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
     public void deleteAllUsers() {
+    	
+    	userService.deleteAllUsers();
 
-        // do nothing
     }
 
     @RequestMapping(
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
     public void deleteAllObjects() {
-        // do nothing
+        
+    	objectsService.deleteAllObjects();
+    	
     }
 
 
@@ -46,7 +49,9 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.DELETE})
     public void deleteAllCommands() {
-        // do nothing
+    	
+    	miniAppCommandService.deleteAllCommands();
+        
     }
 
 
@@ -56,33 +61,33 @@ public class AdminRelatedAPIController
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<UserBoundary> getAllUsers() {
-        return new ArrayList<UserBoundary>();
+        
+    	return userService.getAllUsers();
     }
 
 
 
 
     // GET: ALL MINI-APPS COMMANDS HISTORY
-
     @RequestMapping(
             path ={"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public MiniAppCommandBoundary[] ExportAllMiniAppsHistory()
+    public List<MiniAppCommandBoundary> ExportAllMiniAppsHistory()
     {
-        return new MiniAppCommandBoundary[5];
+        return miniAppCommandService.getAllCommands();
     }
 
+    
     // GET: Specific MINI-APPS COMMANDS HISTORY
-
     @RequestMapping(
             path ={"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE}
             ,consumes = {MediaType.APPLICATION_JSON_VALUE})
 
-    public MiniAppCommandBoundary[] getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp  )
+    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp  )
     {
-        return new MiniAppCommandBoundary[2];
+        return miniAppCommandService.getAllMiniAppCommands(miniapp);
     }
 }
