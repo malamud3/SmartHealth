@@ -33,14 +33,7 @@ class ApplicationTests {
     @Autowired
     private AdminRelatedAPIController adminRelatedAPIController;
 
-    @Test
-    public void TestRetrieveObject() throws Exception{
-        String superapp = "2023b.Gil.Azani";
-        String internalObjectId = "INTERNAL_ID";
-        ObjectBoundary expected = new ObjectBoundary(superapp, internalObjectId);
-        ObjectBoundary actual = superAppObjectsAPIController.retrieveObject(superapp, internalObjectId);
-        assertEquals(expected, actual);
-    }
+
     @Test
     public void TestGetAllObjects() throws Exception{
         int expected = 0;
@@ -98,16 +91,6 @@ class ApplicationTests {
     }
 
 
-
-    @Test
-    public void TestUpdateObject() throws Exception{
-        String superApp = "2023b.Gil.Azani";
-        String internalObjectId = "object1";
-        String expected = "object2";
-        ObjectBoundary obj1 = new ObjectBoundary(superApp, internalObjectId);
-        ObjectBoundary actual = superAppObjectsAPIController.updateObject(superApp, expected, obj1);
-        assertEquals(expected, actual.getObjectId().getInternalObjectId());
-    }
     @Test
     public void TestInvokeMiniApp() throws Exception{
         String miniAppName = "sample-miniapp";

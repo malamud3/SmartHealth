@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class SuperAppObjectsAPIController {
@@ -27,10 +26,10 @@ public class SuperAppObjectsAPIController {
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 	
-	public ObjectBoundary retrieveObject(@PathVariable("superapp") String superapp,
-			@PathVariable("internalObjectId") String internalObjectId)
+	public Optional<Object> retrieveObject(@PathVariable("superapp") String superapp,
+										   @PathVariable("internalObjectId") String internalObjectId)
 	{
-		return new ObjectBoundary(superapp,internalObjectId);
+		return objectsService.getSpecificObject(superapp,internalObjectId);
 		
 	}
 
@@ -40,9 +39,9 @@ public class SuperAppObjectsAPIController {
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
-	public  static List<ObjectBoundary> getAllObjects()
+	public  List<ObjectBoundary> getAllObjects()
 	{
-		return  new ArrayList<ObjectBoundary>();
+		return  objectsService.getAllObjects();
 	}
 
 
@@ -52,19 +51,10 @@ public class SuperAppObjectsAPIController {
 			method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public ObjectBoundary createObject(@RequestBody ObjectBoundary objectBoundary) {
-		// Create a new object with hardcoded data
-		ObjectBoundary createdObject = new ObjectBoundary();
-		createdObject.setObjectId(new ObjectID("hardcoded-superapp", "12345"));
-		createdObject.setType("hardcoded-type");
-		createdObject.setAlias("hardcoded-alias");
-		createdObject.setActive(true);
-		createdObject.setCreationTimestamp(new Date());
-		createdObject.setLocation(new Location(3.124 , 3.5656));
-		createdObject.setCreatedBy(new UserID("hardcoded-user"));
-		createdObject.setOurObject(new OurObject("hardcoded-ourobject"));
+		// Create a new object
 
-		// Return the created object to the client
-		return createdObject;
+		return objectsService.createObject(objectBoundary);
+
 	}
 
 
@@ -74,17 +64,12 @@ public class SuperAppObjectsAPIController {
 			method = {RequestMethod.PUT},
 			consumes = {MediaType.APPLICATION_JSON_VALUE},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ObjectBoundary updateObject(@PathVariable("superapp") String superapp,
+	public void updateObject(@PathVariable("superapp") String superapp,
 									   @PathVariable("internalObjectid") String internalObjectid,
 									   @RequestBody ObjectBoundary objectBoundary) {
-		// Set the updated data in the ObjectBoundary object
-		objectBoundary.setObjectId(new ObjectID(superapp, internalObjectid));
-		objectBoundary.setAlias("updated-alias");
-		objectBoundary.setActive(false);
-		objectBoundary.setLocation(new Location(4.5678, 9.1234));
 
-		// Return the updated ObjectBoundary object to the client
-		return objectBoundary;
+		objectsService.updateObject(superapp, internalObjectid, objectBoundary);
+
 	}
 
 }
