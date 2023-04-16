@@ -8,6 +8,7 @@ import SuperApp.Controller.UsersRelatedAPIController;
 import SuperApp.Model.MiniAppCommandBoundary;
 import SuperApp.Model.ObjectBoundary;
 import SuperApp.Model.UserBoundary;
+import SuperApp.data.MiniAppCommandEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -111,9 +112,8 @@ class ApplicationTests {
     public void TestInvokeMiniApp() throws Exception{
         String miniAppName = "sample-miniapp";
         MiniAppCommandBoundary miniAppCommand = new MiniAppCommandBoundary();
-        Map<String, Object> actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
-        assertEquals("success", actual.get("result"));
+        Object actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
+        assertEquals(miniAppName, ((MiniAppCommandEntity) actual).getCommandId().getMiniApp());
     }
-
 
 }
