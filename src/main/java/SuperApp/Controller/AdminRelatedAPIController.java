@@ -1,7 +1,7 @@
 package SuperApp.Controller;
 
-import SuperApp.Model.MiniAppCommandBoundary;
-import SuperApp.Model.UserBoundary;
+import SuperApp.Model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,12 +11,26 @@ import java.util.List;
 @RestController
 
 
+
 public class AdminRelatedAPIController
 {
+    private UsersService userService;
+    private MiniAppCommandService miniAppCommandService;
+    private ObjectsService objectsService;
+
+    @Autowired
+    public AdminRelatedAPIController(UsersService userService,MiniAppCommandService miniAppCommandService,ObjectsService objectsService) {
+        this.userService = userService;
+        this.miniAppCommandService=miniAppCommandService;
+        this.objectsService=objectsService;
+
+    }
+
     @RequestMapping(
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
     public void deleteAllUsers() {
+
         // do nothing
     }
 
