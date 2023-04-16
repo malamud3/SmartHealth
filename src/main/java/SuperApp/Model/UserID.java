@@ -5,13 +5,14 @@ public class UserID {
 	private String email;
 	
 	public UserID() {
+		
 	}
 
 
 	public UserID(String email) {
 		super();
 		this.email = email;
-		this.superapp = "2023b.Gil.Azani"; //TODO change to constant!
+		this.superapp = "2023b.Gil.Azani"; //TODO change to constant
 	}
 	
 	public UserID(String superapp, String email) {

@@ -63,7 +63,7 @@ public class UsersServiceMockup implements UsersService {
 		
 		UserEntity existing = this.dbMockup.get(userKey);
 		if (existing == null) {
-			throw new RuntimeException("Could not find message by id: " + userKey);
+			throw new RuntimeException("Could not find user by id: " + userKey);
 		}
 		boolean dirtyFlag = false;
 		

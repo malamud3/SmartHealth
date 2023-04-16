@@ -2,11 +2,23 @@ package SuperApp.Controller;
 
 import SuperApp.Model.UserBoundary;
 import SuperApp.Model.UserID;
+import demo.logic.DataManager;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import Logic.Mockup.UsersServiceMockup;
+
 @RestController
 public class UsersRelatedAPIController {
+	private UsersServiceMockup userDataManager;
+	
+	@Autowired
+	public UsersRelatedAPIController(UsersServiceMockup userDataManager) {
+		super();
+		this.userDataManager = userDataManager;
+	}
 
 	//GET : USER LOGIN
 	@RequestMapping(
@@ -17,7 +29,8 @@ public class UsersRelatedAPIController {
 	public UserBoundary validuser(@PathVariable("superapp") String superapp,
 								  @PathVariable("email") String email)
 	{
-		return new UserBoundary(superapp, email);
+		return this.userDataManager.login(superapp, email)
+				.orElseThrow(()->new RuntimeException("could not find user with id: " + superapp + "_" + email));
 
 	}
 
