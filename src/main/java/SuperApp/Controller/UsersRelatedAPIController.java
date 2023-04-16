@@ -2,22 +2,22 @@ package SuperApp.Controller;
 
 import SuperApp.Model.UserBoundary;
 import SuperApp.Model.UserID;
-import demo.logic.DataManager;
 
+import SuperApp.Model.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import Logic.Mockup.UsersServiceMockup;
+import SuperApp.Mockup.UsersServiceMockup;
 
 @RestController
 public class UsersRelatedAPIController {
-	private UsersServiceMockup userDataManager;
+	private UsersService usersService;
 	
 	@Autowired
-	public UsersRelatedAPIController(UsersServiceMockup userDataManager) {
+	public UsersRelatedAPIController(UsersServiceMockup usersService) {
 		super();
-		this.userDataManager = userDataManager;
+		this.usersService = usersService;
 	}
 
 	//GET : USER LOGIN
@@ -29,7 +29,7 @@ public class UsersRelatedAPIController {
 	public UserBoundary validuser(@PathVariable("superapp") String superapp,
 								  @PathVariable("email") String email)
 	{
-		return this.userDataManager.login(superapp, email)
+		return this.usersService.login(superapp, email)
 				.orElseThrow(()->new RuntimeException("could not find user with id: " + superapp + "_" + email));
 
 	}
@@ -80,10 +80,5 @@ public class UsersRelatedAPIController {
 		newUser.setAvatar(avatar);
 		return newUser;
 	}
-
-
-
-
-
 
 }

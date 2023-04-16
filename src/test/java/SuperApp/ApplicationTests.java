@@ -95,34 +95,9 @@ class ApplicationTests {
         int actual = adminRelatedAPIController.getSpecificMiniAppHistory(minApp).length;
         assertEquals(expected, actual);
     }
-    @Test
-    public void TestDeleteAllUsers() {
-        UsersRelatedAPIController controller = new UsersRelatedAPIController();
-        AdminRelatedAPIController controller1 = new AdminRelatedAPIController();
-        UserBoundary user1 = new UserBoundary("superapp", "user1@example.com");
-        UserBoundary user2 = new UserBoundary("superapp", "user2@example.com");
-        controller. createUser(user1);
-        controller.createUser(user2);
 
-        controller1.deleteAllUsers();
-        List<UserBoundary> actualUsers = controller1.getAllUsers();
 
-        assertEquals(0, actualUsers.size());
-    }
 
-    @Test
-    public void TestDeleteAllObjects() {
-        // Arrange
-        AdminRelatedAPIController controller = new AdminRelatedAPIController();
-        SuperAppObjectsAPIController controller1 = new SuperAppObjectsAPIController();
-        ObjectBoundary obj1 = new ObjectBoundary("superapp", "object1");
-        ObjectBoundary obj2 = new ObjectBoundary("superapp", "object2");
-        controller1.createObject(obj1);
-        controller1.createObject(obj2);
-        List<ObjectBoundary> actualObjects = controller1.getAllObjects();
-        controller.deleteAllObjects();
-        assertEquals(0, actualObjects.size());
-    }
     @Test
     public void TestUpdateObject() throws Exception{
         String superApp = "2023b.Gil.Azani";

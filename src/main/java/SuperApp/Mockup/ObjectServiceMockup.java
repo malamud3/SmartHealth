@@ -1,14 +1,16 @@
-package Logic.Mockup;
+package SuperApp.Mockup;
 
 import SuperApp.Model.ObjectBoundary;
 import SuperApp.Model.ObjectID;
 import SuperApp.Model.ObjectsService;
-import data.SuperAppObjectEntity;
+import SuperApp.data.SuperAppObjectEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class ObjectServiceMockup implements ObjectsService {
 
     private Map<String, SuperAppObjectEntity> dbMockup;

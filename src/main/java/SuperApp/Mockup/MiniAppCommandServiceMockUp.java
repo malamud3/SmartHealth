@@ -1,13 +1,14 @@
-package Logic.Mockup;
+package SuperApp.Mockup;
 
 import SuperApp.Model.*;
-import data.MiniAppCommandEntity;
+import SuperApp.data.MiniAppCommandEntity;
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
     private Map<String, MiniAppCommandEntity> dbMockup;

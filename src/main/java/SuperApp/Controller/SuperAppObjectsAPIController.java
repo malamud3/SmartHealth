@@ -1,6 +1,7 @@
 package SuperApp.Controller;
 
 import SuperApp.Model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,17 @@ import java.util.List;
 
 @RestController
 public class SuperAppObjectsAPIController {
-	
+
+
+	private ObjectsService objectsService;
+
+	@Autowired
+	public SuperAppObjectsAPIController(ObjectsService objectsService) {
+		this.objectsService = objectsService;
+
+	}
+
+
 	@RequestMapping(
 			path = {"/superapp/objects/{superapp}/{internalObjectId}"},
 			method = {RequestMethod.GET},

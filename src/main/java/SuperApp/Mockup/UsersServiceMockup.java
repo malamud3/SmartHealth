@@ -1,4 +1,4 @@
-package Logic.Mockup;
+package SuperApp.Mockup;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import SuperApp.Model.UserBoundary;
 import SuperApp.Model.UserID;
 import SuperApp.Model.UsersService;
-import data.UserEntity;
+import SuperApp.data.UserEntity;
 import jakarta.annotation.PostConstruct;
 
 @Service

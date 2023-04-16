@@ -1,10 +1,7 @@
-package data;
+package SuperApp.data;
 
-
-import SuperApp.Model.UserID;
 
 import java.util.List;
-import java.util.Optional;
 
 public class UserEntity {
 	

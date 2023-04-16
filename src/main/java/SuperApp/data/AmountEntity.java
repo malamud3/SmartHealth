@@ -1,4 +1,4 @@
-package data;
+package SuperApp.data;
 
 public class AmountEntity {
 	private String amountType;
