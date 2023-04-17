@@ -35,7 +35,7 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         if (MiniAppCommandBoundary.getCommand() == null) {
             throw new RuntimeException("Command is missing");
         }
-        if (MiniAppCommandBoundary.getCommandAttributed() == null) {
+        if (MiniAppCommandBoundary.getCommandAttributes() == null) {
             throw new RuntimeException("Command attributes are missing");
         }
         if (MiniAppCommandBoundary.getCommandId() == null) {
@@ -44,10 +44,10 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         if (MiniAppCommandBoundary.getCommand() == null) {
             throw new RuntimeException("Command details are missing");
         }
-        if (MiniAppCommandBoundary.getInvokcationTimeStap() == null) {
+        if (MiniAppCommandBoundary.getInvocationTimestamp() == null) {
             throw new RuntimeException("Invocation timestamp is missing");
         }
-        if (MiniAppCommandBoundary.getInvokedby() == null) {
+        if (MiniAppCommandBoundary.getInvokedBy() == null) {
             throw new RuntimeException("Invoked by is missing");
         }
         if (MiniAppCommandBoundary.getTargetObject() == null) {
@@ -74,7 +74,7 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         List<MiniAppCommandBoundary> rv = new ArrayList<>();
         return allminiAppCommand
                 .stream() // Stream<MessageEntity>
-                .filter(obj->obj.getCommandId().getMiniApp().equalsIgnoreCase(miniAppName))
+                .filter(obj->obj.getCommandId().getMiniapp().equalsIgnoreCase(miniAppName))
                 .toList();
     }
 
@@ -91,8 +91,8 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         boundary.setCommandId(entity.getCommandId());
         boundary.setCommand(entity.getCommand());
         boundary.setTargetObject(entity.getTargetObject());
-        boundary.setInvokcationTimeStap(entity.getInvokcationTimeStap());
-        boundary.setInvokedby(entity.getInvokedby());
+        boundary.setInvocationTimestamp(entity.getInvocationTimestamp());
+        boundary.setInvokedBy(entity.getInvokedBy());
 
         return boundary;
     }
@@ -123,17 +123,17 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
             entity.setTargetObject(obj.getTargetObject());
 
 
-        if (obj.getInvokedby() == null) {
-            entity.setInvokedby(new UserId());
+        if (obj.getInvokedBy() == null) {
+            entity.setInvokedBy(new UserId());
         }else {
-            entity.setInvokedby(obj.getInvokedby());
+            entity.setInvokedBy(obj.getInvokedBy());
         }
 
         //Date
-        entity.setInvokcationTimeStap(obj.getInvokcationTimeStap());
+        entity.setInvocationTimestamp(obj.getInvocationTimestamp());
 
         //Data
-        entity.setCommandAttributed(obj.getCommandAttributed());
+        entity.setCommandAttributes(obj.getCommandAttributes());
 
         return entity;
     }

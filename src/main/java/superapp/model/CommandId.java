@@ -2,16 +2,16 @@ package superapp.model;
 
 public class CommandId {
     private String superapp;
-    private String miniApp;
+    private String miniapp;
     private String internalCommandId;
 
     public CommandId() {
     }
 
-    public CommandId(String superapp, String miniApp, String internalCommandId)
+    public CommandId(String superapp, String miniapp, String internalCommandId)
     {
         this.superapp = superapp;
-        this.miniApp = miniApp;
+        this.miniapp = miniapp;
         this.internalCommandId = internalCommandId;
     }
 
@@ -21,11 +21,11 @@ public class CommandId {
     public void setSuperapp(String superapp) {
         this.superapp = superapp;
     }
-    public String getMiniApp() {
-        return miniApp;
+    public String getMiniapp() {
+        return miniapp;
     }
-    public void setMiniApp(String miniApp) {
-        this.miniApp = miniApp;
+    public void setMiniapp(String miniApp) {
+        this.miniapp = miniApp;
     }
     public String getInternalCommandId() {
         return internalCommandId;

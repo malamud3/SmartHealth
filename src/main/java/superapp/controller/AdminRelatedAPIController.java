@@ -31,6 +31,7 @@ public class AdminRelatedAPIController
     @RequestMapping(
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
+    
     public void deleteAllUsers() {
     	
     	userService.deleteAllUsers();
@@ -41,6 +42,7 @@ public class AdminRelatedAPIController
     @RequestMapping(
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
+    
     public void deleteAllObjects() {
         
     	objectsService.deleteAllObjects();
@@ -51,6 +53,7 @@ public class AdminRelatedAPIController
     @RequestMapping(
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.DELETE})
+    
     public void deleteAllCommands() {
     	
     	miniAppCommandService.deleteAllCommands();
@@ -63,6 +66,7 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/users"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    
     public List<UserBoundary> getAllUsers() {
         
     	return userService.getAllUsers();
@@ -76,18 +80,18 @@ public class AdminRelatedAPIController
             path ={"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    
     public List<MiniAppCommandBoundary> ExportAllMiniAppsHistory()
     {
         return miniAppCommandService.getAllCommands();
     }
 
     
-    //GET: Specific MiniApp Command History
+    //GET: Get Specific MiniApp Command History
     @RequestMapping(
             path ={"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},
-            produces = {MediaType.APPLICATION_JSON_VALUE}
-            ,consumes = {MediaType.APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE})
 
     public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp  )
     {

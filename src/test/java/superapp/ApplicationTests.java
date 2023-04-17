@@ -6,6 +6,7 @@ import superapp.controller.MiniAppCommandApiController;
 import superapp.controller.SuperAppObjectsAPIController;
 import superapp.controller.UsersRelatedAPIController;
 import superapp.model.MiniAppCommandBoundary;
+import superapp.model.NewUserBoundary;
 import superapp.model.ObjectBoundary;
 import superapp.model.UserBoundary;
 import superapp.data.MiniAppCommandEntity;
@@ -45,7 +46,7 @@ class ApplicationTests {
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
         UserBoundary expected = new UserBoundary(superApp, email);
-        UserBoundary actual = usersRelatedAPIController.validuser(superApp, email);
+        UserBoundary actual = usersRelatedAPIController.validUser(superApp, email);
         assertEquals(expected, actual);
     }
 
@@ -54,7 +55,7 @@ class ApplicationTests {
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
         UserBoundary expected = new UserBoundary(superApp, email);
-        UserBoundary actual = usersRelatedAPIController.retrieveUser(superApp, email);
+        UserBoundary actual = usersRelatedAPIController.validUser(superApp, email);
 
         assertEquals(expected, actual);
     }
@@ -70,23 +71,24 @@ class ApplicationTests {
     public void TestCreateUser(){
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
-        UserBoundary expected = new UserBoundary(superApp, email);
+        NewUserBoundary expected = new NewUserBoundary();
+        expected.setEmail(email);
         UserBoundary actual = usersRelatedAPIController.createUser(expected);
-        assertEquals(expected, actual);
+        assertEquals(expected.newUserBoundaryToUserBoundary(superApp), actual);
     }
 
     @Test
     public void TestExportAllMiniAppsHistory() {
 
         int expected = 5;
-        int actual = adminRelatedAPIController.ExportAllMiniAppsHistory().length;
+        int actual = adminRelatedAPIController.ExportAllMiniAppsHistory().size();
         assertEquals(expected, actual);
     }
     @Test
     public void TestGetSpecificMiniAppHistory(){
         String minApp = "sample-miniapp";
         int expected = 2;
-        int actual = adminRelatedAPIController.getSpecificMiniAppHistory(minApp).length;
+        int actual = adminRelatedAPIController.getSpecificMiniAppHistory(minApp).size();
         assertEquals(expected, actual);
     }
 
@@ -96,7 +98,7 @@ class ApplicationTests {
         String miniAppName = "sample-miniapp";
         MiniAppCommandBoundary miniAppCommand = new MiniAppCommandBoundary();
         Object actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
-        assertEquals(miniAppName, ((MiniAppCommandEntity) actual).getCommandId().getMiniApp());
+        assertEquals(miniAppName, ((MiniAppCommandEntity) actual).getCommandId().getMiniapp());
     }
 
 }

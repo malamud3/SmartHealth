@@ -11,7 +11,7 @@ public interface ObjectsService
 
         public ObjectBoundary updateObject(String obj , String internal_obj_id , ObjectBoundary update);
 
-        public Optional<Object> getSpecificObject (String obj , String internal_obj_id);
+        public Optional<ObjectBoundary> getSpecificObject (String obj , String internal_obj_id);
 
         public List<ObjectBoundary> getAllObjects();
 

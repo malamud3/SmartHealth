@@ -31,10 +31,10 @@ public class ObjectServiceMockup implements ObjectsService {
     @Override
     public ObjectBoundary createObject(ObjectBoundary obj) {
 
-        if (obj.getAllObjects() == null) {
-            obj.setAllObjects(new HashMap<>());
-        }
-        obj.getAllObjects().put(springAppName, obj);
+//        if (obj.getAllObjects() == null) {
+//            obj.setAllObjects(new HashMap<>());
+//        }
+//        obj.getAllObjects().put(springAppName, obj);
 
         SuperAppObjectEntity entity = this.boundaryToEntity(obj);
         entity.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
@@ -74,8 +74,8 @@ public class ObjectServiceMockup implements ObjectsService {
                 entity.setCreatedBy(update.getCreatedBy());
             dirtyFlag=true;
             }
-        if (update.getOurObject() != null) {
-                entity.setOurObject(update.getOurObject());
+        if (update.getObjectDetails() != null) {
+                entity.setObjectDetails(update.getObjectDetails());
             dirtyFlag=true;
             }
         if(update.getObjectId() != null){
@@ -91,7 +91,7 @@ public class ObjectServiceMockup implements ObjectsService {
 
 
     @Override
-    public Optional<Object> getSpecificObject(String superAppId, String internal_obj_id) {
+    public Optional<ObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
         SuperAppObjectEntity entity = this.dbMockup.get(superAppId);
         if (entity == null)
             return Optional.empty();
@@ -122,11 +122,11 @@ public class ObjectServiceMockup implements ObjectsService {
         obj.setActive(entity.getActive());
         obj.setCreatedBy(entity.getCreatedBy());
         obj.setAlias(entity.getAlias());
-        obj.setOurObject(entity.getOurObject());
+        obj.setObjectDetails(entity.getObjectDetails());
         obj.setCreationTimestamp(entity.getCreationTimestamp());
         obj.setType(entity.getType());
         obj.setLocation(entity.getLocation());
-        obj.setAllObjects(entity.getAllObjects());
+        //obj.setAllObjects(entity.getAllObjects());
         return obj;
     }
 
@@ -140,11 +140,11 @@ public class ObjectServiceMockup implements ObjectsService {
         rv.setActive(obj.getActive());
         rv.setLocation(obj.getLocation());
         rv.setType(obj.getType());
-        rv.setOurObject(obj.getOurObject());
+        rv.setObjectDetails(obj.getObjectDetails());
         rv.setAlias(obj.getAlias());
         rv.setCreatedBy(obj.getCreatedBy());
         rv.setCreationTimestamp(obj.getCreationTimestamp());
-        rv.setAllObjects(obj.getAllObjects());
+        //rv.setAllObjects(obj.getAllObjects());
 
         return rv;
     }

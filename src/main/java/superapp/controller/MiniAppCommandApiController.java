@@ -1,12 +1,7 @@
 package superapp.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import superapp.logic.mockup.MiniAppCommandServiceMockUp;
 import superapp.model.MiniAppCommandBoundary;
 import superapp.logic.MiniAppCommandService;
-import superapp.logic.ObjectsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +22,15 @@ public class MiniAppCommandApiController
     }
 
 
-    // POST: Invoke MiniApp command
+    //POST: Invoke MiniApp Command
     @RequestMapping(
-            path = {"/superapp/miniapp/{miniappname}"},
+            path = {"/superapp/miniapp/{miniAppName}"},
             method = {RequestMethod.POST},
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Object invokeMiniApp(@PathVariable("miniappname") String miniAppName, @RequestBody MiniAppCommandBoundary miniAppCommand) {
-        miniAppCommand.getCommandId().setMiniApp(miniAppName);
+    
+    public Object invokeMiniApp(@PathVariable("miniAppName") String miniAppName, @RequestBody MiniAppCommandBoundary miniAppCommand) {
+        miniAppCommand.getCommandId().setMiniapp(miniAppName);
         return miniAppCommandService.InvokeCommand(miniAppCommand);
     }
 

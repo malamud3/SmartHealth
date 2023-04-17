@@ -25,14 +25,26 @@ public class UsersRelatedAPIController {
 		super();
 		this.usersService = usersService;
 	}
+	
+	//POST: Create User
+	@RequestMapping(
+			path = {"/superapp/users"},
+			method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE},
+			produces = {MediaType.APPLICATION_JSON_VALUE})
+	
+	public UserBoundary createUser(@RequestBody NewUserBoundary user) {
+			
+	     return usersService.createUser(user.newUserBoundaryToUserBoundary(springAppName));
+	}
 
-	//GET : USER LOGIN
+	//GET: User Login And Retrieve User Details
 	@RequestMapping(
 			path = {"/superapp/users/login/{superapp}/{email}"},
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
-	public UserBoundary validuser(@PathVariable("superapp") String superapp,
+	public UserBoundary validUser(@PathVariable("superapp") String superapp,
 								  @PathVariable("email") String email)
 	{
 		return this.usersService.login(superapp, email)
@@ -41,28 +53,20 @@ public class UsersRelatedAPIController {
 	}
 
 
-	//PUT: Update USER
+	//PUT: Update User
 	@RequestMapping(
 			path = {"/superapp/users/{superapp}/{userEmail}"},
 			method = {RequestMethod.PUT},
-			consumes = {MediaType.APPLICATION_JSON_VALUE},
-			produces = {MediaType.APPLICATION_JSON_VALUE})
+			consumes = {MediaType.APPLICATION_JSON_VALUE})
+			/*produces = {MediaType.APPLICATION_JSON_VALUE} in the REST API 'update user' has no output
+			but the userService's method 'updatedUser' returns user boundary, so to avoid troubles this method doesn't return User
+			Boundary as a JSON*/  
 
-	public UserBoundary updateUser(@PathVariable("superapp") String superapp,
+	public void updateUser(@PathVariable("superapp") String superapp,
 								   @PathVariable("userEmail") String email,
 								   @RequestBody UserBoundary updatedUser) {
 		
-		return usersService.updateUser(superapp, email, updatedUser);
-	}
-
-	// POST: Create USER
-	@RequestMapping(
-			path = {"/superapp/users"},
-			method = {RequestMethod.POST},
-			consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public UserBoundary createUser(@RequestBody NewUserBoundary user) {
-		
-		return usersService.createUser(user.newUserBoundaryToUserBoundary(springAppName));
+		usersService.updateUser(superapp, email, updatedUser);
 	}
 
 }

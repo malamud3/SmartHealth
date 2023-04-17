@@ -106,12 +106,28 @@ public class UsersServiceMockup implements UsersService {
 		
 		UserEntity rv = new UserEntity();
 		
-		rv.setSuperapp(user.getUserId().getSuperapp());
-		rv.setEmail(user.getUserId().getEmail());
-		rv.setRole(user.getRole());
-		rv.setUsername(user.getUsername());
-		rv.setAvatar(user.getAvatar());
-		
+		if(user.getUserId() == null) {
+			rv.setSuperapp("");
+			rv.setEmail("");
+		}else {
+			rv.setSuperapp(user.getUserId().getSuperapp());
+			rv.setEmail(user.getUserId().getEmail());
+		}
+		if(user.getRole() == null) {
+			rv.setRole("");
+		}else {
+			rv.setRole(user.getRole());
+		}
+		if(user.getUsername() == null) {
+			rv.setUsername("");
+		}else {
+			rv.setUsername(user.getUsername());
+		}
+		if(user.getAvatar() == null) {
+			rv.setAvatar("");
+		}else {
+			rv.setAvatar(user.getAvatar());
+		}
 		return rv;
 		
 	}

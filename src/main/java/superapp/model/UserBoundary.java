@@ -4,7 +4,7 @@ package superapp.model;
 
 public class UserBoundary {
 	
-    private UserId userID;
+    private UserId userId;
     private String role;//can change to enum
     private String username;
     private String avatar;
@@ -13,7 +13,7 @@ public class UserBoundary {
     
     //check if constructor needed here
     public UserBoundary(String email) {
-    	this.userID = new UserId(email);
+    	this.userId = new UserId(email);
     	
     	//get from DB
     	role = "Student";
@@ -23,7 +23,7 @@ public class UserBoundary {
     
   //check if constructor needed here
     public UserBoundary(String superapp, String email) {
-    	this.userID = new UserId(superapp, email);
+    	this.userId = new UserId(superapp, email);
     	
     	//get from DB
     	role = "Student";
@@ -32,11 +32,11 @@ public class UserBoundary {
     }
 
 	public UserId getUserId() {
-		return userID;
+		return userId;
 	}
 
-	public void setUserId(UserId userID) {
-		this.userID = userID;
+	public void setUserId(UserId userId) {
+		this.userId = userId;
 	}
 
 	public String getRole() {
@@ -66,6 +66,6 @@ public class UserBoundary {
 	@Override
 	public boolean equals(Object obj){
 		UserBoundary other = (UserBoundary) obj;
-		return this.userID.equals(other.userID);
+		return this.userId.equals(other.userId);
 	}
 }

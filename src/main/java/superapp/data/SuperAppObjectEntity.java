@@ -14,19 +14,20 @@ public class SuperAppObjectEntity{
     private Date creationTimestamp;
     private Location location;
     private UserId createdBy;
+    private Map<String, Object> objectDetails;
+    
 
-
-    private Map <String , ObjectBoundary> allObjects;
-
-    public void setAllObjects(Map<String, ObjectBoundary> allObjects) {
-        this.allObjects = allObjects;
-    }
-
-    public Map<String, ObjectBoundary> getAllObjects() {
-        return allObjects;
-    }
-
-    private OurObject ourObject;
+//    private Map <String , ObjectBoundary> allObjects;
+//
+//    public void setAllObjects(Map<String, ObjectBoundary> allObjects) {
+//        this.allObjects = allObjects;
+//    }
+//
+//    public Map<String, ObjectBoundary> getAllObjects() {
+//        return allObjects;
+//    }
+//
+//    private OurObject ourObject;
 
 
 
@@ -87,17 +88,27 @@ public class SuperAppObjectEntity{
     public void setCreatedBy(UserId createdBy) {
         this.createdBy = createdBy;
     }
-    public OurObject getOurObject() {
-        return ourObject;
-    }
-    public void setOurObject(OurObject ourObject) {
-        this.ourObject = ourObject;
-    }
+//    public OurObject getOurObject() {
+//        return ourObject;
+//    }
+//    public void setOurObject(OurObject ourObject) {
+//        this.ourObject = ourObject;
+//    }
 
     @Override
     public boolean equals(Object obj) {
         ObjectBoundary other = (ObjectBoundary) obj;
         return objectId.equals(other.getObjectId());
     }
+
+	public Map<String, Object> getObjectDetails() {
+		return objectDetails;
+	}
+
+	public void setObjectDetails(Map<String, Object> objectDetails) {
+		this.objectDetails = objectDetails;
+	}
+
+
 
 }
