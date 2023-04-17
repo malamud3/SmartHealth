@@ -7,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -27,7 +26,8 @@ public class AdminRelatedAPIController
         this.objectsService=objectsService;
 
     }
-
+    
+    //DELETE: Delete All Users
     @RequestMapping(
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
@@ -36,7 +36,8 @@ public class AdminRelatedAPIController
     	userService.deleteAllUsers();
 
     }
-
+    
+    //DELETE: Delete All Objects
     @RequestMapping(
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
@@ -46,7 +47,7 @@ public class AdminRelatedAPIController
     	
     }
 
-
+    //DELETE: Delete All Commands History
     @RequestMapping(
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.DELETE})
@@ -57,7 +58,7 @@ public class AdminRelatedAPIController
     }
 
 
-    // GET: ALL USERS
+    //GET: Get All Users
     @RequestMapping(
             path = {"/superapp/admin/users"},
             method = {RequestMethod.GET},
@@ -70,7 +71,7 @@ public class AdminRelatedAPIController
 
 
 
-    // GET: ALL MINI-APPS COMMANDS HISTORY
+    //GET: Get All MiniApps Commands History
     @RequestMapping(
             path ={"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
@@ -81,7 +82,7 @@ public class AdminRelatedAPIController
     }
 
     
-    // GET: Specific MINI-APPS COMMANDS HISTORY
+    //GET: Specific MiniApp Command History
     @RequestMapping(
             path ={"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},

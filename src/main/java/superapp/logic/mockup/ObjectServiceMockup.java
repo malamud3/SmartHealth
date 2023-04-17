@@ -1,7 +1,7 @@
 package superapp.logic.mockup;
 
 import superapp.model.ObjectBoundary;
-import superapp.model.ObjectID;
+import superapp.model.ObjectId;
 import superapp.logic.ObjectsService;
 import superapp.data.SuperAppObjectEntity;
 import jakarta.annotation.PostConstruct;
@@ -37,7 +37,7 @@ public class ObjectServiceMockup implements ObjectsService {
         obj.getAllObjects().put(springAppName, obj);
 
         SuperAppObjectEntity entity = this.boundaryToEntity(obj);
-        entity.setObjectId(new ObjectID(springAppName, UUID.randomUUID().toString()));
+        entity.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
         entity.setCreationTimestamp(new Date());
 
         this.dbMockup.put(entity.getObjectId().getInternalObjectId(), entity);

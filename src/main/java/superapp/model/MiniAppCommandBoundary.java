@@ -7,9 +7,9 @@ public class MiniAppCommandBoundary
 {
     private CommandId commandId;
     private String command;
-    private ObjectID targetObject;
+    private ObjectId targetObject;
     private Date invokcationTimeStap;
-    private UserID invokedBy;
+    private UserId invokedBy;
     private Map<String, Object> commandAttributed; // key-value
 
     public CommandId getCommandId() {
@@ -25,8 +25,8 @@ public class MiniAppCommandBoundary
         this.commandId.setInternalCommandId("231");
     }
 
-    public MiniAppCommandBoundary(CommandId commandId, String command, ObjectID targetObject, Date invocationTimestamp,
-                                  UserID invokedBy, Map<String, Object> commandAttributes) {
+    public MiniAppCommandBoundary(CommandId commandId, String command, ObjectId targetObject, Date invocationTimestamp,
+                                  UserId invokedBy, Map<String, Object> commandAttributes) {
         this.commandId = commandId;
         this.command = command;
         this.targetObject = targetObject;
@@ -35,7 +35,7 @@ public class MiniAppCommandBoundary
         this.commandAttributed = commandAttributes;
     }
 
-    public MiniAppCommandBoundary(String command, ObjectID targetObject, Date invocationTimestamp, UserID invokedBy,
+    public MiniAppCommandBoundary(String command, ObjectId targetObject, Date invocationTimestamp, UserId invokedBy,
                                   Map<String, Object> commandAttributes) {
         this(null, command, targetObject, invocationTimestamp, invokedBy, commandAttributes);
     }
@@ -45,7 +45,7 @@ public class MiniAppCommandBoundary
         return command;
     }
 
-    public ObjectID getTargetObject() {
+    public ObjectId getTargetObject() {
         return targetObject;
     }
 
@@ -53,7 +53,7 @@ public class MiniAppCommandBoundary
         return invokcationTimeStap;
     }
 
-    public UserID getInvokedby() {
+    public UserId getInvokedby() {
         return invokedBy;
     }
 
@@ -70,7 +70,7 @@ public class MiniAppCommandBoundary
         this.command = command;
     }
 
-    public void setTargetObject(ObjectID targetObject) {
+    public void setTargetObject(ObjectId targetObject) {
         this.targetObject = targetObject;
     }
 
@@ -78,7 +78,7 @@ public class MiniAppCommandBoundary
         this.invokcationTimeStap = invokcationTimeStap;
     }
 
-    public void setInvokedby(UserID invokedby) {
+    public void setInvokedby(UserId invokedby) {
         this.invokedBy = invokedby;
     }
 

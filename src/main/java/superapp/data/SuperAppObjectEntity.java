@@ -7,13 +7,13 @@ import java.util.Map;
 
 public class SuperAppObjectEntity{
 
-    private ObjectID objectId;
+    private ObjectId objectId;
     private String type;
     private String alias;
     private Boolean active;
     private Date creationTimestamp;
     private Location location;
-    private UserID createdBy;
+    private UserId createdBy;
 
 
     private Map <String , ObjectBoundary> allObjects;
@@ -31,7 +31,7 @@ public class SuperAppObjectEntity{
 
 
     public SuperAppObjectEntity(String superapp,String internalObjectId) {
-        objectId = new ObjectID(superapp, internalObjectId);
+        objectId = new ObjectId(superapp, internalObjectId);
 
     }
 
@@ -45,10 +45,10 @@ public class SuperAppObjectEntity{
     }
     
     
-    public ObjectID getObjectId() {
+    public ObjectId getObjectId() {
         return objectId;
     }
-    public void setObjectId(ObjectID objectId) {
+    public void setObjectId(ObjectId objectId) {
         this.objectId = objectId;
     }
     public String getType() {
@@ -81,10 +81,10 @@ public class SuperAppObjectEntity{
     public void setLocation(Location location) {
         this.location = location;
     }
-    public UserID getCreatedBy() {
+    public UserId getCreatedBy() {
         return createdBy;
     }
-    public void setCreatedBy(UserID createdBy) {
+    public void setCreatedBy(UserId createdBy) {
         this.createdBy = createdBy;
     }
     public OurObject getOurObject() {

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import superapp.model.UserBoundary;
-import superapp.model.UserID;
+import superapp.model.UserId;
 import superapp.logic.UsersService;
 import superapp.data.UserEntity;
 import jakarta.annotation.PostConstruct;
@@ -120,7 +120,7 @@ public UserBoundary entityToBoundary (UserEntity user) {
 		
 		UserBoundary rv = new UserBoundary();
 		
-		rv.setUserId(new UserID(user.getSuperapp(), user.getEmail()));
+		rv.setUserId(new UserId(user.getSuperapp(), user.getEmail()));
 		rv.setRole(user.getRole());
 		rv.setUsername(user.getUsername());
 		rv.setAvatar(user.getAvatar());

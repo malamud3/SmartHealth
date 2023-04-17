@@ -1,8 +1,8 @@
 package superapp.data;
 
 import superapp.model.CommandId;
-import superapp.model.ObjectID;
-import superapp.model.UserID;
+import superapp.model.ObjectId;
+import superapp.model.UserId;
 
 import java.util.Date;
 import java.util.Map;
@@ -12,9 +12,9 @@ public class MiniAppCommandEntity {
 
     private CommandId commandId;
     private String command;
-    private ObjectID targetObject;
+    private ObjectId targetObject;
     private Date invokcationTimeStap;
-    private UserID invokedBy;
+    private UserId invokedBy;
     private Map<String, Object> commandAttributed; // key-value
 
     public CommandId getCommandId() {
@@ -30,8 +30,8 @@ public class MiniAppCommandEntity {
         this.commandId.setInternalCommandId("231");
     }
 
-    public MiniAppCommandEntity(CommandId commandId, String command, ObjectID targetObject, Date invocationTimestamp,
-                                  UserID invokedBy, Map<String, Object> commandAttributes) {
+    public MiniAppCommandEntity(CommandId commandId, String command, ObjectId targetObject, Date invocationTimestamp,
+                                  UserId invokedBy, Map<String, Object> commandAttributes) {
         this.commandId = commandId;
         this.command = command;
         this.targetObject = targetObject;
@@ -40,7 +40,7 @@ public class MiniAppCommandEntity {
         this.commandAttributed = commandAttributes;
     }
 
-    public MiniAppCommandEntity(String command, ObjectID targetObject, Date invocationTimestamp, UserID invokedBy,
+    public MiniAppCommandEntity(String command, ObjectId targetObject, Date invocationTimestamp, UserId invokedBy,
                                   Map<String, Object> commandAttributes) {
         this(null, command, targetObject, invocationTimestamp, invokedBy, commandAttributes);
     }
@@ -50,7 +50,7 @@ public class MiniAppCommandEntity {
         return command;
     }
 
-    public ObjectID getTargetObject() {
+    public ObjectId getTargetObject() {
         return targetObject;
     }
 
@@ -58,7 +58,7 @@ public class MiniAppCommandEntity {
         return invokcationTimeStap;
     }
 
-    public UserID getInvokedby() {
+    public UserId getInvokedby() {
         return invokedBy;
     }
 
@@ -75,7 +75,7 @@ public class MiniAppCommandEntity {
         this.command = command;
     }
 
-    public void setTargetObject(ObjectID targetObject) {
+    public void setTargetObject(ObjectId targetObject) {
         this.targetObject = targetObject;
     }
 
@@ -83,7 +83,7 @@ public class MiniAppCommandEntity {
         this.invokcationTimeStap = invokcationTimeStap;
     }
 
-    public void setInvokedby(UserID invokedby) {
+    public void setInvokedby(UserId invokedby) {
         this.invokedBy = invokedby;
     }
 

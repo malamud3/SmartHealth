@@ -1,14 +1,14 @@
 package superapp.model;
 
-public class ObjectID {
+public class ObjectId {
 	
 	private String superapp;
 	private String internalObjectId;
 	
-	public ObjectID() {
+	public ObjectId() {
 	}
 	
-	public ObjectID(String superapp,String internalObjectId) {
+	public ObjectId(String superapp,String internalObjectId) {
 		this.superapp = superapp;
 		this.internalObjectId = internalObjectId;
 	}
@@ -28,7 +28,7 @@ public class ObjectID {
 
 	@Override
 	public boolean equals(Object obj) {
-		ObjectID other = (ObjectID) obj;
+		ObjectId other = (ObjectId) obj;
 		return other.superapp.equals(this.superapp) && other.internalObjectId.equals(this.internalObjectId);
 	}
 }

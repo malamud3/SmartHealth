@@ -1,21 +1,21 @@
 package superapp.model;
 
-public class UserID {
+public class UserId {
 	private String superapp;
 	private String email;
 	
-	public UserID() {
+	public UserId() {
 		
 	}
 
 
-	public UserID(String email) {
+	public UserId(String email) {
 		super();
 		this.email = email;
 		this.superapp = "2023b.Gil.Azani"; //TODO change to constant
 	}
 	
-	public UserID(String superapp, String email) {
+	public UserId(String superapp, String email) {
 		super();
 		this.email = email;
 		this.superapp = superapp;
@@ -39,7 +39,7 @@ public class UserID {
 
 	@Override
 	public boolean equals(Object obj){
-		UserID other = (UserID) obj;
+		UserId other = (UserId) obj;
 		return this.email.equals(other.email) && this.superapp.equals(other.superapp);
 	}
 }

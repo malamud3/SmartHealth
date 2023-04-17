@@ -117,14 +117,14 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
 
         if (obj.getTargetObject() == null) {
-            entity.setTargetObject(new ObjectID());
+            entity.setTargetObject(new ObjectId());
         }
         else
             entity.setTargetObject(obj.getTargetObject());
 
 
         if (obj.getInvokedby() == null) {
-            entity.setInvokedby(new UserID());
+            entity.setInvokedby(new UserId());
         }else {
             entity.setInvokedby(obj.getInvokedby());
         }
