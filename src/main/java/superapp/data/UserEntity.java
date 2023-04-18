@@ -16,6 +16,8 @@ public class UserEntity {
     private List<UserEntity> connections; //TODO - check optional condition
 	
     
+    //TODO - find a way to get user miniapp origin and 'inject' it into userId 
+    
     public String getSuperapp() {
 		return superapp;
 	}
