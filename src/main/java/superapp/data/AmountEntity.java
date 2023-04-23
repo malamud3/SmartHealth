@@ -1,5 +1,4 @@
 package superapp.data;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 public class AmountEntity {
 	private String amountType;

@@ -19,11 +19,30 @@ services:
     image: mongo-express
     restart: always
     environment:
+      ME_CONFIG_MONGODB_URI: mongodb://rootuser:rootpass@mongodb:27017/mydatabase?authSource=admin
       ME_CONFIG_MONGODB_ADMINUSERNAME: rootuser
       ME_CONFIG_MONGODB_ADMINPASSWORD: rootpass
-      ME_CONFIG_MONGODB_SERVER: mongodb
     ports:
       - "8081:8081"
+    networks:
+      - mongodb_network
+
+  smart-health:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smart-health:latest
+    restart: always
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATA_MONGODB_DATABASE: mydatabase
+      SPRING_DATA_MONGODB_URI: mongodb+srv://amir:thisisok1234@bestsites.mtxy2.mongodb.net/mydatabase?retryWrites=true&w=majority
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      SPRING_DATA_MONGODB_USERNAME: rootuser
+      SPRING_DATA_MONGODB_PASSWORD: rootpass
+    depends_on:
+      - mongodb
     networks:
       - mongodb_network
 

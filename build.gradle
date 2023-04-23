@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.example'
 version = '0.0.3-SPRINT4'
-sourceCompatibility = '20'
+sourceCompatibility = '17'
 
 repositories {
 	mavenCentral()
