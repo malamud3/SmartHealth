@@ -23,8 +23,7 @@ public class UserEntity {
 	}
 
 	public UserEntity() {
-		this.userId.setSuperapp("");
-		this.userId.setEmail("");
+
 	}
 
 	public UserId getUserId() {
