@@ -6,28 +6,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import superapp.Boundary.User.UserBoundary;
+import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
 
+
+
 @Service
 
 public class UsersServiceMockup implements UsersService {
-	//private UserRepository userRepository;
+	private UserRepository userRepository;
 
 	private Map<String,UserEntity> dbMockup;
     private  String springAppName;
 
-//	@Autowired
-//	public UsersServiceMockup(UserRepository userRepository) {
-//		this.userRepository = userRepository;
-//	}
+	@Autowired
+	public UsersServiceMockup(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 
     // this method injects a configuration value of spring
@@ -47,9 +52,7 @@ public class UsersServiceMockup implements UsersService {
 	@Override
 	public UserBoundary createUser(UserBoundary user) {
 		UserEntity userEntity = this.boundaryToEntity(user);
-
-		this.dbMockup.put(userEntity.getUserId().getSuperapp() + "_" + userEntity.getUserId().getEmail()
-		, userEntity);
+			userEntity = this.userRepository.save(userEntity);
 
 		return this.entityToBoundary(userEntity);
 	}
@@ -58,11 +61,15 @@ public class UsersServiceMockup implements UsersService {
 	public Optional<UserBoundary> login(String userSuperApp, String userEmail) {
 		String userKey = userSuperApp + "_" + userEmail; //temp user key
 
-		UserEntity entity = this.dbMockup.get(userKey);
-		if (entity == null) {
+		Optional<UserEntity> entity = userRepository.findByEmail(userEmail);
+		if (entity.isPresent()){
+			System.out.println(" "+entity);
+		}
+//		UserEntity entity = this.dbMockup.get(userKey);
+		if (entity.get() == null) {
 			return Optional.empty();
 		}else {
-		    UserBoundary boundary = this.entityToBoundary(entity);
+		    UserBoundary boundary = this.entityToBoundary(entity.get());
 			return Optional.of(boundary);
 		}
 	}
@@ -70,22 +77,33 @@ public class UsersServiceMockup implements UsersService {
 	@Override
 	public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) {
 		String userKey = userSuperApp + "_" + userEmail; // temp user key
+
+
 		UserEntity existing = this.dbMockup.get(userKey);
-		UserBoundary userBoundary = new UserBoundary();
 
 		if (existing == null) {
 			throw new RuntimeException("Could not find user by id: " + userKey);
-		} else {
-			if(existing == null){
-				userBoundary = this.createUser(update);
-			}else if (update.getRole() != null && update.getUsername() != null && update.getAvatar() != null ) {
-				userBoundary = entityToBoundary(existing);
-				userBoundary.setRole(update.getRole());
-				userBoundary.setUsername(update.getUsername());
-				userBoundary.setAvatar(update.getAvatar());
-			}
-			return userBoundary;
 		}
+		boolean dirtyFlag = false;
+
+		if (update.getRole() != null) {
+			existing.setRole(UserRole.valueOf(update.getRole()));
+			dirtyFlag = true;
+		}
+
+		if (update.getUsername() != null) {
+			existing.setUsername(update.getUsername());
+			dirtyFlag = true;
+		}
+
+		if (update.getAvatar() != null) {
+			existing.setAvatar(update.getAvatar());
+			dirtyFlag = true;
+		}
+		if (dirtyFlag) {
+			this.dbMockup.put(userKey, existing);
+		}
+		return this.entityToBoundary(existing);
 	}
 
 
