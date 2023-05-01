@@ -1,4 +1,4 @@
-package superapp.model;
+package superapp.Boundary;
 
 public class CommandId {
     private String superapp;

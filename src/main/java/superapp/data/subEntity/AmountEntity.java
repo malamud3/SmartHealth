@@ -1,5 +1,6 @@
-package superapp.data;
-
+package superapp.data.subEntity;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.Document;
 public class AmountEntity {
 	private String amountType;
 	

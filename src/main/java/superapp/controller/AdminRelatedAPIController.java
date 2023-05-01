@@ -1,10 +1,13 @@
 package superapp.controller;
 
-import superapp.model.*;
-import superapp.logic.*;
+import superapp.Boundary.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import superapp.Boundary.User.UserBoundary;
+import superapp.logic.service.MiniAppCommandService;
+import superapp.logic.service.ObjectsService;
+import superapp.logic.service.UsersService;
 
 import java.util.List;
 

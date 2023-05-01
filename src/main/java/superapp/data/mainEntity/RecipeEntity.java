@@ -1,8 +1,14 @@
-package superapp.data;
+package superapp.data.mainEntity;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import superapp.data.subEntity.AmountEntity;
+import superapp.data.subEntity.IngridientEntity;
 
 import java.util.*;
-
+@Document
 public class RecipeEntity {
+	@Id
 	private UUID r_id;
 	private String name;
 	

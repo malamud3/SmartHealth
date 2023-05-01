@@ -1,8 +1,8 @@
 package superapp.data;
 
-import superapp.model.CommandId;
-import superapp.model.ObjectId;
-import superapp.model.UserId;
+import superapp.Boundary.CommandId;
+import superapp.Boundary.ObjectId;
+import superapp.Boundary.User.UserId;
 
 
 

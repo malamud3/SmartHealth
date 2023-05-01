@@ -1,8 +1,8 @@
-package superapp.logic;
+package superapp.logic.service;
 
 import java.util.List;
 
-import superapp.model.MiniAppCommandBoundary;
+import superapp.Boundary.MiniAppCommandBoundary;
 
 public interface MiniAppCommandService {
 

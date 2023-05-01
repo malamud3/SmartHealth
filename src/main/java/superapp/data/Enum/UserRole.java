@@ -1,5 +1,6 @@
 package superapp.data.Enum;
 
 public enum UserRole {
-	MINIAPP_USER, SUPERAPP_USER, ADMIN
+	CUSTOMER_USER, DIETITIAN_USER, ADMIN
 }
+

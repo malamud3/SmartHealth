@@ -1,7 +1,7 @@
 package superapp.controller;
 
-import superapp.model.*;
-import superapp.logic.ObjectsService;
+import superapp.Boundary.*;
+import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

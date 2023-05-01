@@ -1,10 +1,12 @@
 package superapp.data;
 
-import superapp.model.*;
+import org.springframework.data.mongodb.core.mapping.Document;
+import superapp.Boundary.*;
+import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
-
+@Document
 public class SuperAppObjectEntity{
 
     private ObjectId objectId;

@@ -1,8 +1,8 @@
 package superapp.logic.mockup;
 
-import superapp.model.ObjectBoundary;
-import superapp.model.ObjectId;
-import superapp.logic.ObjectsService;
+import superapp.Boundary.ObjectBoundary;
+import superapp.Boundary.ObjectId;
+import superapp.logic.service.ObjectsService;
 import superapp.data.SuperAppObjectEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

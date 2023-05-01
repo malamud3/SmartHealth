@@ -1,9 +1,9 @@
-package superapp.logic;
+package superapp.logic.service;
 
 import java.util.List;
 import java.util.Optional;
 
-import superapp.model.UserBoundary;
+import superapp.Boundary.User.UserBoundary;
 
 public interface UsersService {
 	

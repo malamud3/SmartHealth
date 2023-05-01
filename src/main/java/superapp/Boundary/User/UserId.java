@@ -1,4 +1,4 @@
-package superapp.model;
+package superapp.Boundary.User;
 
 public class UserId {
 	private String superapp;

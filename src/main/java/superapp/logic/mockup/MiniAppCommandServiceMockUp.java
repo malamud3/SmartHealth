@@ -1,8 +1,9 @@
 package superapp.logic.mockup;
 
-import superapp.model.*;
+import superapp.Boundary.*;
+import superapp.Boundary.User.UserId;
 import superapp.data.MiniAppCommandEntity;
-import superapp.logic.MiniAppCommandService;
+import superapp.logic.service.MiniAppCommandService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

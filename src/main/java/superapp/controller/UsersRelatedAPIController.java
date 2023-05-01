@@ -1,8 +1,8 @@
 package superapp.controller;
 
-import superapp.model.NewUserBoundary;
-import superapp.model.UserBoundary;
-import superapp.logic.UsersService;
+import superapp.Boundary.User.UserBoundary;
+import superapp.Boundary.User.NewUserBoundary;
+import superapp.logic.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

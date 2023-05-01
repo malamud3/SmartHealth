@@ -1,4 +1,6 @@
-package superapp.model;
+package superapp.Boundary;
+
+import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
