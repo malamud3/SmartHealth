@@ -2,6 +2,8 @@ package superapp.controller;
 
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.NewUserBoundary;
+import superapp.dal.UserRepository;
+import superapp.data.mainEntity.UserEntity;
 import superapp.logic.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class UsersRelatedAPIController {
 	private UsersService usersService;
 	private String springAppName;
-	
+
+
 	// this method injects a configuration value of spring
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
     public void setSpringApplicationName(String springApplicationName) {
@@ -25,7 +28,7 @@ public class UsersRelatedAPIController {
 		super();
 		this.usersService = usersService;
 	}
-	
+
 	//POST: Create User
 	@RequestMapping(
 			path = {"/superapp/users"},
@@ -34,7 +37,6 @@ public class UsersRelatedAPIController {
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 	
 	public UserBoundary createUser(@RequestBody NewUserBoundary user) {
-
 	     return usersService.createUser(user.newUserBoundaryToUserBoundary(springAppName));
 	}
 

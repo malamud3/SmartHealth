@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import superapp.Boundary.User.UserBoundary;
+import superapp.data.mainEntity.UserEntity;
 
 public interface UsersService {
 	
@@ -16,4 +17,6 @@ public interface UsersService {
 	public List<UserBoundary> getAllUsers();
 
 	public void deleteAllUsers();
+
+	public UserEntity boundaryToEntity (UserBoundary user);
 }

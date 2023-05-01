@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import superapp.Boundary.User.UserBoundary;
+import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
@@ -19,15 +20,15 @@ import jakarta.annotation.PostConstruct;
 @Service
 
 public class UsersServiceMockup implements UsersService {
-	//private UserRepository userRepository;
+	private UserRepository userRepository;
 
 	private Map<String,UserEntity> dbMockup;
     private  String springAppName;
 
-//	@Autowired
-//	public UsersServiceMockup(UserRepository userRepository) {
-//		this.userRepository = userRepository;
-//	}
+	@Autowired
+	public UsersServiceMockup(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 
     // this method injects a configuration value of spring
@@ -48,8 +49,7 @@ public class UsersServiceMockup implements UsersService {
 	public UserBoundary createUser(UserBoundary user) {
 		UserEntity userEntity = this.boundaryToEntity(user);
 
-		this.dbMockup.put(userEntity.getUserId().getSuperapp() + "_" + userEntity.getUserId().getEmail()
-		, userEntity);
+		userEntity = this.userRepository.save(userEntity);
 
 		return this.entityToBoundary(userEntity);
 	}
