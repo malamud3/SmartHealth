@@ -34,7 +34,7 @@ public class UsersRelatedAPIController {
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 	
 	public UserBoundary createUser(@RequestBody NewUserBoundary user) {
-			
+
 	     return usersService.createUser(user.newUserBoundaryToUserBoundary(springAppName));
 	}
 
