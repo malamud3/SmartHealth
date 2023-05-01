@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -69,25 +68,35 @@ public class UsersServiceMockup implements UsersService {
 	}
 
 	@Override
-	public UserBoundary updateUser(String userSuperApp, String userEmail,@NotNull UserBoundary update) {
+	public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) {
 		String userKey = userSuperApp + "_" + userEmail; // temp user key
 		UserEntity existing = this.dbMockup.get(userKey);
-		UserBoundary userBoundary = new UserBoundary();
 
 		if (existing == null) {
 			throw new RuntimeException("Could not find user by id: " + userKey);
-		} else {
-			if(existing == null){
-				userBoundary = this.createUser(update);
-			}else if (update.getRole() != null && update.getUsername() != null && update.getAvatar() != null ) {
-				userBoundary = entityToBoundary(existing);
-				userBoundary.setRole(update.getRole());
-				userBoundary.setUsername(update.getUsername());
-				userBoundary.setAvatar(update.getAvatar());
-			}
-			return userBoundary;
 		}
+			boolean dirtyFlag = false;
+
+			if (update.getRole() != null) {
+				existing.setRole(UserRole.valueOf(update.getRole()));
+				dirtyFlag = true;
+			}
+
+			if (update.getUsername() != null) {
+				existing.setUsername(update.getUsername());
+				dirtyFlag = true;
+			}
+
+			if (update.getAvatar() != null) {
+				existing.setAvatar(update.getAvatar());
+				dirtyFlag = true;
+			}
+			if (dirtyFlag) {
+				this.dbMockup.put(userKey, existing);
+			}
+		return this.entityToBoundary(existing);
 	}
+
 
 
 
@@ -112,7 +121,7 @@ public class UsersServiceMockup implements UsersService {
 	 * @return a UserEntity object representing the same data as the input UserBoundary object,
 	 *         or null if any required fields are null
 	 */
-	public UserEntity boundaryToEntity (@NotNull UserBoundary user) {
+	public UserEntity boundaryToEntity (UserBoundary user) {
 
 		// should not be null
 		if (	user.getUserId() == null ||
@@ -143,7 +152,7 @@ public class UsersServiceMockup implements UsersService {
 	 * @return a UserBoundary object representing the same data as the input UserEntity object,
 	 *         or null if any required fields are null
 	 */
-	public UserBoundary entityToBoundary (@NotNull UserEntity user) {
+	public UserBoundary entityToBoundary ( UserEntity user) {
 
 	// should not be null
 	if (	user.getUserId() == null ||
@@ -163,7 +172,6 @@ public class UsersServiceMockup implements UsersService {
 		return rv;
 		
 	}
-	
-	
+
 
 }
