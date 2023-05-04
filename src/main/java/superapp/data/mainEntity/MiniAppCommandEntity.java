@@ -1,5 +1,8 @@
-package superapp.data;
+package superapp.data.mainEntity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import superapp.Boundary.CommandId;
 import superapp.Boundary.ObjectId;
 import superapp.Boundary.User.UserId;
@@ -8,27 +11,20 @@ import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
-
+@Document(collection = "COMMAND")
 public class MiniAppCommandEntity {
-
-
+    @Id
     private CommandId commandId;
     private String command;
     private ObjectId targetObject;
     private Date invocationTimestamp;
+    @DBRef
     private UserId invokedBy;
     private Map<String, Object> commandAttributes; // key-value
 
-    
 
     public MiniAppCommandEntity() {
     }
-
-//    public MiniAppCommandEntity(String miniapp_name){
-//        this.commandId.setMiniapp(miniapp_name);
-//        this.commandId.setSuperapp("12");
-//        this.commandId.setInternalCommandId("231");
-//    }
 
     public MiniAppCommandEntity(CommandId commandId, String command, ObjectId targetObject, Date invocationTimestamp,
                                   UserId invokedBy, Map<String, Object> commandAttributes) {

@@ -1,16 +1,12 @@
 package superapp.logic.mockup;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.StringUtils;
@@ -22,19 +18,20 @@ import superapp.data.Enum.UserRole;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
-import superapp.utilitys.userUtility;
+import superapp.logic.utilitys.userUtility;
 
 @Service
 
 public class UsersServiceMockup implements UsersService {
 	private UserRepository userRepository;
+	private  MongoTemplate mongoTemplate;
 
-	private Map<String, UserEntity> dbMockup;
 	private String springAppName;
 
 	@Autowired
-	public UsersServiceMockup(UserRepository userRepository) {
+	public UsersServiceMockup(UserRepository userRepository, MongoTemplate mongoTemplate) {
 		this.userRepository = userRepository;
+		this.mongoTemplate = mongoTemplate;
 	}
 
 
@@ -46,9 +43,11 @@ public class UsersServiceMockup implements UsersService {
 
 	@PostConstruct
 	public void init() {
-		this.dbMockup = Collections.synchronizedMap(new HashMap<>());
-		System.err.println("******" + this.springAppName); //test
+		if (!mongoTemplate.collectionExists("USERS")) {
+			mongoTemplate.createCollection("USERS");
+		}
 	}
+
 
 
 	@Override
@@ -201,9 +200,7 @@ public class UsersServiceMockup implements UsersService {
 		}
 
 		// Check if role is valid
-		try {
-			UserRole.valueOf(newUser.getRole());
-		} catch (IllegalArgumentException e) {
+		if(UserUtility.isUserRoleValid(newUser.getRole())){
 			throw new IllegalArgumentException("Invalid role: " + newUser.getRole());
 		}
 
@@ -212,6 +209,7 @@ public class UsersServiceMockup implements UsersService {
 		if (this.userRepository.existsById(userId)) {
 			throw new RuntimeException("User with email " + newUser.getEmail() + " already exists");
 		}
+
 		if (StringUtils.isEmpty(newUser.getUsername())) {
 			throw new IllegalArgumentException("Username cannot be null or empty");
 		}

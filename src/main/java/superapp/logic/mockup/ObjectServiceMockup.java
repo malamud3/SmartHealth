@@ -1,120 +1,130 @@
 package superapp.logic.mockup;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import superapp.Boundary.ObjectBoundary;
 import superapp.Boundary.ObjectId;
+import superapp.dal.SuperAppObjectRelationshipRepository;
+import superapp.dal.SuperAppObjectRepository;
+import superapp.data.mainEntity.SuperAppObjectEntity;
+import superapp.data.subEntity.SuperAppObjectRelationship;
 import superapp.logic.service.ObjectsService;
-import superapp.data.SuperAppObjectEntity;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ObjectServiceMockup implements ObjectsService {
 
-    private Map<String, SuperAppObjectEntity> dbMockup;
+    private final SuperAppObjectRepository objectRepository;
+    private final SuperAppObjectRelationshipRepository relationshipRepository;
     private String springAppName;
 
-    // this method injects a configuration value of spring
+    @Autowired
+    public ObjectServiceMockup(SuperAppObjectRepository objectRepository, SuperAppObjectRelationshipRepository relationshipRepository) {
+        this.objectRepository = objectRepository;
+        this.relationshipRepository = relationshipRepository;
+    }
+
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
     public void setSpringApplicationName(String springApplicationName) {
         this.springAppName = springApplicationName;
     }
 
-    @PostConstruct
-    public void init() {
-        this.dbMockup = Collections.synchronizedMap(new HashMap<>());
-        System.err.println("******" + this.springAppName);
-    }
-
     @Override
     public ObjectBoundary createObject(ObjectBoundary obj) {
-
-//        if (obj.getAllObjects() == null) {
-//            obj.setAllObjects(new HashMap<>());
-//        }
-//        obj.getAllObjects().put(springAppName, obj);
-
-        SuperAppObjectEntity entity = this.boundaryToEntity(obj);
-        entity.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
-        entity.setCreationTimestamp(new Date());
-
-        this.dbMockup.put(entity.getObjectId().getInternalObjectId(), entity);
-
-        return this.entityToBoundary(entity);
-
-    }
-
-    @Override
-    public ObjectBoundary updateObject(String obj, String internal_obj_id, ObjectBoundary update) {
-
-        SuperAppObjectEntity entity = this.dbMockup.get(internal_obj_id);
-        boolean dirtyFlag = false;
-        if(entity == null)
-            throw  new NullPointerException("internal id not exist");
-        if (update.getType() != null) {
-                entity.setType(update.getType());
-                dirtyFlag=true;
+        SuperAppObjectEntity entity = boundaryToEntity(obj);
+        Set<SuperAppObjectEntity> parentObjects = new HashSet<>();
+        Set<SuperAppObjectEntity> childObjects = new HashSet<>();
+        if (obj.getParentObjects() != null) {
+            for (ObjectBoundary parent : obj.getParentObjects()) {
+                SuperAppObjectEntity parentEntity = objectRepository.findById(parent.getObjectId()).orElse(null);
+                if (parentEntity != null) {
+                    parentObjects.add(parentEntity);
+                }
             }
-        if (update.getAlias() != null) {
-                entity.setAlias(update.getAlias());
-                dirtyFlag=true;
-
         }
-        if (update.getActive() != null) {
-                entity.setActive(update.getActive());
-            dirtyFlag=true;
+        if (obj.getChildObjects() != null) {
+            for (ObjectBoundary child : obj.getChildObjects()) {
+                SuperAppObjectEntity childEntity = objectRepository.findById(child.getObjectId()).orElse(null);
+                if (childEntity != null) {
+                    childObjects.add(childEntity);
+                }
             }
-        if (update.getLocation() != null) {
-                entity.setLocation(update.getLocation());
-            dirtyFlag=true;
-            }
-        if (update.getCreatedBy() != null) {
-                entity.setCreatedBy(update.getCreatedBy());
-            dirtyFlag=true;
-            }
-        if (update.getObjectDetails() != null) {
-                entity.setObjectDetails(update.getObjectDetails());
-            dirtyFlag=true;
-            }
-        if(update.getObjectId() != null){
-            entity.setObjectId(update.getObjectId());
-            dirtyFlag=true;
         }
-
-        if(dirtyFlag)
-            this.dbMockup.put(internal_obj_id , entity);
-
+        entity.setParentObjects(parentObjects);
+        entity.setChildObjects(childObjects);
+        entity = objectRepository.save(entity);
         return entityToBoundary(entity);
     }
 
 
     @Override
+    public ObjectBoundary updateObject(String superAppId, String internal_obj_id, ObjectBoundary update) {
+        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
+        if (optionalEntity.isEmpty()) {
+            throw new NullPointerException("internal id not exist");
+        }
+        SuperAppObjectEntity entity = optionalEntity.get();
+        boolean dirtyFlag = false;
+        if (update.getType() != null) {
+            entity.setType(update.getType());
+            dirtyFlag=true;
+        }
+        if (update.getAlias() != null) {
+            entity.setAlias(update.getAlias());
+            dirtyFlag=true;
+        }
+        if (update.getActive() != null) {
+            entity.setActive(update.getActive());
+            dirtyFlag=true;
+        }
+        if (update.getLocation() != null) {
+            entity.setLocation(update.getLocation());
+            dirtyFlag=true;
+        }
+        if (update.getCreatedBy() != null) {
+            entity.setCreatedBy(update.getCreatedBy());
+            dirtyFlag=true;
+        }
+        if (update.getObjectDetails() != null) {
+            entity.setObjectDetails(update.getObjectDetails());
+            dirtyFlag=true;
+        }
+        if(update.getObjectId() != null){
+            entity.setObjectId(update.getObjectId());
+            dirtyFlag=true;
+        }
+
+        if(dirtyFlag){
+            entity = objectRepository.save(entity);
+        }
+
+        return entityToBoundary(entity);
+    }
+
+    @Override
     public Optional<ObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
-        SuperAppObjectEntity entity = this.dbMockup.get(superAppId);
-        if (entity == null)
-            return Optional.empty();
-        ObjectBoundary obj = this.entityToBoundary(entity);
-        return Optional.of(obj);
+        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
+        return optionalEntity.map(this::entityToBoundary);
     }
 
     @Override
     public List<ObjectBoundary> getAllObjects() {
-        return this.dbMockup.values()
-                .stream() // Stream<MessageEntity>
-                .map(this::entityToBoundary) // Stream<Message>
-                .toList(); // List<Message>
+        List<SuperAppObjectEntity> entities = objectRepository.findAll();
+        return entities.stream()
+                .map(this::entityToBoundary)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void deleteAllObjects() {
-        this.dbMockup.clear();
-
+        objectRepository.deleteAll();
+        relationshipRepository.deleteAll();
     }
 
-
-    public ObjectBoundary entityToBoundary( SuperAppObjectEntity entity) {
+        public ObjectBoundary entityToBoundary( SuperAppObjectEntity entity) {
         ObjectBoundary obj = new ObjectBoundary();
 
         // convert entity to boundary
@@ -126,7 +136,8 @@ public class ObjectServiceMockup implements ObjectsService {
         obj.setCreationTimestamp(entity.getCreationTimestamp());
         obj.setType(entity.getType());
         obj.setLocation(entity.getLocation());
-        //obj.setAllObjects(entity.getAllObjects());
+        obj.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
+        obj.setCreationTimestamp(new Date());
         return obj;
     }
 

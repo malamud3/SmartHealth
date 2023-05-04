@@ -2,7 +2,7 @@ package superapp.logic.mockup;
 
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
-import superapp.data.MiniAppCommandEntity;
+import superapp.data.mainEntity.MiniAppCommandEntity;
 import superapp.logic.service.MiniAppCommandService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

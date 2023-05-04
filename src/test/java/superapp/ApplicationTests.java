@@ -8,7 +8,7 @@ import superapp.controller.SuperAppObjectsAPIController;
 import superapp.controller.UsersRelatedAPIController;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.User.UserBoundary;
-import superapp.data.MiniAppCommandEntity;
+import superapp.data.mainEntity.MiniAppCommandEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,9 +1,11 @@
 package superapp.Boundary;
 
+import org.springframework.data.mongodb.core.mapping.Document;
 import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 public class ObjectBoundary {
 	
@@ -16,6 +18,8 @@ public class ObjectBoundary {
     private UserId createdBy;
     private Map<String, Object> objectDetails;
 
+	private Set<ObjectBoundary> parentObjects;
+	private Set<ObjectBoundary> childObjects;
     
 	public ObjectBoundary(String superapp,String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);
@@ -89,7 +93,24 @@ public class ObjectBoundary {
 //		this.ourObject = ourObject;
 //		
 //	}
-	
+
+
+	public Set<ObjectBoundary> getParentObjects() {
+		return parentObjects;
+	}
+
+	public void setParentObjects(Set<ObjectBoundary> parentObjects) {
+		this.parentObjects = parentObjects;
+	}
+
+	public Set<ObjectBoundary> getChildObjects() {
+		return childObjects;
+	}
+
+	public void setChildObjects(Set<ObjectBoundary> childObjects) {
+		this.childObjects = childObjects;
+	}
+
 	public Map<String, Object> getObjectDetails() {
 		return objectDetails;
 	}

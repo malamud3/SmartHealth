@@ -1,15 +1,18 @@
-package superapp.data;
+package superapp.data.mainEntity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
+import superapp.data.subEntity.SuperAppObjectRelationship;
 
-import java.util.Date;
-import java.util.Map;
-@Document
-public class SuperAppObjectEntity{
-@Id
+import java.util.*;
+
+@Document(collection = "SUPER_APP_OBJECTS")
+public class SuperAppObjectEntity {
+    @Id
     private ObjectId objectId;
     private String type;
     private String alias;
@@ -18,21 +21,12 @@ public class SuperAppObjectEntity{
     private Location location;
     private UserId createdBy;
     private Map<String, Object> objectDetails;
-    
-
-//    private Map <String , ObjectBoundary> allObjects;
-//
-//    public void setAllObjects(Map<String, ObjectBoundary> allObjects) {
-//        this.allObjects = allObjects;
-//    }
-//
-//    public Map<String, ObjectBoundary> getAllObjects() {
-//        return allObjects;
-//    }
-//
-//    private OurObject ourObject;
-
-
+    @DBRef
+    @Field("parentObjects")
+    private Set<SuperAppObjectEntity> parentObjects;
+    @DBRef
+    @Field("childObjects")
+    private Set<SuperAppObjectEntity> childObjects;
 
     public SuperAppObjectEntity(String superapp,String internalObjectId) {
         objectId = new ObjectId(superapp, internalObjectId);
@@ -43,12 +37,6 @@ public class SuperAppObjectEntity{
 
     }
 
-    //check
-    public void SuperAppObjectEntity() {
-
-    }
-    
-    
     public ObjectId getObjectId() {
         return objectId;
     }
@@ -86,17 +74,12 @@ public class SuperAppObjectEntity{
         this.location = location;
     }
     public UserId getCreatedBy() {
-        return createdBy;
+        return this.createdBy;
     }
     public void setCreatedBy(UserId createdBy) {
         this.createdBy = createdBy;
     }
-//    public OurObject getOurObject() {
-//        return ourObject;
-//    }
-//    public void setOurObject(OurObject ourObject) {
-//        this.ourObject = ourObject;
-//    }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -112,6 +95,50 @@ public class SuperAppObjectEntity{
 		this.objectDetails = objectDetails;
 	}
 
+    public Set<SuperAppObjectEntity> getParentObjects() {
+        return parentObjects;
+    }
 
+    public void setParentObjects(Set<SuperAppObjectEntity> parentObjects) {
+        this.parentObjects = parentObjects;
+    }
+
+    public Set<SuperAppObjectEntity> getChildObjects() {
+        return childObjects;
+    }
+
+    public void setChildObjects(Set<SuperAppObjectEntity> childObjects) {
+        this.childObjects = childObjects;
+    }
+
+    public void addParentObject(SuperAppObjectEntity parentObject) {
+        if (parentObjects == null) {
+            parentObjects = new HashSet<>();
+        }
+        parentObjects.add(parentObject);
+        parentObject.addChildObject(this);
+    }
+
+    public void addChildObject(SuperAppObjectEntity childObject) {
+        if (childObjects == null) {
+            childObjects = new HashSet<>();
+        }
+        childObjects.add(childObject);
+        childObject.addParentObject(this);
+    }
+
+    public void removeParentObject(SuperAppObjectEntity parentObject) {
+        if (parentObjects != null) {
+            parentObjects.remove(parentObject);
+            parentObject.removeChildObject(this);
+        }
+    }
+
+    public void removeChildObject(SuperAppObjectEntity childObject) {
+        if (childObjects != null) {
+            childObjects.remove(childObject);
+            childObject.removeParentObject(this);
+        }
+    }
 
 }

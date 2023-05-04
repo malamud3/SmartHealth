@@ -1,10 +1,10 @@
 package superapp.Boundary;
 
+import org.springframework.data.mongodb.core.mapping.Document;
 import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
-
 public class MiniAppCommandBoundary
 {
     private CommandId commandId;

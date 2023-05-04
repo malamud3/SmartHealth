@@ -1,4 +1,4 @@
-package superapp.utilitys;
+package superapp.logic.utilitys;
 
 import superapp.data.Enum.UserRole;
 

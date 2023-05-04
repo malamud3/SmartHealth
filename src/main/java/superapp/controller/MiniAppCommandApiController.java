@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 public class MiniAppCommandApiController
 {
 
-
     private MiniAppCommandService miniAppCommandService;
 
     @Autowired
@@ -20,7 +19,6 @@ public class MiniAppCommandApiController
         this.miniAppCommandService = miniAppCommandService;
 
     }
-
 
     //POST: Invoke MiniApp Command
     @RequestMapping(
