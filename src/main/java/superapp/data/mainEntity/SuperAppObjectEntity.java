@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
-import superapp.data.subEntity.SuperAppObjectRelationship;
 
 import java.util.*;
 
@@ -30,7 +29,6 @@ public class SuperAppObjectEntity {
 
     public SuperAppObjectEntity(String superapp,String internalObjectId) {
         objectId = new ObjectId(superapp, internalObjectId);
-
     }
 
     public SuperAppObjectEntity() {

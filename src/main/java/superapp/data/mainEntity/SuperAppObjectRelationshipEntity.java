@@ -1,4 +1,4 @@
-package superapp.data.subEntity;
+package superapp.data.mainEntity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -8,23 +8,21 @@ import superapp.Boundary.ObjectId;
 import superapp.data.mainEntity.SuperAppObjectEntity;
 
 @Document(collection = "SUPER_APP_OBJECTS_RELATIONSHIPS")
-public class SuperAppObjectRelationship {
+public class SuperAppObjectRelationshipEntity {
     @Id
     private ObjectId id;
     @DBRef
-    @Field("parentObjectId")
     private ObjectId parentObject;
     @DBRef
-    @Field("childObjectId")
     private ObjectId childObject;
 
-    public SuperAppObjectRelationship(ObjectId id, SuperAppObjectEntity parentObject, SuperAppObjectEntity childObject) {
+    public SuperAppObjectRelationshipEntity(ObjectId id, SuperAppObjectEntity parentObject, SuperAppObjectEntity childObject) {
         this.id = id;
         this.parentObject = parentObject.getObjectId();
         this.childObject = childObject.getObjectId();
     }
 
-    public SuperAppObjectRelationship() {
+    public SuperAppObjectRelationshipEntity() {
 
     }
 

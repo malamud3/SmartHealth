@@ -1,12 +1,12 @@
 package superapp.logic.mockup;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import superapp.Boundary.ObjectBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRelationshipRepository;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
-import superapp.data.subEntity.SuperAppObjectRelationship;
 import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,11 +20,13 @@ public class ObjectServiceMockup implements ObjectsService {
     private final SuperAppObjectRepository objectRepository;
     private final SuperAppObjectRelationshipRepository relationshipRepository;
     private String springAppName;
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     public ObjectServiceMockup(SuperAppObjectRepository objectRepository, SuperAppObjectRelationshipRepository relationshipRepository) {
         this.objectRepository = objectRepository;
         this.relationshipRepository = relationshipRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -35,8 +37,10 @@ public class ObjectServiceMockup implements ObjectsService {
     @Override
     public ObjectBoundary createObject(ObjectBoundary obj) {
         SuperAppObjectEntity entity = boundaryToEntity(obj);
+
         Set<SuperAppObjectEntity> parentObjects = new HashSet<>();
         Set<SuperAppObjectEntity> childObjects = new HashSet<>();
+
         if (obj.getParentObjects() != null) {
             for (ObjectBoundary parent : obj.getParentObjects()) {
                 SuperAppObjectEntity parentEntity = objectRepository.findById(parent.getObjectId()).orElse(null);
@@ -124,7 +128,31 @@ public class ObjectServiceMockup implements ObjectsService {
         relationshipRepository.deleteAll();
     }
 
-        public ObjectBoundary entityToBoundary( SuperAppObjectEntity entity) {
+    public void bindParentAndChild(String parentId, String childId) {
+        SuperAppObjectEntity parent = mongoTemplate.findById(parentId, SuperAppObjectEntity.class);
+        SuperAppObjectEntity child = mongoTemplate.findById(childId, SuperAppObjectEntity.class);
+
+        parent.getChildObjects().add(child);
+
+        child.getParentObjects().add(parent);
+
+        mongoTemplate.save(parent);
+        mongoTemplate.save(child);
+    }
+
+    public Set<SuperAppObjectEntity> getAllParents(SuperAppObjectEntity object) {
+        Set<SuperAppObjectEntity> parents = new HashSet<>();
+
+        for (SuperAppObjectEntity parent : object.getParentObjects()) {
+            parents.add(parent);
+            parents.addAll(getAllParents(parent));
+        }
+        return parents;
+    }
+
+
+
+    public ObjectBoundary entityToBoundary( SuperAppObjectEntity entity) {
         ObjectBoundary obj = new ObjectBoundary();
 
         // convert entity to boundary
@@ -155,7 +183,6 @@ public class ObjectServiceMockup implements ObjectsService {
         rv.setAlias(obj.getAlias());
         rv.setCreatedBy(obj.getCreatedBy());
         rv.setCreationTimestamp(obj.getCreationTimestamp());
-        //rv.setAllObjects(obj.getAllObjects());
 
         return rv;
     }

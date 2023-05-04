@@ -86,13 +86,7 @@ public class ObjectBoundary {
 		this.createdBy = createdBy;
 	}
 	
-//	public OurObject getOurObject() {
-//		return ourObject;
-//	}
-//	public void setOurObject(OurObject ourObject) {
-//		this.ourObject = ourObject;
-//		
-//	}
+
 
 
 	public Set<ObjectBoundary> getParentObjects() {
