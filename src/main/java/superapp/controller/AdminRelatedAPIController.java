@@ -12,9 +12,6 @@ import superapp.logic.service.UsersService;
 import java.util.List;
 
 @RestController
-
-
-
 public class AdminRelatedAPIController
 {
     private UsersService userService;
@@ -28,38 +25,38 @@ public class AdminRelatedAPIController
         this.objectsService=objectsService;
 
     }
-    
+
     //DELETE: Delete All Users
     @RequestMapping(
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
-    
+
     public void deleteAllUsers() {
-    	
+
     	userService.deleteAllUsers();
 
     }
-    
+
     //DELETE: Delete All Objects
     @RequestMapping(
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
-    
+
     public void deleteAllObjects() {
-        
+
     	objectsService.deleteAllObjects();
-    	
+
     }
 
     //DELETE: Delete All Commands History
     @RequestMapping(
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.DELETE})
-    
+
     public void deleteAllCommands() {
-    	
+
     	miniAppCommandService.deleteAllCommands();
-        
+
     }
 
 
@@ -68,9 +65,9 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/users"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    
+
     public List<UserBoundary> getAllUsers() {
-        
+
     	return userService.getAllUsers();
     }
 
@@ -82,13 +79,13 @@ public class AdminRelatedAPIController
             path ={"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    
+
     public List<MiniAppCommandBoundary> ExportAllMiniAppsHistory()
     {
         return miniAppCommandService.getAllCommands();
     }
 
-    
+
     //GET: Get Specific MiniApp Command History
     @RequestMapping(
             path ={"/superapp/admin/miniapp/{miniAppName}"},

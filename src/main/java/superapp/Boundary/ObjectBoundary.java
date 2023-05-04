@@ -16,20 +16,6 @@ public class ObjectBoundary {
     private UserId createdBy;
     private Map<String, Object> objectDetails;
 
-//	private Map<String , ObjectBoundary> allObjects;
-
-//	public Map<String, ObjectBoundary> getAllObjects() {
-//		return allObjects;
-//	}
-//
-//	public void setAllObjects(Map<String, ObjectBoundary> allObjects) {
-//		this.allObjects = allObjects;
-//	}
-//
-//	private OurObject ourObject;
-
-
-  
     
 	public ObjectBoundary(String superapp,String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);

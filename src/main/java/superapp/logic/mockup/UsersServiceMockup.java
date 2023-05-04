@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,22 +13,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.StringUtils;
+import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
+import superapp.Boundary.User.UserId;
 import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
-
-
+import superapp.utilitys.userUtility;
 
 @Service
 
 public class UsersServiceMockup implements UsersService {
 	private UserRepository userRepository;
 
-	private Map<String,UserEntity> dbMockup;
-    private  String springAppName;
+	private Map<String, UserEntity> dbMockup;
+	private String springAppName;
 
 	@Autowired
 	public UsersServiceMockup(UserRepository userRepository) {
@@ -35,55 +38,55 @@ public class UsersServiceMockup implements UsersService {
 	}
 
 
-    // this method injects a configuration value of spring
-    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
-    public void setSpringApplicationName(String springApplicationName) {
-        this.springAppName = springApplicationName;
-    }
+	// this method injects a configuration value of spring
+	@Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
+	public void setSpringApplicationName(String springApplicationName) {
+		this.springAppName = springApplicationName;
+	}
 
-    @PostConstruct
-    public void init()
-    {
-        this.dbMockup = Collections.synchronizedMap(new HashMap<>());
-        System.err.println("******"+this.springAppName); //test
-    }
+	@PostConstruct
+	public void init() {
+		this.dbMockup = Collections.synchronizedMap(new HashMap<>());
+		System.err.println("******" + this.springAppName); //test
+	}
 
 
 	@Override
-	public UserBoundary createUser(UserBoundary user) {
+	public UserBoundary createUser(NewUserBoundary newUser) {
+
+		try {
+			validateUser(newUser);
+		} catch (IllegalArgumentException e) {
+			return  null;
+		}
+
+		UserBoundary user = new UserBoundary(newUser, springAppName);
 		UserEntity userEntity = this.boundaryToEntity(user);
-			userEntity = this.userRepository.save(userEntity);
+		userEntity = this.userRepository.save(userEntity);
 
 		return this.entityToBoundary(userEntity);
 	}
 
+
 	@Override
 	public Optional<UserBoundary> login(String userSuperApp, String userEmail) {
-		String userKey = userSuperApp + "_" + userEmail; //temp user key
-
-		Optional<UserEntity> entity = userRepository.findByEmail(userEmail);
-		if (entity.isPresent()){
-			System.out.println(" "+entity);
-		}
-//		UserEntity entity = this.dbMockup.get(userKey);
-		if (entity.get() == null) {
-			return Optional.empty();
-		}else {
-		    UserBoundary boundary = this.entityToBoundary(entity.get());
+		UserId userId = new UserId(userSuperApp, userEmail);
+		Optional<UserEntity> entity = userRepository.findByUserId(userId);
+		if (entity.isPresent()) {
+			UserBoundary boundary = entityToBoundary(entity.get());
 			return Optional.of(boundary);
+		} else {
+			return Optional.empty();
 		}
 	}
 
+
 	@Override
 	public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) {
-		String userKey = userSuperApp + "_" + userEmail; // temp user key
+		UserId userId = new UserId(userSuperApp, userEmail);
+		Optional<UserEntity> optionalUser = userRepository.findByUserId(userId);
+		UserEntity existing = optionalUser.orElseThrow(() -> new RuntimeException("could not find user with id: " + userSuperApp + "_" + userEmail));
 
-
-		UserEntity existing = this.dbMockup.get(userKey);
-
-		if (existing == null) {
-			throw new RuntimeException("Could not find user by id: " + userKey);
-		}
 		boolean dirtyFlag = false;
 
 		if (update.getRole() != null) {
@@ -100,26 +103,29 @@ public class UsersServiceMockup implements UsersService {
 			existing.setAvatar(update.getAvatar());
 			dirtyFlag = true;
 		}
-		if (dirtyFlag) {
-			this.dbMockup.put(userKey, existing);
-		}
-		return this.entityToBoundary(existing);
-	}
 
+		if (dirtyFlag) {
+			userRepository.save(existing);
+		}
+
+		return entityToBoundary(existing);
+	}
 
 
 	@Override
 	public List<UserBoundary> getAllUsers() {
-		return this.dbMockup.values()
-				.stream()
+		List<UserEntity> userEntities = userRepository.findAll();
+		return userEntities.stream()
 				.map(this::entityToBoundary)
-				.toList();
+				.collect(Collectors.toList());
 	}
+
 
 	@Override
 	public void deleteAllUsers() {
-		this.dbMockup.clear();
+		this.userRepository.deleteAll();
 	}
+
 
 
 	/**
@@ -127,16 +133,16 @@ public class UsersServiceMockup implements UsersService {
 	 *
 	 * @param user the UserBoundary object to convert
 	 * @return a UserEntity object representing the same data as the input UserBoundary object,
-	 *         or null if any required fields are null
+	 * or null if any required fields are null
 	 */
-	public UserEntity boundaryToEntity (UserBoundary user) {
+	public UserEntity boundaryToEntity(UserBoundary user) {
 
 		// should not be null
-		if (	user.getUserId() == null ||
+		if (user.getUserId() == null ||
 				user.getRole() == null ||
 				user.getUsername() == null ||
-				user.getAvatar() == null){
-				return null;
+				user.getAvatar() == null) {
+			return null;
 		}
 
 		UserEntity rv = new UserEntity();
@@ -158,17 +164,17 @@ public class UsersServiceMockup implements UsersService {
 	 *
 	 * @param user the UserEntity object to convert
 	 * @return a UserBoundary object representing the same data as the input UserEntity object,
-	 *         or null if any required fields are null
+	 * or null if any required fields are null
 	 */
-	public UserBoundary entityToBoundary ( UserEntity user) {
+	public UserBoundary entityToBoundary(UserEntity user) {
 
-	// should not be null
-	if (	user.getUserId() == null ||
-			user.getRole() == null ||
-			user.getUsername() == null ||
-			user.getAvatar() == null){
-		return null;
-	}
+		// should not be null
+		if (user.getUserId() == null ||
+				user.getRole() == null ||
+				user.getUsername() == null ||
+				user.getAvatar() == null) {
+			return null;
+		}
 
 		UserBoundary rv = new UserBoundary();
 
@@ -180,7 +186,41 @@ public class UsersServiceMockup implements UsersService {
 		return rv;
 
 	}
+	/**
+	 Validates the given NewUserBoundary object.
+	 @param newUser the NewUserBoundary object to validate
+	 @throws IllegalArgumentException if the email address is invalid, role is invalid, username is null or empty, or avatar is null or empty
+	 @throws RuntimeException if a user with the same email address already exists in the database
+	 */
+	private void validateUser(NewUserBoundary newUser) {
+		userUtility UserUtility = new userUtility();
 
+		// Check if email is valid
+		if (!UserUtility.isValidEmail(newUser.getEmail())) {
+			throw new IllegalArgumentException("Invalid email address: " + newUser.getEmail());
+		}
 
+		// Check if role is valid
+		try {
+			UserRole.valueOf(newUser.getRole());
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Invalid role: " + newUser.getRole());
+		}
 
+		// Check if the user already exists
+		UserId userId = new UserId(newUser.getEmail(), this.springAppName);
+		if (this.userRepository.existsById(userId)) {
+			throw new RuntimeException("User with email " + newUser.getEmail() + " already exists");
+		}
+		if (StringUtils.isEmpty(newUser.getUsername())) {
+			throw new IllegalArgumentException("Username cannot be null or empty");
+		}
+
+		if (StringUtils.isEmpty(newUser.getAvatar())) {
+			throw new IllegalArgumentException("Avatar cannot be null or empty");
+		}
+
+	}
 }
+
+

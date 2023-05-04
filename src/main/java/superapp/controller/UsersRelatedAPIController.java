@@ -2,8 +2,6 @@ package superapp.controller;
 
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.NewUserBoundary;
-import superapp.dal.UserRepository;
-import superapp.data.mainEntity.UserEntity;
 import superapp.logic.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +35,7 @@ public class UsersRelatedAPIController {
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 	
 	public UserBoundary createUser(@RequestBody NewUserBoundary user) {
-	     return usersService.createUser(user.newUserBoundaryToUserBoundary(springAppName));
+	     return usersService.createUser(user);
 	}
 
 	//GET: User Login And Retrieve User Details

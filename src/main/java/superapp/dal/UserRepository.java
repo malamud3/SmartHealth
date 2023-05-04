@@ -7,9 +7,12 @@ import superapp.data.mainEntity.UserEntity;
 
 import java.util.Optional;
 
-public interface UserRepository
-        extends MongoRepository<UserEntity, String> {
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-        @Query("{'userId.email': ?0}")
-        Optional<UserEntity> findByEmail(String email);
+public interface UserRepository
+        extends MongoRepository<UserEntity, UserId> {
+
+        Optional<UserEntity> findByUserId(UserId userId);
+
 }
+

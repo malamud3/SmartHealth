@@ -1,5 +1,6 @@
 package superapp.data;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
@@ -8,7 +9,7 @@ import java.util.Date;
 import java.util.Map;
 @Document
 public class SuperAppObjectEntity{
-
+@Id
     private ObjectId objectId;
     private String type;
     private String alias;
