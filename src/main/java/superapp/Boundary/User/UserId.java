@@ -1,5 +1,7 @@
 package superapp.Boundary.User;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class UserId {
 	private String superapp;
 	private String email;
@@ -8,18 +10,12 @@ public class UserId {
 		
 	}
 
-
-	public UserId(String email) {
-		super();
-		this.email = email;
-		this.superapp = "2023b.Gil.Azani"; //TODO change to constant
-	}
-	
-	public UserId(String superapp, String email) {
+	public UserId(String email, @Value("${spring.application.name}") String superapp) {
 		super();
 		this.email = email;
 		this.superapp = superapp;
 	}
+
 
 	public String getSuperapp() {
 		return superapp;
