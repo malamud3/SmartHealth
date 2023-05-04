@@ -5,19 +5,22 @@ import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import superapp.logic.service.SuperAppObjectRelationshipService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-public class SuperAppObjectsAPIController {
+public class SuperAppObjectsAPIController  {
 
 
 	private ObjectsService objectsService;
-
+	private SuperAppObjectRelationshipService superAppObjectRelationshipService;
 	@Autowired
-	public SuperAppObjectsAPIController(ObjectsService objectsService) {
+	public SuperAppObjectsAPIController(ObjectsService objectsService,
+										SuperAppObjectRelationshipService superAppObjectRelationshipService) {
 		this.objectsService = objectsService;
-
+		this.superAppObjectRelationshipService = superAppObjectRelationshipService;
 	}
 
 	
@@ -48,19 +51,19 @@ public class SuperAppObjectsAPIController {
 
 		}
 
-	//GET: Get Object
+//GET: Get Object
 	@RequestMapping(
 			path = {"/superapp/objects/{superapp}/{internalObjectId}"},
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
-	
 	public ObjectBoundary retrieveObject(@PathVariable("superapp") String superapp,
-										   @PathVariable("internalObjectId") String internalObjectId)
+										 @PathVariable("internalObjectId") String internalObjectId)
 	{
 		return objectsService.getSpecificObject(superapp, internalObjectId)
-				.orElseThrow(()->new RuntimeException("could not find object with id: " + superapp + "_" + internalObjectId));
-		
+				.orElseThrow(() -> new RuntimeException("could not find object with id: " + superapp + "_" + internalObjectId));
+
 	}
+
 
 	//GET: Get All Objects
 	@RequestMapping(
@@ -73,8 +76,23 @@ public class SuperAppObjectsAPIController {
 		return  objectsService.getAllObjects();
 	}
 
-}
+	//PUT: Bind an existing object to an existing child object
+	@PutMapping(
+			path = "/superapp/objects/{superapp}/{internalObjectId}/children",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public List<ObjectBoundary> bindObjectToChild(
+			@PathVariable("superapp") String superapp,
+			@PathVariable("internalObjectId") String internalObjectId,
+			@RequestBody String childId
+	) {
+		Optional<ObjectBoundary> objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId);
+		superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.get().getObjectId().getInternalObjectId(), childId);
+		return objectsService.getAllObjects();
+	}
 
+}
 
 
 
