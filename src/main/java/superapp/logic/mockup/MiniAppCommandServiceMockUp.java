@@ -6,7 +6,6 @@ import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
 import superapp.data.mainEntity.MiniAppCommandEntity;
-import superapp.data.mainEntity.UserEntity;
 import superapp.logic.service.MiniAppCommandService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +16,9 @@ import java.util.stream.Collectors;
 @Service
 public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
-    private String springApplicationName;
-    private MiniAppCommandRepository repository;
-    private MongoTemplate mongoTemplate;
+    private  String springApplicationName;
+    private final MiniAppCommandRepository repository;
+    private final MongoTemplate mongoTemplate;
 
     // this method injects a configuration value of spring
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -35,9 +34,9 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
     }
 
     @Autowired
-    public void MiniAppCommandServiceMockUp(MongoTemplate mongoTemplate ,
-                                            MiniAppCommandRepository repository)
-    {
+    public MiniAppCommandServiceMockUp(MongoTemplate mongoTemplate,
+                                       MiniAppCommandRepository repository) {
+
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
     }
@@ -112,7 +111,7 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
     {
         MiniAppCommandEntity entity = new MiniAppCommandEntity();
 
-        entity.setCommand(obj.getCommand().toString());
+        entity.setCommand(obj.getCommand());
         if (obj.getCommandId() == null) {
             entity.setCommandId(new CommandId());
         }
