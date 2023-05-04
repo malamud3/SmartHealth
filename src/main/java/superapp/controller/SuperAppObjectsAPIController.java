@@ -14,8 +14,8 @@ import java.util.Optional;
 public class SuperAppObjectsAPIController  {
 
 
-	private ObjectsService objectsService;
-	private SuperAppObjectRelationshipService superAppObjectRelationshipService;
+	private final ObjectsService objectsService;
+	private final SuperAppObjectRelationshipService superAppObjectRelationshipService;
 	@Autowired
 	public SuperAppObjectsAPIController(ObjectsService objectsService,
 										SuperAppObjectRelationshipService superAppObjectRelationshipService) {
