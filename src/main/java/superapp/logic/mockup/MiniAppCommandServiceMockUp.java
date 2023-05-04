@@ -33,9 +33,7 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
     @Override
     public Object InvokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) {
-        if (MiniAppCommandBoundary.getCommand() == null) {
-            throw new RuntimeException("Command is missing");
-        }
+
         if (MiniAppCommandBoundary.getCommandAttributes() == null) {
             throw new RuntimeException("Command attributes are missing");
         }

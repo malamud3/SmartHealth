@@ -4,28 +4,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import superapp.Boundary.ObjectBoundary;
 import superapp.Boundary.ObjectId;
-import superapp.dal.SuperAppObjectRelationshipRepository;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
 import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import superapp.logic.service.SuperAppObjectRelationshipService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ObjectServiceMockup implements ObjectsService {
+public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelationshipService {
 
     private final SuperAppObjectRepository objectRepository;
-    private final SuperAppObjectRelationshipRepository relationshipRepository;
     private String springAppName;
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public ObjectServiceMockup(SuperAppObjectRepository objectRepository, SuperAppObjectRelationshipRepository relationshipRepository) {
+    public ObjectServiceMockup(SuperAppObjectRepository objectRepository,
+                               MongoTemplate mongoTemplate) {
+
         this.objectRepository = objectRepository;
-        this.relationshipRepository = relationshipRepository;
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -43,18 +43,12 @@ public class ObjectServiceMockup implements ObjectsService {
 
         if (obj.getParentObjects() != null) {
             for (ObjectBoundary parent : obj.getParentObjects()) {
-                SuperAppObjectEntity parentEntity = objectRepository.findById(parent.getObjectId()).orElse(null);
-                if (parentEntity != null) {
-                    parentObjects.add(parentEntity);
-                }
+                objectRepository.findById(parent.getObjectId()).ifPresent(parentObjects::add);
             }
         }
         if (obj.getChildObjects() != null) {
             for (ObjectBoundary child : obj.getChildObjects()) {
-                SuperAppObjectEntity childEntity = objectRepository.findById(child.getObjectId()).orElse(null);
-                if (childEntity != null) {
-                    childObjects.add(childEntity);
-                }
+                objectRepository.findById(child.getObjectId()).ifPresent(childObjects::add);
             }
         }
         entity.setParentObjects(parentObjects);
@@ -125,21 +119,39 @@ public class ObjectServiceMockup implements ObjectsService {
     @Override
     public void deleteAllObjects() {
         objectRepository.deleteAll();
-        relationshipRepository.deleteAll();
     }
-
+    @Override
     public void bindParentAndChild(String parentId, String childId) {
         SuperAppObjectEntity parent = mongoTemplate.findById(parentId, SuperAppObjectEntity.class);
         SuperAppObjectEntity child = mongoTemplate.findById(childId, SuperAppObjectEntity.class);
 
+        assert parent != null;
         parent.getChildObjects().add(child);
 
+        assert child != null;
         child.getParentObjects().add(parent);
 
         mongoTemplate.save(parent);
         mongoTemplate.save(child);
     }
+    @Override
+    public Set<SuperAppObjectEntity> getAllChildren(String objectId) {
+        SuperAppObjectEntity parent = mongoTemplate.findById(objectId, SuperAppObjectEntity.class);
 
+        if (parent == null) {
+            throw new IllegalArgumentException("Invalid object ID");
+        }
+
+        Set<SuperAppObjectEntity> children = new HashSet<>();
+
+        for (SuperAppObjectEntity child : parent.getChildObjects()) {
+            children.add(child);
+            children.addAll(getAllChildren(child.getObjectId().toString()));
+        }
+
+        return children;
+    }
+    @Override
     public Set<SuperAppObjectEntity> getAllParents(SuperAppObjectEntity object) {
         Set<SuperAppObjectEntity> parents = new HashSet<>();
 
@@ -149,7 +161,6 @@ public class ObjectServiceMockup implements ObjectsService {
         }
         return parents;
     }
-
 
 
     public ObjectBoundary entityToBoundary( SuperAppObjectEntity entity) {

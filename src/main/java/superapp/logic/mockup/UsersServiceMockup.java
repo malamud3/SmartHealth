@@ -15,6 +15,7 @@ import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
+import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
@@ -124,7 +125,6 @@ public class UsersServiceMockup implements UsersService {
 	public void deleteAllUsers() {
 		this.userRepository.deleteAll();
 	}
-
 
 
 	/**

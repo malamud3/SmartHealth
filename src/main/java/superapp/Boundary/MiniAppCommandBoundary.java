@@ -17,11 +17,7 @@ public class MiniAppCommandBoundary
     public MiniAppCommandBoundary() {
     }
 
-//    public MiniAppCommandBoundary(String miniapp_name){
-//        this.commandId.setMiniapp(miniapp_name);
-//        this.commandId.setSuperapp("12");
-//        this.commandId.setInternalCommandId("231");
-//    }
+
 
     public MiniAppCommandBoundary(CommandId commandId, String command, ObjectId targetObject, Date invocationTimestamp,
                                   UserId invokedBy, Map<String, Object> commandAttributes) {
