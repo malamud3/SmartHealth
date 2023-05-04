@@ -21,8 +21,8 @@ public class AdminRelatedAPIController
     @Autowired
     public AdminRelatedAPIController(UsersService userService,MiniAppCommandService miniAppCommandService,ObjectsService objectsService) {
         this.userService = userService;
-        this.miniAppCommandService=miniAppCommandService;
-        this.objectsService=objectsService;
+        this.miniAppCommandService = miniAppCommandService;
+        this.objectsService = objectsService;
 
     }
 
@@ -70,8 +70,6 @@ public class AdminRelatedAPIController
 
     	return userService.getAllUsers();
     }
-
-
 
 
     //GET: Get All MiniApps Commands History

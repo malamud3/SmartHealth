@@ -1,20 +1,25 @@
 package superapp.logic.mockup;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
+import superapp.dal.MiniAppCommandRepository;
 import superapp.data.mainEntity.MiniAppCommandEntity;
+import superapp.data.mainEntity.UserEntity;
 import superapp.logic.service.MiniAppCommandService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
+import java.util.stream.Collectors;
 @Service
 public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
-    private Map<String, MiniAppCommandEntity> dbMockup;
     private String springApplicationName;
+    private MiniAppCommandRepository repository;
+    private MongoTemplate mongoTemplate;
 
     // this method injects a configuration value of spring
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -22,14 +27,20 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         this.springApplicationName = springApplicationName;
     }
 
-    // this method is invoked after values are injected to instance
     @PostConstruct
     public void init() {
-        // create a thread safe map
-        this.dbMockup = Collections.synchronizedMap(new HashMap<>());
-        System.err.println("***** " + this.springApplicationName);
+        if (!mongoTemplate.collectionExists("COMMAND")) {
+            mongoTemplate.createCollection("COMMAND");
+        }
     }
 
+    @Autowired
+    public void MiniAppCommandServiceMockUp(MongoTemplate mongoTemplate ,
+                                            MiniAppCommandRepository repository)
+    {
+        this.repository = repository;
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Override
     public Object InvokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) {
@@ -55,33 +66,33 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         MiniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
         MiniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
         MiniAppCommandEntity entity = this.boundaryToEntity(MiniAppCommandBoundary);
-        this.dbMockup.put(springApplicationName,entity);
-        return this.boundaryToEntity(MiniAppCommandBoundary);
-    }
-
-    @Override
-    public List<MiniAppCommandBoundary> getAllCommands() {
-        return this.dbMockup.values()
-                .stream() // Stream<MessageEntity>
-                .map(this::entityToBoundary) // Stream<Message>
-                .toList(); // List<Message>
-    }
-
-    @Override
-    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) {
-        List<MiniAppCommandBoundary> allminiAppCommand = getAllCommands();
-        List<MiniAppCommandBoundary> rv = new ArrayList<>();
-        return allminiAppCommand
-                .stream() // Stream<MessageEntity>
-                .filter(obj->obj.getCommandId().getMiniapp().equalsIgnoreCase(miniAppName))
-                .toList();
+        this.repository.save(entity);
+        return this.entityToBoundary(entity);
     }
 
     @Override
     public void deleteAllCommands() {
-        this.dbMockup.clear();
-
+        this.repository.deleteAll();
     }
+
+    @Override
+    public List<MiniAppCommandBoundary> getAllCommands() {
+        List<MiniAppCommandEntity> entities = this.repository.findAll();
+        List<MiniAppCommandBoundary> boundaries = new ArrayList<>();
+        for (MiniAppCommandEntity entity : entities) {
+            boundaries.add(this.entityToBoundary(entity));
+        }
+        return boundaries;
+    }
+
+    @Override
+    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) {
+        List<MiniAppCommandEntity> entities = repository.findAllByCommandIdMiniapp(miniAppName);
+        return entities.stream()
+                .map(this::entityToBoundary)
+                .collect(Collectors.toList());
+    }
+
 
 
     public MiniAppCommandBoundary entityToBoundary(MiniAppCommandEntity entity) {
