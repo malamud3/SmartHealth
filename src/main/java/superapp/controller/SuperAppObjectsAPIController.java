@@ -1,6 +1,7 @@
 package superapp.controller;
 
 import superapp.Boundary.*;
+import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -120,8 +121,7 @@ public class SuperAppObjectsAPIController  {
 			@PathVariable("superapp") String superapp,
 			@PathVariable("internalObjectId") String internalObjectId){
 		Optional<ObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId);
-		assert objectBoundary.orElse(null) != null;
-		return superAppObjectRelationshipService.getAllParents(objectBoundary.orElse(null).getObjectId().getInternalObjectId()).stream().toList();
+		return superAppObjectRelationshipService.getAllParents(objectBoundary.orElseThrow(()->new ObjectNotFoundException("could not find Object with id:"+internalObjectId)).getObjectId().getInternalObjectId()).stream().toList();
 	}
 
 }

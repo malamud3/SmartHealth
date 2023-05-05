@@ -1,6 +1,8 @@
 package superapp.Boundary.User;
 
 
+import java.util.Objects;
+
 public class UserBoundary {
 	
     private UserId userId;
@@ -65,5 +67,10 @@ public class UserBoundary {
 	public boolean equals(Object obj){
 		UserBoundary other = (UserBoundary) obj;
 		return this.userId.equals(other.userId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(userId, role, username, avatar);
 	}
 }
