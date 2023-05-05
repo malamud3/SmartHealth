@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UsersRelatedAPIController {
-	private UsersService usersService;
+	private final UsersService usersService;
 	private String springAppName;
 
 

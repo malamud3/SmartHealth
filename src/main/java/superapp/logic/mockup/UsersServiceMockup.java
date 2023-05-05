@@ -15,7 +15,6 @@ import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
-import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
@@ -24,9 +23,8 @@ import superapp.logic.utilitys.userUtility;
 @Service
 
 public class UsersServiceMockup implements UsersService {
-	private UserRepository userRepository;
-	private  MongoTemplate mongoTemplate;
-
+	private final UserRepository userRepository;
+	private final MongoTemplate mongoTemplate;
 	private String springAppName;
 
 	@Autowired
@@ -200,7 +198,7 @@ public class UsersServiceMockup implements UsersService {
 		}
 
 		// Check if role is valid
-		if(UserUtility.isUserRoleValid(newUser.getRole())){
+		if(!UserUtility.isUserRoleValid(newUser.getRole())){
 			throw new IllegalArgumentException("Invalid role: " + newUser.getRole());
 		}
 

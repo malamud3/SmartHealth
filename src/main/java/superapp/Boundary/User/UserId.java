@@ -10,7 +10,7 @@ public class UserId {
 		
 	}
 
-	public UserId(String email, @Value("${spring.application.name}") String superapp) {
+	public UserId(@Value("${spring.application.name}") String superapp,String email) {
 		super();
 		this.email = email;
 		this.superapp = superapp;

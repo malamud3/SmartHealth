@@ -19,14 +19,13 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
 
     private final SuperAppObjectRepository objectRepository;
     private String springAppName;
-    private final MongoTemplate mongoTemplate;
+
 
     @Autowired
     public ObjectServiceMockup(SuperAppObjectRepository objectRepository,
                                MongoTemplate mongoTemplate) {
 
         this.objectRepository = objectRepository;
-        this.mongoTemplate = mongoTemplate;
     }
 
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -36,23 +35,9 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
 
     @Override
     public ObjectBoundary createObject(ObjectBoundary obj) {
+
+        obj.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
         SuperAppObjectEntity entity = boundaryToEntity(obj);
-
-        Set<SuperAppObjectEntity> parentObjects = new HashSet<>();
-        Set<SuperAppObjectEntity> childObjects = new HashSet<>();
-
-        if (obj.getParentObjects() != null) {
-            for (ObjectBoundary parent : obj.getParentObjects()) {
-                objectRepository.findById(parent.getObjectId()).ifPresent(parentObjects::add);
-            }
-        }
-        if (obj.getChildObjects() != null) {
-            for (ObjectBoundary child : obj.getChildObjects()) {
-                objectRepository.findById(child.getObjectId()).ifPresent(childObjects::add);
-            }
-        }
-        entity.setParentObjects(parentObjects);
-        entity.setChildObjects(childObjects);
         entity = objectRepository.save(entity);
         return entityToBoundary(entity);
     }
@@ -82,16 +67,8 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
             entity.setLocation(update.getLocation());
             dirtyFlag=true;
         }
-        if (update.getCreatedBy() != null) {
-            entity.setCreatedBy(update.getCreatedBy());
-            dirtyFlag=true;
-        }
         if (update.getObjectDetails() != null) {
             entity.setObjectDetails(update.getObjectDetails());
-            dirtyFlag=true;
-        }
-        if(update.getObjectId() != null){
-            entity.setObjectId(update.getObjectId());
             dirtyFlag=true;
         }
 
@@ -122,44 +99,53 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
     @Override
     public void bindParentAndChild(String parentId, String childId) {
-        SuperAppObjectEntity parent = mongoTemplate.findById(parentId, SuperAppObjectEntity.class);
-        SuperAppObjectEntity child = mongoTemplate.findById(childId, SuperAppObjectEntity.class);
+        Optional<SuperAppObjectEntity> optionalParent = objectRepository.findById(new ObjectId(springAppName, parentId));
+        Optional<SuperAppObjectEntity> optionalChild = objectRepository.findById(new ObjectId(springAppName, childId));
 
-        assert parent != null;
-        parent.getChildObjects().add(child);
-
-        assert child != null;
-        child.getParentObjects().add(parent);
-
-        mongoTemplate.save(parent);
-        mongoTemplate.save(child);
-    }
-    @Override
-    public Set<SuperAppObjectEntity> getAllChildren(String objectId) {
-        SuperAppObjectEntity parent = mongoTemplate.findById(objectId, SuperAppObjectEntity.class);
-
-        if (parent == null) {
-            throw new IllegalArgumentException("Invalid object ID");
+        if (optionalParent.isEmpty() || optionalChild.isEmpty()) {
+            throw new NullPointerException("internal id not exist");
         }
 
-        Set<SuperAppObjectEntity> children = new HashSet<>();
+        SuperAppObjectEntity parent = optionalParent.get();
+        SuperAppObjectEntity child = optionalChild.get();
+        parent.getChildObjects().add(child);
+        child.getParentObjects().add(parent);
+        objectRepository.save(child);
+        objectRepository.save(parent);
 
-        for (SuperAppObjectEntity child : parent.getChildObjects()) {
-            children.add(child);
-            children.addAll(getAllChildren(child.getObjectId().toString()));
+    }
+    @Override
+    public Set<ObjectBoundary> getAllChildren(String objectId) {
+        Optional<SuperAppObjectEntity> optionalParent = objectRepository.findById(new ObjectId(springAppName, objectId));
+
+        if (optionalParent.isEmpty()) {
+            throw new NullPointerException("internal id not exist");
+        }
+        Set<ObjectBoundary> children = new HashSet<>();
+        SuperAppObjectEntity parent = optionalParent.get();
+
+        if (!parent.getChildObjects().isEmpty()){
+            children.addAll(parent.getChildObjects().stream().map(this::entityToBoundary).toList());
         }
 
         return children;
     }
     @Override
-    public Set<SuperAppObjectEntity> getAllParents(SuperAppObjectEntity object) {
-        Set<SuperAppObjectEntity> parents = new HashSet<>();
+    public Set<ObjectBoundary> getAllParents(String objectId) {
 
-        for (SuperAppObjectEntity parent : object.getParentObjects()) {
-            parents.add(parent);
-            parents.addAll(getAllParents(parent));
+        Optional<SuperAppObjectEntity> optionalChild = objectRepository.findById(new ObjectId(springAppName, objectId));
+
+        if (optionalChild.isEmpty()) {
+            throw new NullPointerException("internal id not exist");
+        }
+        Set<ObjectBoundary> parents = new HashSet<>();
+        SuperAppObjectEntity child = optionalChild.get();
+
+        if (!child.getParentObjects().isEmpty()){
+            parents.addAll(child.getParentObjects().stream().map(this::entityToBoundary).toList());
         }
         return parents;
+
     }
 
 
@@ -175,8 +161,6 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         obj.setCreationTimestamp(entity.getCreationTimestamp());
         obj.setType(entity.getType());
         obj.setLocation(entity.getLocation());
-        obj.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
-        obj.setCreationTimestamp(new Date());
         return obj;
     }
 

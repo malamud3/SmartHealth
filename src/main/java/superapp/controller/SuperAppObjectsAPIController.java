@@ -82,14 +82,46 @@ public class SuperAppObjectsAPIController  {
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE
 	)
-	public List<ObjectBoundary> bindObjectToChild(
+	public void bindObjectToChild(
 			@PathVariable("superapp") String superapp,
 			@PathVariable("internalObjectId") String internalObjectId,
-			@RequestBody String childId
+			@RequestBody  SuperAppObjectIdBoundary objectIdBoundary
 	) {
 		Optional<ObjectBoundary> objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId);
-		superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.get().getObjectId().getInternalObjectId(), childId);
-		return objectsService.getAllObjects();
+		assert objectBoundaryParent.orElse(null) != null;
+		superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.get().getObjectId().getInternalObjectId(), objectIdBoundary.getInternalObjectId());
+	}
+
+
+
+	//GET: Get all children of an existing object
+	@GetMapping(
+			path = "/superapp/objects/{superapp}/{internalObjectId}/children",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public List<ObjectBoundary> getAllObjectChildren(
+			@PathVariable("superapp") String superapp,
+			@PathVariable("internalObjectId") String internalObjectId){
+		Optional<ObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId);
+		assert objectBoundary.orElse(null) != null;
+		superAppObjectRelationshipService.getAllChildren(objectBoundary.orElse(null).getObjectId().getInternalObjectId());
+		return superAppObjectRelationshipService.getAllChildren(objectBoundary.orElse(null).getObjectId().getInternalObjectId()).stream().toList();
+	}
+
+
+	//GET: Get all parents of an existing object
+	@GetMapping(
+			path = "/superapp/objects/{superapp}/{internalObjectId}/parents",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public List<ObjectBoundary> getAllObjectParents(
+			@PathVariable("superapp") String superapp,
+			@PathVariable("internalObjectId") String internalObjectId){
+		Optional<ObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId);
+		assert objectBoundary.orElse(null) != null;
+		return superAppObjectRelationshipService.getAllParents(objectBoundary.orElse(null).getObjectId().getInternalObjectId()).stream().toList();
 	}
 
 }

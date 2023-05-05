@@ -1,6 +1,5 @@
 package superapp.Boundary.User;
 
-import   superapp.Boundary.User.UserBoundary;
 
 public class UserBoundary {
 	

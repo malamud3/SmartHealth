@@ -17,9 +17,6 @@ public class ObjectBoundary {
     private Location location;
     private UserId createdBy;
     private Map<String, Object> objectDetails;
-
-	private Set<ObjectBoundary> parentObjects;
-	private Set<ObjectBoundary> childObjects;
     
 	public ObjectBoundary(String superapp,String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);
@@ -88,22 +85,6 @@ public class ObjectBoundary {
 	
 
 
-
-	public Set<ObjectBoundary> getParentObjects() {
-		return parentObjects;
-	}
-
-	public void setParentObjects(Set<ObjectBoundary> parentObjects) {
-		this.parentObjects = parentObjects;
-	}
-
-	public Set<ObjectBoundary> getChildObjects() {
-		return childObjects;
-	}
-
-	public void setChildObjects(Set<ObjectBoundary> childObjects) {
-		this.childObjects = childObjects;
-	}
 
 	public Map<String, Object> getObjectDetails() {
 		return objectDetails;
