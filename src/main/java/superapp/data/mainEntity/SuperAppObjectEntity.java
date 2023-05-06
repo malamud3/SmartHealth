@@ -82,7 +82,7 @@ public class SuperAppObjectEntity {
 
     @Override
     public boolean equals(Object obj) {
-        ObjectBoundary other = (ObjectBoundary) obj;
+        SuperAppObjectEntity other = (SuperAppObjectEntity) obj;
         return objectId.equals(other.getObjectId());
     }
 

@@ -108,11 +108,16 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         SuperAppObjectEntity parent = optionalParent.get();
         SuperAppObjectEntity child = optionalChild.get();
 
-        parent.getChildObjects().add(child);
-        child.getParentObjects().add(parent);
-        objectRepository.save(child);
-        objectRepository.save(parent);
+        boolean isChildAlreadyAssociated = parent.getChildObjects().stream()
+                .anyMatch(existingChild -> existingChild.equals(child));
 
+        if (!isChildAlreadyAssociated) {
+
+            parent.getChildObjects().add(child);
+            child.getParentObjects().add(parent);
+            objectRepository.save(child);
+            objectRepository.save(parent);
+        }
     }
     @Override
     public Set<ObjectBoundary> getAllChildren(String objectId) {
