@@ -2,6 +2,7 @@ package superapp.logic.mockup;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
@@ -42,30 +43,26 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
     }
 
     @Override
-    public Object InvokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) {
+    public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) {
 
-        if (MiniAppCommandBoundary.getCommandAttributes() == null) {
+        if (miniAppCommandBoundary.getCommandAttributes() == null) {
             throw new RuntimeException("Command attributes are missing");
         }
-        if (MiniAppCommandBoundary.getCommandId() == null) {
-            throw new RuntimeException("Command ID is missing");
-        }
-        if (MiniAppCommandBoundary.getCommand() == null) {
+        if (miniAppCommandBoundary.getCommand() == null) {
             throw new RuntimeException("Command details are missing");
         }
-        if (MiniAppCommandBoundary.getInvocationTimestamp() == null) {
-            throw new RuntimeException("Invocation timestamp is missing");
-        }
-        if (MiniAppCommandBoundary.getInvokedBy() == null) {
+        if (miniAppCommandBoundary.getInvokedBy() == null) {
             throw new RuntimeException("Invoked by is missing");
         }
-        if (MiniAppCommandBoundary.getTargetObject() == null) {
+        if (miniAppCommandBoundary.getTargetObject() == null) {
             throw new RuntimeException("Target object is missing");
         }
-        MiniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
-        MiniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
-        MiniAppCommandEntity entity = this.boundaryToEntity(MiniAppCommandBoundary);
-        this.repository.save(entity);
+        miniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
+
+        miniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
+        miniAppCommandBoundary.setInvocationTimestamp(new Date());
+        MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
+        entity = this.repository.save(entity);
         return this.entityToBoundary(entity);
     }
 
@@ -98,6 +95,7 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         MiniAppCommandBoundary boundary = new MiniAppCommandBoundary();
 
         boundary.setCommandId(entity.getCommandId());
+        boundary.setCommandAttributes(entity.getCommandAttributes());
         boundary.setCommand(entity.getCommand());
         boundary.setTargetObject(entity.getTargetObject());
         boundary.setInvocationTimestamp(entity.getInvocationTimestamp());
@@ -136,6 +134,12 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
             entity.setInvokedBy(new UserId());
         }else {
             entity.setInvokedBy(obj.getInvokedBy());
+        }
+        if (obj.getCommandAttributes() == null){
+            entity.setCommandAttributes(new HashMap<>() {
+            });
+        }else {
+            entity.setCommandAttributes(obj.getCommandAttributes());
         }
 
         //Date

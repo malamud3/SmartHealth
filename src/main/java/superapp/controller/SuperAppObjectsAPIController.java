@@ -105,9 +105,7 @@ public class SuperAppObjectsAPIController  {
 			@PathVariable("superapp") String superapp,
 			@PathVariable("internalObjectId") String internalObjectId){
 		Optional<ObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId);
-		assert objectBoundary.orElse(null) != null;
-		superAppObjectRelationshipService.getAllChildren(objectBoundary.orElse(null).getObjectId().getInternalObjectId());
-		return superAppObjectRelationshipService.getAllChildren(objectBoundary.orElse(null).getObjectId().getInternalObjectId()).stream().toList();
+		return superAppObjectRelationshipService.getAllChildren(objectBoundary.orElseThrow(()->new ObjectNotFoundException("could not find Object with id:"+internalObjectId)).getObjectId().getInternalObjectId()).stream().toList();
 	}
 
 

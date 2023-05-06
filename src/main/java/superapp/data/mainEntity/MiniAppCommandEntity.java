@@ -18,7 +18,6 @@ public class MiniAppCommandEntity {
     private String command;
     private ObjectId targetObject;
     private Date invocationTimestamp;
-    @DBRef
     private UserId invokedBy;
     private Map<String, Object> commandAttributes; // key-value
 

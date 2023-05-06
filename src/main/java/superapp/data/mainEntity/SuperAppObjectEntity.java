@@ -13,13 +13,14 @@ import java.util.*;
 public class SuperAppObjectEntity {
     @Id
     private ObjectId objectId;
-    private String type;
+    private String type; //todo- define types
     private String alias;
     private Boolean active;
     private Date creationTimestamp;
     private Location location;
     private UserId createdBy;
     private Map<String, Object> objectDetails;
+
     @DBRef
     @Field("parentObjects")
     private Set<SuperAppObjectEntity> parentObjects;
@@ -94,6 +95,9 @@ public class SuperAppObjectEntity {
 	}
 
     public Set<SuperAppObjectEntity> getParentObjects() {
+        if (parentObjects == null) {
+            parentObjects = new HashSet<SuperAppObjectEntity>();
+        }
         return parentObjects;
     }
 
@@ -102,6 +106,9 @@ public class SuperAppObjectEntity {
     }
 
     public Set<SuperAppObjectEntity> getChildObjects() {
+        if (childObjects == null) {
+            childObjects = new HashSet<SuperAppObjectEntity>();
+        }
         return childObjects;
     }
 

@@ -35,15 +35,15 @@ public class UserTests {
     @PostConstruct
     public void setup() {
         this.restTemplate = new RestTemplate();
-        this.baseUrl = "http://localhost:" + this.port + "/message";
+        this.baseUrl = "http://localhost:" + this.port;
     }
 
-    @AfterEach
+ //   @AfterEach
 //	@BeforeEach
-    public void tearDown () {
-        this.restTemplate
-                .delete(this.baseUrl);
-    }
+//    public void tearDown () {
+//        this.restTemplate
+//                .delete(this.baseUrl);
+//    }
     @Test
     @DisplayName("test create user")
     public void testCreateUser() {
@@ -55,7 +55,7 @@ public class UserTests {
         newUserBoundary.setUsername("example_userName");
 
         // WHEN a POST request is sent to create a new user
-        UserBoundary userBoundary = this.restTemplate.postForObject(this.baseUrl,
+        UserBoundary userBoundary = this.restTemplate.postForObject(this.baseUrl+"/superapp/users",
                 usersRelatedAPIController.createUser(newUserBoundary), UserBoundary.class);
 
         // THEN the user should be created successfully

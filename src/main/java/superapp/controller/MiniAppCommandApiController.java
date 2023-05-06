@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class MiniAppCommandApiController
 {
 
-    private MiniAppCommandService miniAppCommandService;
+    private final MiniAppCommandService miniAppCommandService;
 
     @Autowired
     public MiniAppCommandApiController(MiniAppCommandService miniAppCommandService) {
@@ -27,9 +27,9 @@ public class MiniAppCommandApiController
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     
-    public Object invokeMiniApp(@PathVariable("miniAppName") String miniAppName, @RequestBody MiniAppCommandBoundary miniAppCommand) {
+    public MiniAppCommandBoundary invokeMiniApp(@PathVariable("miniAppName") String miniAppName, @RequestBody MiniAppCommandBoundary miniAppCommand) {
         miniAppCommand.getCommandId().setMiniapp(miniAppName);
-        return miniAppCommandService.InvokeCommand(miniAppCommand);
+        return miniAppCommandService.invokeCommand(miniAppCommand);
     }
 
 }

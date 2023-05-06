@@ -22,8 +22,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
 
 
     @Autowired
-    public ObjectServiceMockup(SuperAppObjectRepository objectRepository,
-                               MongoTemplate mongoTemplate) {
+    public ObjectServiceMockup(SuperAppObjectRepository objectRepository) {
 
         this.objectRepository = objectRepository;
     }
@@ -108,6 +107,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
 
         SuperAppObjectEntity parent = optionalParent.get();
         SuperAppObjectEntity child = optionalChild.get();
+
         parent.getChildObjects().add(child);
         child.getParentObjects().add(parent);
         objectRepository.save(child);

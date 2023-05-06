@@ -1,6 +1,8 @@
 package superapp.Boundary.User;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.annotation.Id;
+
 
 public class UserId {
 	private String superapp;

@@ -1,11 +1,11 @@
 package superapp.Boundary;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+
 import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
+
 
 public class ObjectBoundary {
 	
