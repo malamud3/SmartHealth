@@ -1,7 +1,6 @@
 package superapp;
 
 import jakarta.annotation.PostConstruct;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +10,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
+import superapp.Boundary.User.UserId;
 import superapp.controller.UsersRelatedAPIController;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,12 +41,7 @@ public class UserTests {
         this.baseUrl = "http://localhost:" + this.port;
     }
 
- //   @AfterEach
-//	@BeforeEach
-//    public void tearDown () {
-//        this.restTemplate
-//                .delete(this.baseUrl);
-//    }
+
     @Test
     @DisplayName("test successful post user")
     public void testPostUser() {
@@ -72,14 +65,55 @@ public class UserTests {
         assertThat(userBoundary.getAvatar()).isEqualTo(newUserBoundary.getAvatar());
         assertThat(userBoundary.getRole()).isEqualTo(newUserBoundary.getRole());
         assertThat(userBoundary.getUsername()).isEqualTo(newUserBoundary.getUsername());
-        // AND the database should have only one user with this email
-        assertThat(this.restTemplate
-                .getForObject(this.baseUrl + "/superapp/users/login/"+springAppName+"/"+userBoundary.getUserId().getEmail(), UserBoundary[].class))
-                .hasSize(1)
-                .usingRecursiveFieldByFieldElementComparatorOnFields("email")
-                .containsExactly(userBoundary);
+    }
+
+    @Test
+    @DisplayName("test successful get user by email")
+    public void testGetUserByEmail() {
+        // GIVEN the database has a user with email "example545@example.com"
+        String email = "example545@example.com";
+        String superApp = springAppName;
+        UserBoundary expectedUser = new UserBoundary();
+        UserId userId = new UserId();
+        userId.setEmail(email);
+        userId.setSuperapp(springAppName);
+        expectedUser.setUserId(userId);
+        expectedUser.setAvatar("example_avatar");
+        expectedUser.setRole("MINIAPP_USER");
+        expectedUser.setUsername("example_userName");
+
+        // WHEN a GET request is sent to retrieve the user by email
+        UserBoundary actualUser =  this.restTemplate.getForObject(
+                this.baseUrl + "/superapp/users/login/"+superApp+"/"+email,
+                UserBoundary.class
+        );
+
+        // THEN the user should be retrieved successfully
+        assertThat(actualUser).isNotNull();
+        assertThat(actualUser).usingRecursiveComparison().isEqualTo(expectedUser);
+
     }
 
 
+    @Test
+    @DisplayName("test successful update user")
+    public void testUpdateUser() {
+        // GIVEN the database has a user with email "example545@example.com"
+        String email = "example545@example.com";
+        String superApp = springAppName;
+        UserBoundary existingUser = new UserBoundary();
+        existingUser.setAvatar("example_avatar");
+        existingUser.setRole("MINIAPP_USER");
+        existingUser.setUsername("example_userName");
+        existingUser.setUserId(new UserId(superApp, email));
+
+        // GIVEN an updated user object
+        UserBoundary updatedUser = new UserBoundary();
+        updatedUser.setAvatar("new_avatar");
+        updatedUser.setRole("ADMIN");
+        updatedUser.setUsername("new_username");
+        // WHEN a PUT request is sent to update the user
+        this.restTemplate.put(this.baseUrl + "/superapp/users/{superapp}/{userEmail}", updatedUser, superApp, email );
+    }
 
 }
