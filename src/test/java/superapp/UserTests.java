@@ -50,8 +50,8 @@ public class UserTests {
 //                .delete(this.baseUrl);
 //    }
     @Test
-    @DisplayName("test create user")
-    public void testCreateUser() {
+    @DisplayName("test successful post user")
+    public void testPostUser() {
         // GIVEN the database is up
         NewUserBoundary newUserBoundary = new NewUserBoundary();
         newUserBoundary.setAvatar("example_avatar");
