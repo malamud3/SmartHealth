@@ -25,7 +25,12 @@ public class UserTests {
     private RestTemplate restTemplate;
     private String baseUrl;
     private int port;
+    private String springAppName;
 
+    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
+    public void setSpringApplicationName(String springApplicationName) {
+        this.springAppName = springApplicationName;
+    }
 
     @LocalServerPort
     public void setPort(int port) {
@@ -51,20 +56,28 @@ public class UserTests {
         NewUserBoundary newUserBoundary = new NewUserBoundary();
         newUserBoundary.setAvatar("example_avatar");
         newUserBoundary.setRole("MINIAPP_USER");
-        newUserBoundary.setEmail("example@example.com");
+        newUserBoundary.setEmail("example545@example.com");
         newUserBoundary.setUsername("example_userName");
 
         // WHEN a POST request is sent to create a new user
-        UserBoundary userBoundary = this.restTemplate.postForObject(this.baseUrl+"/superapp/users",
-                usersRelatedAPIController.createUser(newUserBoundary), UserBoundary.class);
+        UserBoundary userBoundary = this.restTemplate.postForObject(
+                this.baseUrl + "/superapp/users",
+                newUserBoundary,
+                UserBoundary.class
+        );
 
         // THEN the user should be created successfully
         assertThat(userBoundary).isNotNull();
-        assertThat(userBoundary.getUserId()).isNotNull();
+        assertThat(userBoundary.getUserId().getEmail()).isNotNull().isEqualTo((newUserBoundary.getEmail()));
         assertThat(userBoundary.getAvatar()).isEqualTo(newUserBoundary.getAvatar());
         assertThat(userBoundary.getRole()).isEqualTo(newUserBoundary.getRole());
-        assertThat(userBoundary.getUserId().getEmail()).isEqualTo(newUserBoundary.getEmail());
         assertThat(userBoundary.getUsername()).isEqualTo(newUserBoundary.getUsername());
+        // AND the database should have only one user with this email
+        assertThat(this.restTemplate
+                .getForObject(this.baseUrl + "/superapp/users/login/"+springAppName+"/"+userBoundary.getUserId().getEmail(), UserBoundary[].class))
+                .hasSize(1)
+                .usingRecursiveFieldByFieldElementComparatorOnFields("email")
+                .containsExactly(userBoundary);
     }
 
 

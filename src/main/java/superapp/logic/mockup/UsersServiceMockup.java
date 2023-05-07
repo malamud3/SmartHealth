@@ -145,7 +145,6 @@ public class UsersServiceMockup implements UsersService {
 		UserEntity rv = new UserEntity();
 
 		rv.setUserId(user.getUserId());
-
 		rv.setRole(UserRole.valueOf(user.getRole()));
 
 		rv.setUsername(user.getUsername());
@@ -193,7 +192,7 @@ public class UsersServiceMockup implements UsersService {
 		userUtility UserUtility = new userUtility();
 
 		// Check if email is valid
-		if (!UserUtility.isValidEmail(newUser.getEmail())) {
+		if (!userUtility.isValidEmail(newUser.getEmail())) {
 			throw new IllegalArgumentException("Invalid email address: " + newUser.getEmail());
 		}
 
