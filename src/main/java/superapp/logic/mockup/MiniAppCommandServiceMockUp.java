@@ -44,7 +44,6 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
     @Override
     public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) {
-
         if (miniAppCommandBoundary.getCommandAttributes() == null) {
             throw new RuntimeException("Command attributes are missing");
         }
@@ -59,12 +58,17 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         }
         miniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
 
-        miniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
-        miniAppCommandBoundary.setInvocationTimestamp(new Date());
-        MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
-        entity = this.repository.save(entity);
-        return this.entityToBoundary(entity);
+        if (miniAppCommandBoundary.getCommand() != null) {
+            miniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
+            miniAppCommandBoundary.setInvocationTimestamp(new Date());
+            MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
+            entity = this.repository.save(entity);
+            return this.entityToBoundary(entity);
+        } else {
+            throw new RuntimeException("Command details are missing");
+        }
     }
+
 
     @Override
     public void deleteAllCommands() {

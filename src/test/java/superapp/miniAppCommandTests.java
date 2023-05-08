@@ -9,26 +9,32 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
+import superapp.Boundary.CommandId;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.Boundary.User.UserId;
+import superapp.controller.MiniAppCommandApiController;
 import superapp.controller.SuperAppObjectsAPIController;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class MiniAppTests {
+public class miniAppCommandTests {
 
     @Autowired
-    private SuperAppObjectsAPIController superAppObjectsAPIController;
+    private MiniAppCommandApiController miniAppCommandApiController;
     private String baseUrl;
     private RestTemplate restTemplate;
     private int port;
     private String springAppName;
+
+    private String miniAppName="foodApp";
+
 
 
 
@@ -52,16 +58,15 @@ public class MiniAppTests {
     @DisplayName("Test invoke mini app command")
     public void testInvokeMiniAppCommand() {
 
-        String miniAppName="foodApp";
         // GIVEN a mini app command
-           MiniAppCommandBoundary command = new MiniAppCommandBoundary();
-//        command.setCommand("exampleCommand");
-//        command.setTargetObject(new ObjectId());
-//        command.setInvocationTimestamp(new Date());
-//        command.setInvokedBy(new UserId("superApp", "example545@example.com"));
-//        command.setCommandAttributes(new HashMap<>());
-
-
+        MiniAppCommandBoundary command = new MiniAppCommandBoundary();
+        command.setCommand("exampleCommand");
+        command.setTargetObject(new ObjectId());
+        command.setInvocationTimestamp(new Date());
+        command.setInvokedBy(new UserId("superApp", "example545@example.com"));
+        command.setCommandAttributes(new HashMap<>());
+        CommandId commandId = new CommandId("superApp", miniAppName, UUID.randomUUID().toString());
+        command.setCommandId(commandId);
 
         // WHEN a POST request is sent to invoke the mini app command
         MiniAppCommandBoundary response = this.restTemplate.postForObject(

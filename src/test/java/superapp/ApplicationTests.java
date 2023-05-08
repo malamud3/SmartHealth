@@ -90,12 +90,12 @@ class ApplicationTests {
     }
 
 
-    @Test
-    public void TestInvokeMiniApp() throws Exception{
-        String miniAppName = "sample-miniapp";
-        MiniAppCommandBoundary miniAppCommand = new MiniAppCommandBoundary();
-        Object actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
-        assertEquals(miniAppName, ((MiniAppCommandEntity) actual).getCommandId().getMiniapp());
-    }
+//    @Test
+//    public void TestInvokeMiniApp() throws Exception{
+//        String miniAppName = "sample-miniapp";
+//        MiniAppCommandBoundary miniAppCommand = new MiniAppCommandBoundary();
+//        Object actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
+//        assertEquals(miniAppName, ((MiniAppCommandEntity) actual).getCommandId().getMiniapp());
+//    }
 
 }
