@@ -10,7 +10,7 @@ import superapp.data.Enum.UserRole;
 
 @Document(collection = "USERS")
 public class UserEntity {
-	@Id
+
 	private UserId userId;
 	private UserRole role;
     private String username;

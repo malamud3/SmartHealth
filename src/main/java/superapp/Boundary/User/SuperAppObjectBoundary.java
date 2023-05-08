@@ -5,6 +5,9 @@ import superapp.Boundary.ObjectId;
 public class SuperAppObjectBoundary {
     private ObjectId id;
 
+    public SuperAppObjectBoundary() {
+    }
+
     public SuperAppObjectBoundary(ObjectId id) {
         this.id = id;
     }

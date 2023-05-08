@@ -1,10 +1,12 @@
 package superapp.Boundary.User;
 
 
+import org.springframework.data.annotation.Id;
+
 import java.util.Objects;
 
 public class UserBoundary {
-	
+	@Id
     private UserId userId;
     private String role;
     private String username;

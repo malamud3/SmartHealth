@@ -5,7 +5,7 @@ import superapp.data.Enum.UserRole;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class userUtility {
+public class UserUtility {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$"
@@ -23,5 +23,9 @@ public class userUtility {
             return false;
         }
     }
+
+
+
+
 
 }

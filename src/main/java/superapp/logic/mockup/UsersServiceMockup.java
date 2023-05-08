@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import org.springframework.util.StringUtils;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
@@ -18,7 +17,8 @@ import superapp.data.Enum.UserRole;
 import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
-import superapp.logic.utilitys.userUtility;
+import superapp.logic.utilitys.GeneralUtility;
+import superapp.logic.utilitys.UserUtility;
 
 @Service
 
@@ -59,6 +59,7 @@ public class UsersServiceMockup implements UsersService {
 		}
 
 		UserBoundary user = new UserBoundary(newUser, springAppName);
+
 		UserEntity userEntity = this.boundaryToEntity(user);
 		userEntity = this.userRepository.save(userEntity);
 
@@ -189,29 +190,30 @@ public class UsersServiceMockup implements UsersService {
 	 @throws RuntimeException if a user with the same email address already exists in the database
 	 */
 	private void validateUser(NewUserBoundary newUser) {
-		userUtility UserUtility = new userUtility();
+		UserUtility userUtility = new UserUtility();
+		GeneralUtility generalUtility = new GeneralUtility();
 
 		// Check if email is valid
-		if (!userUtility.isValidEmail(newUser.getEmail())) {
+		if (!superapp.logic.utilitys.UserUtility.isValidEmail(newUser.getEmail())) {
 			throw new IllegalArgumentException("Invalid email address: " + newUser.getEmail());
 		}
 
 		// Check if role is valid
-		if(!UserUtility.isUserRoleValid(newUser.getRole())){
+		if(!userUtility.isUserRoleValid(newUser.getRole())){
 			throw new IllegalArgumentException("Invalid role: " + newUser.getRole());
 		}
 
 		// Check if the user already exists
 		UserId userId = new UserId(newUser.getEmail(), this.springAppName);
-		if (this.userRepository.existsById(userId)) {
-			throw new RuntimeException("User with email " + newUser.getEmail() + " already exists");
-		}
+		Optional<UserEntity> optionalUser = userRepository.findByUserId(userId);
+		optionalUser.orElseThrow(() -> new RuntimeException("User with email " + newUser.getEmail() + " already exists"));
 
-		if (StringUtils.isEmpty(newUser.getUsername())) {
+		//check if userName is not empty or null
+		if (generalUtility.isStringEmptyOrNull(newUser.getUsername())) {
 			throw new IllegalArgumentException("Username cannot be null or empty");
 		}
-
-		if (StringUtils.isEmpty(newUser.getAvatar())) {
+		//check if avatar is not empty or null
+		if (generalUtility.isStringEmptyOrNull(newUser.getAvatar())) {
 			throw new IllegalArgumentException("Avatar cannot be null or empty");
 		}
 

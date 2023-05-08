@@ -31,9 +31,13 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllUsers() {
+    public void deleteAllUsers() throws RuntimeException {
+        try {
+            userService.deleteAllUsers();
+        }catch (RuntimeException e){
+            throw new RuntimeException("Failed to delete all users: " + e.getMessage());
+        }
 
-    	userService.deleteAllUsers();
 
     }
 
@@ -42,9 +46,12 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllObjects() {
-
-    	objectsService.deleteAllObjects();
+    public void deleteAllObjects() throws RuntimeException{
+        try {
+            objectsService.deleteAllObjects();
+        }catch (RuntimeException e){
+            throw new RuntimeException("can't delete all objects: "+e.getMessage());
+        }
 
     }
 
@@ -55,7 +62,7 @@ public class AdminRelatedAPIController
 
     public void deleteAllCommands() {
 
-    	miniAppCommandService.deleteAllCommands();
+        miniAppCommandService.deleteAllCommands();
 
     }
 
@@ -66,9 +73,12 @@ public class AdminRelatedAPIController
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<UserBoundary> getAllUsers() {
-
-    	return userService.getAllUsers();
+    public List<UserBoundary> getAllUsers() throws RuntimeException{
+        try {
+            return userService.getAllUsers();
+        }catch (RuntimeException e){
+            throw new RuntimeException("Failed to get all users: " + e.getMessage());
+        }
     }
 
 

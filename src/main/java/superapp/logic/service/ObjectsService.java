@@ -7,13 +7,13 @@ import superapp.Boundary.ObjectBoundary;
 
 public interface ObjectsService
 {
-        public  ObjectBoundary createObject(ObjectBoundary obj);
+        public  ObjectBoundary createObject(ObjectBoundary obj) throws RuntimeException;
 
-        public ObjectBoundary updateObject(String obj , String internal_obj_id , ObjectBoundary update);
+        public ObjectBoundary updateObject(String obj , String internal_obj_id , ObjectBoundary update) throws RuntimeException;
 
-        public Optional<ObjectBoundary> getSpecificObject (String obj , String internal_obj_id);
+        public Optional<ObjectBoundary> getSpecificObject (String obj , String internal_obj_id) throws RuntimeException;
 
-        public List<ObjectBoundary> getAllObjects();
+        public List<ObjectBoundary> getAllObjects() throws RuntimeException;
 
-        public void deleteAllObjects();
+        public void deleteAllObjects() throws RuntimeException;
 }

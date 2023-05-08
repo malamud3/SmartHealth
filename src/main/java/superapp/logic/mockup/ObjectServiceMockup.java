@@ -1,15 +1,16 @@
 package superapp.logic.mockup;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import superapp.Boundary.ObjectBoundary;
 import superapp.Boundary.ObjectId;
+import superapp.Boundary.User.SuperAppObjectBoundary;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
 import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import superapp.logic.service.SuperAppObjectRelationshipService;
+import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,15 +34,34 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
 
     @Override
-    public ObjectBoundary createObject(ObjectBoundary obj) {
-
+    public ObjectBoundary createObject(ObjectBoundary obj) throws RuntimeException {
+        try {
+            validateObject(obj);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         obj.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
+        obj.setCreationTimestamp(new Date());
         SuperAppObjectEntity entity = boundaryToEntity(obj);
         entity = objectRepository.save(entity);
         return entityToBoundary(entity);
     }
 
-
+    private void validateObject(ObjectBoundary obj) {
+        GeneralUtility generalUtility = new GeneralUtility();
+        // Check if alias is valid
+        if (generalUtility.isStringEmptyOrNull(obj.getAlias())){
+            throw new RuntimeException("alias is empty");
+        }
+        // Check if type is valid
+        if (generalUtility.isStringEmptyOrNull(obj.getType())){
+            throw new RuntimeException("alias is empty");
+        // Check if created by is valid
+        }if (generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getEmail()) ||
+                generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getSuperapp()) ){
+            throw new RuntimeException("created by is empty");
+        }
+    }
     @Override
     public ObjectBoundary updateObject(String superAppId, String internal_obj_id, ObjectBoundary update) {
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
@@ -97,40 +117,37 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         objectRepository.deleteAll();
     }
     @Override
-    public void bindParentAndChild(String parentId, String childId) {
-        Optional<SuperAppObjectEntity> optionalParent = objectRepository.findById(new ObjectId(springAppName, parentId));
-        Optional<SuperAppObjectEntity> optionalChild = objectRepository.findById(new ObjectId(springAppName, childId));
-
-        if (optionalParent.isEmpty() || optionalChild.isEmpty()) {
-            throw new NullPointerException("internal id not exist");
+    public void bindParentAndChild(String parentId, String childId) throws RuntimeException{
+        if (childId.equals(parentId)){
+            throw new RuntimeException("can't bind the same object");
         }
-
-        SuperAppObjectEntity parent = optionalParent.get();
-        SuperAppObjectEntity child = optionalChild.get();
+        SuperAppObjectEntity parent  = objectRepository.findById(new ObjectId(springAppName, parentId)).orElseThrow(()
+                -> new RuntimeException("could not find object with id: "+parentId ));
+        SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, childId)).orElseThrow(()
+                -> new RuntimeException("could not find object with id: " +childId));
 
         boolean isChildAlreadyAssociated = parent.getChildObjects().stream()
                 .anyMatch(existingChild -> existingChild.equals(child));
 
         if (!isChildAlreadyAssociated) {
-
             parent.getChildObjects().add(child);
             child.getParentObjects().add(parent);
             objectRepository.save(child);
             objectRepository.save(parent);
+        }else {
+            throw new RuntimeException("child and parent already bind");
         }
     }
     @Override
     public Set<ObjectBoundary> getAllChildren(String objectId) {
-        Optional<SuperAppObjectEntity> optionalParent = objectRepository.findById(new ObjectId(springAppName, objectId));
+        SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new RuntimeException("object not found"));
 
-        if (optionalParent.isEmpty()) {
-            throw new NullPointerException("internal id not exist");
-        }
         Set<ObjectBoundary> children = new HashSet<>();
-        SuperAppObjectEntity parent = optionalParent.get();
 
         if (!parent.getChildObjects().isEmpty()){
             children.addAll(parent.getChildObjects().stream().map(this::entityToBoundary).toList());
+        }else {
+            throw new RuntimeException("object doesn't have children");
         }
 
         return children;
@@ -138,17 +155,15 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     @Override
     public Set<ObjectBoundary> getAllParents(String objectId) {
 
-        Optional<SuperAppObjectEntity> optionalChild = objectRepository.findById(new ObjectId(springAppName, objectId));
+        SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new RuntimeException("object not found"));
 
-        if (optionalChild.isEmpty()) {
-            throw new NullPointerException("internal id not exist");
-        }
         Set<ObjectBoundary> parents = new HashSet<>();
-        SuperAppObjectEntity child = optionalChild.get();
-
         if (!child.getParentObjects().isEmpty()){
             parents.addAll(child.getParentObjects().stream().map(this::entityToBoundary).toList());
+        }else {
+            throw new RuntimeException("object doesn't have parents");
         }
+
         return parents;
 
     }
@@ -168,7 +183,13 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         obj.setLocation(entity.getLocation());
         return obj;
     }
+    public SuperAppObjectBoundary entityToSuperAppObjectBoundary(SuperAppObjectEntity entity) {
+        SuperAppObjectBoundary obj = new SuperAppObjectBoundary();
 
+        // convert entity to SuperAppObjectBoundary
+        obj.setId(entity.getObjectId());
+        return obj;
+    }
 
 
 
