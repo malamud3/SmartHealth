@@ -50,29 +50,33 @@ public class UsersRelatedAPIController {
 
 	public UserBoundary validUser(@PathVariable("superapp") String superapp,
 								  @PathVariable("email") String email) {
-		return this.usersService.login(superapp, email)
-				.orElseThrow(()->new RuntimeException("could not find user with id: " + superapp + "_" + email));
+		try {
+			return this.usersService.login(superapp, email).orElseThrow();
+		}catch (RuntimeException e){
+			throw new RuntimeException("can't login: "+ e.getMessage());
+		}
 
-	}
+
+		}
 
 
-	//PUT: Update User
-	@RequestMapping(
-			path = {"/superapp/users/{superapp}/{userEmail}"},
-			method = {RequestMethod.PUT},
-			consumes = {MediaType.APPLICATION_JSON_VALUE})
+		//PUT: Update User
+		@RequestMapping(
+				path = {"/superapp/users/{superapp}/{userEmail}"},
+				method = {RequestMethod.PUT},
+				consumes = {MediaType.APPLICATION_JSON_VALUE})
             /*produces = {MediaType.APPLICATION_JSON_VALUE} in the REST API 'update user' has no output
 			but the userService's method 'updatedUser' returns user boundary, so to avoid troubles this method doesn't return User
 			Boundary as a JSON*/
 
-	public UserBoundary updateUser(@PathVariable("superapp") String superapp,
-						   @PathVariable("userEmail") String email,
-						   @RequestBody UserBoundary updatedUser) throws RuntimeException{
-		try {
-			return this.usersService.updateUser(superapp, email, updatedUser);
-		}catch (RuntimeException e){
-			throw new RuntimeException("Failed to update user: " + e.getMessage());
-		}
+		public UserBoundary updateUser(@PathVariable("superapp") String superapp,
+				@PathVariable("userEmail") String email,
+				@RequestBody UserBoundary updatedUser) throws RuntimeException{
+			try {
+				return this.usersService.updateUser(superapp, email, updatedUser);
+			}catch (RuntimeException e){
+				throw new RuntimeException("Failed to update user: " + e.getMessage());
+			}
 		}
 
 }

@@ -3,9 +3,9 @@ package superapp.logic.mockup;
 import org.springframework.beans.factory.annotation.Autowired;
 import superapp.Boundary.ObjectBoundary;
 import superapp.Boundary.ObjectId;
-import superapp.Boundary.User.SuperAppObjectBoundary;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
+import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -122,9 +122,9 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
             throw new RuntimeException("can't bind the same object");
         }
         SuperAppObjectEntity parent  = objectRepository.findById(new ObjectId(springAppName, parentId)).orElseThrow(()
-                -> new RuntimeException("could not find object with id: "+parentId ));
+                -> new ObjectNotFoundException("could not find object with id: "+parentId ));
         SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, childId)).orElseThrow(()
-                -> new RuntimeException("could not find object with id: " +childId));
+                -> new ObjectNotFoundException("could not find object with id: " +childId));
 
         boolean isChildAlreadyAssociated = parent.getChildObjects().stream()
                 .anyMatch(existingChild -> existingChild.equals(child));
@@ -140,7 +140,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
     @Override
     public Set<ObjectBoundary> getAllChildren(String objectId) {
-        SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new RuntimeException("object not found"));
+        SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new ObjectNotFoundException("object not found"));
 
         Set<ObjectBoundary> children = new HashSet<>();
 
@@ -155,7 +155,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     @Override
     public Set<ObjectBoundary> getAllParents(String objectId) {
 
-        SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new RuntimeException("object not found"));
+        SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new ObjectNotFoundException("object not found"));
 
         Set<ObjectBoundary> parents = new HashSet<>();
         if (!child.getParentObjects().isEmpty()){
@@ -183,14 +183,6 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         obj.setLocation(entity.getLocation());
         return obj;
     }
-    public SuperAppObjectBoundary entityToSuperAppObjectBoundary(SuperAppObjectEntity entity) {
-        SuperAppObjectBoundary obj = new SuperAppObjectBoundary();
-
-        // convert entity to SuperAppObjectBoundary
-        obj.setId(entity.getObjectId());
-        return obj;
-    }
-
 
 
     public SuperAppObjectEntity boundaryToEntity (ObjectBoundary obj) {

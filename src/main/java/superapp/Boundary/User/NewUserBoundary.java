@@ -45,16 +45,6 @@ public class NewUserBoundary {
         this.avatar = avatar;
     }
 
-    public UserBoundary newUserBoundaryToUserBoundary(String springAppName) {
-        UserBoundary user = new UserBoundary();
-
-        user.setUserId(new UserId(springAppName, this.email));
-        user.setRole(this.role);
-        user.setUsername(this.username);
-        user.setAvatar(this.avatar);
-
-        return user;
-    }
 
 }
 

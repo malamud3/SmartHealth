@@ -12,14 +12,13 @@ import superapp.logic.service.UsersService;
 import java.util.List;
 
 @RestController
-public class AdminRelatedAPIController
-{
+public class AdminRelatedAPIController {
     private UsersService userService;
     private MiniAppCommandService miniAppCommandService;
     private ObjectsService objectsService;
 
     @Autowired
-    public AdminRelatedAPIController(UsersService userService,MiniAppCommandService miniAppCommandService,ObjectsService objectsService) {
+    public AdminRelatedAPIController(UsersService userService, MiniAppCommandService miniAppCommandService, ObjectsService objectsService) {
         this.userService = userService;
         this.miniAppCommandService = miniAppCommandService;
         this.objectsService = objectsService;
@@ -34,7 +33,7 @@ public class AdminRelatedAPIController
     public void deleteAllUsers() throws RuntimeException {
         try {
             userService.deleteAllUsers();
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to delete all users: " + e.getMessage());
         }
 
@@ -46,11 +45,11 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllObjects() throws RuntimeException{
+    public void deleteAllObjects() throws RuntimeException {
         try {
             objectsService.deleteAllObjects();
-        }catch (RuntimeException e){
-            throw new RuntimeException("can't delete all objects: "+e.getMessage());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("can't delete all objects: " + e.getMessage());
         }
 
     }
@@ -60,9 +59,12 @@ public class AdminRelatedAPIController
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllCommands() {
-
-        miniAppCommandService.deleteAllCommands();
+    public void deleteAllCommands() throws RuntimeException {
+        try {
+            miniAppCommandService.deleteAllCommands();
+        }catch (RuntimeException e){
+            throw new RuntimeException();
+        }
 
     }
 
@@ -73,10 +75,10 @@ public class AdminRelatedAPIController
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<UserBoundary> getAllUsers() throws RuntimeException{
+    public List<UserBoundary> getAllUsers() throws RuntimeException {
         try {
             return userService.getAllUsers();
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to get all users: " + e.getMessage());
         }
     }
@@ -84,24 +86,31 @@ public class AdminRelatedAPIController
 
     //GET: Get All MiniApps Commands History
     @RequestMapping(
-            path ={"/superapp/admin/miniapp"},
+            path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<MiniAppCommandBoundary> ExportAllMiniAppsHistory()
-    {
-        return miniAppCommandService.getAllCommands();
+    public List<MiniAppCommandBoundary> ExportAllMiniAppsHistory() throws RuntimeException {
+        try {
+            return miniAppCommandService.getAllCommands();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("cant get all commands: " + e.getMessage());
+        }
     }
 
 
     //GET: Get Specific MiniApp Command History
     @RequestMapping(
-            path ={"/superapp/admin/miniapp/{miniAppName}"},
+            path = {"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp  )
-    {
-        return miniAppCommandService.getAllMiniAppCommands(miniapp);
+    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp)
+            throws RuntimeException {
+        try {
+            return miniAppCommandService.getAllMiniAppCommands(miniapp);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("can't get miniapp history: " + e.getMessage());
+        }
     }
 }

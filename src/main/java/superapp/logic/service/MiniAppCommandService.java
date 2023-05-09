@@ -6,10 +6,10 @@ import superapp.Boundary.MiniAppCommandBoundary;
 
 public interface MiniAppCommandService {
 
-        public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary);
-        public List<MiniAppCommandBoundary> getAllCommands();
-        public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName);
-        public void deleteAllCommands();
+        public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) throws RuntimeException;
+        public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException;
+        public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException;
+        public void deleteAllCommands() throws RuntimeException;
 
 }
 

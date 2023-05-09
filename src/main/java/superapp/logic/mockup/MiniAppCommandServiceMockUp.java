@@ -11,6 +11,7 @@ import superapp.logic.service.MiniAppCommandService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,41 +44,57 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
     }
 
     @Override
-    public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) {
+    public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
+        try {
+            validatMiniappCommand(miniAppCommandBoundary);
+        }catch (RuntimeException e){
+            throw new RuntimeException(e.getMessage());
+        }
+        miniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
+        miniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
+        miniAppCommandBoundary.setInvocationTimestamp(new Date());
+        MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
+        entity = this.repository.save(entity);
+        return this.entityToBoundary(entity);
+
+
+    }
+
+
+    private void validatMiniappCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
+        GeneralUtility generalUtility = new GeneralUtility();
         if (miniAppCommandBoundary.getCommandAttributes() == null) {
             throw new RuntimeException("Command attributes are missing");
         }
-        if (miniAppCommandBoundary.getCommand() == null) {
+        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getCommand())) {
             throw new RuntimeException("Command details are missing");
         }
-        if (miniAppCommandBoundary.getInvokedBy() == null) {
+        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getEmail()) ||
+        generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getSuperapp())) {
             throw new RuntimeException("Invoked by is missing");
         }
-        if (miniAppCommandBoundary.getTargetObject() == null) {
+        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getInternalObjectId()) ||
+                generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getSuperapp())) {
             throw new RuntimeException("Target object is missing");
         }
-        miniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
+    }
 
-        if (miniAppCommandBoundary.getCommand() != null) {
-            miniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
-            miniAppCommandBoundary.setInvocationTimestamp(new Date());
-            MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
-            entity = this.repository.save(entity);
-            return this.entityToBoundary(entity);
-        } else {
-            throw new RuntimeException("Command details are missing");
+
+    @Override
+    public void deleteAllCommands() throws RuntimeException {
+        try {
+            this.repository.deleteAll();
+        }catch (RuntimeException e){
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-
     @Override
-    public void deleteAllCommands() {
-        this.repository.deleteAll();
-    }
-
-    @Override
-    public List<MiniAppCommandBoundary> getAllCommands() {
+    public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException {
         List<MiniAppCommandEntity> entities = this.repository.findAll();
+        if (entities.isEmpty()){
+            throw new RuntimeException("there aren't any commands");
+        }
         List<MiniAppCommandBoundary> boundaries = new ArrayList<>();
         for (MiniAppCommandEntity entity : entities) {
             boundaries.add(this.entityToBoundary(entity));
@@ -86,8 +103,11 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
     }
 
     @Override
-    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) {
+    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException {
         List<MiniAppCommandEntity> entities = repository.findAllByCommandIdMiniapp(miniAppName);
+        if (entities.isEmpty()){
+            throw new RuntimeException("mini app history is empty");
+        }
         return entities.stream()
                 .map(this::entityToBoundary)
                 .collect(Collectors.toList());

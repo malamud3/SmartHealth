@@ -20,7 +20,7 @@ public class UserUtility {
             UserRole.valueOf(role);
             return true;
         } catch (IllegalArgumentException e) {
-            return false;
+            throw new IllegalArgumentException("role is not ok");
         }
     }
 
