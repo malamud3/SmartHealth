@@ -90,7 +90,7 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<MiniAppCommandBoundary> ExportAllMiniAppsHistory() throws RuntimeException {
+    public List<MiniAppCommandBoundary> exportAllMiniAppsHistory() throws RuntimeException {
         try {
             return miniAppCommandService.getAllCommands();
         } catch (RuntimeException e) {

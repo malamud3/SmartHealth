@@ -22,7 +22,7 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class miniAppCommandTests {
+public class MiniAppCommandTests {
 
     @Autowired
     private MiniAppCommandApiController miniAppCommandApiController;

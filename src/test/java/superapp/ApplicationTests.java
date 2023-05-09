@@ -33,13 +33,13 @@ class ApplicationTests {
 
 
     @Test
-    public void TestGetAllObjects() throws Exception{
+    public void testGetAllObjects() throws Exception{
         int expected = 0;
         int actual = superAppObjectsAPIController.getAllObjects().size();
         assertEquals(expected, actual);
     }
     @Test
-    public void TestValidUser() throws Exception {
+    public void testValidUser() throws Exception {
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
         UserBoundary expected = new UserBoundary(new UserId(superApp,email));
@@ -48,7 +48,7 @@ class ApplicationTests {
     }
 
     @Test
-    public void TestRetrieveUser() throws Exception{
+    public void testRetrieveUser() throws Exception{
         String superApp = "2023b.Gil.Azani";
         String email = "kuku@gmail.com";
         UserBoundary expected = new UserBoundary(new UserId(superApp,email));
@@ -58,14 +58,14 @@ class ApplicationTests {
     }
 
     @Test
-    public void TestGetAllUsers() throws Exception{
+    public void testGetAllUsers() throws Exception{
         int expected = 0;
         int actual = adminRelatedAPIController.getAllUsers().size();
         assertEquals(expected, actual);
     }
 
 //    @Test
-//    public void TestCreateUser(){
+//    public void testCreateUser(){
 //        String superApp = "2023b.Gil.Azani";
 //        String email = "kuku@gmail.com";
 //        NewUserBoundary expected = new NewUserBoundary();
@@ -75,14 +75,14 @@ class ApplicationTests {
 //    }
 
     @Test
-    public void TestExportAllMiniAppsHistory() {
+    public void testExportAllMiniAppsHistory() {
 
         int expected = 5;
-        int actual = adminRelatedAPIController.ExportAllMiniAppsHistory().size();
+        int actual = adminRelatedAPIController.exportAllMiniAppsHistory().size();
         assertEquals(expected, actual);
     }
     @Test
-    public void TestGetSpecificMiniAppHistory(){
+    public void testGetSpecificMiniAppHistory(){
         String minApp = "sample-miniapp";
         int expected = 2;
         int actual = adminRelatedAPIController.getSpecificMiniAppHistory(minApp).size();
@@ -91,7 +91,7 @@ class ApplicationTests {
 
 
 //    @Test
-//    public void TestInvokeMiniApp() throws Exception{
+//    public void testInvokeMiniApp() throws Exception{
 //        String miniAppName = "sample-miniapp";
 //        MiniAppCommandBoundary miniAppCommand = new MiniAppCommandBoundary();
 //        Object actual = miniAppCommandApiController.invokeMiniApp(miniAppName, miniAppCommand);
