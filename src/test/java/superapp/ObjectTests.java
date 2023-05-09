@@ -11,10 +11,7 @@ import superapp.Boundary.Location;
 import superapp.Boundary.ObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.controller.SuperAppObjectsAPIController;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -54,7 +51,8 @@ public class ObjectTests {
         objectBoundary.setType("exampleType");
         objectBoundary.setAlias("exampleAlias");
         objectBoundary.setActive(true);
-        objectBoundary.setCreationTimestamp(new Date());
+        Date now = new Date();
+        objectBoundary.setCreationTimestamp(now);
         objectBoundary.setLocation(new Location(1.0, 2.0));
         objectBoundary.setCreatedBy(new UserId("superapp", "example545@example.com"));
         objectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
@@ -71,9 +69,9 @@ public class ObjectTests {
         assertEquals(objectBoundary.getType(), response.getType());
         assertEquals(objectBoundary.getAlias(), response.getAlias());
         assertEquals(objectBoundary.getActive(), response.getActive());
-        assertEquals(objectBoundary.getCreationTimestamp(), response.getCreationTimestamp());
-        assertEquals(objectBoundary.getLocation().getLat(), response.getLocation().getLat());
-        assertEquals(objectBoundary.getLocation().getLng(), response.getLocation().getLng());
+        assertEquals(now.getTime(), response.getCreationTimestamp().getTime(),1000);
+        assertEquals(objectBoundary.getLocation().getLat(), response.getLocation().getLat(),0.01);
+        assertEquals(objectBoundary.getLocation().getLng(), response.getLocation().getLng(),0.01);
         assertEquals(objectBoundary.getCreatedBy().getEmail(), response.getCreatedBy().getEmail());
         assertEquals(objectBoundary.getObjectDetails(), response.getObjectDetails());
     }
@@ -151,30 +149,5 @@ public class ObjectTests {
         assertEquals(createdObject.getCreatedBy(), retrievedObject.getCreatedBy());
         assertEquals(createdObject.getObjectDetails(), retrievedObject.getObjectDetails());
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

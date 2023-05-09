@@ -14,11 +14,9 @@ import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.Boundary.User.UserId;
 import superapp.controller.MiniAppCommandApiController;
-import superapp.controller.SuperAppObjectsAPIController;
-
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.UUID;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
@@ -33,9 +31,7 @@ public class miniAppCommandTests {
     private int port;
     private String springAppName;
 
-    private String miniAppName="foodApp";
-
-
+    private String miniAppName = "foodApp";
 
 
     @LocalServerPort
@@ -60,18 +56,18 @@ public class miniAppCommandTests {
 
         // GIVEN a mini app command
         MiniAppCommandBoundary command = new MiniAppCommandBoundary();
-        command.setCommand("exampleCommand");
-        command.setTargetObject(new ObjectId());
-        command.setInvocationTimestamp(new Date());
-        command.setInvokedBy(new UserId("superApp", "example545@example.com"));
+        command.setCommand("example-command");
+        command.setTargetObject(new ObjectId("2023b.gil.azani", "bdde6835-67e9-4ef5-8d39-705f71c8e8c5"));
+        command.setInvocationTimestamp(Date.from(Instant.parse("2023-05-09T14:32:07.905Z")));
+        command.setInvokedBy(new UserId("2023b.gil.azani", "45555@example.com"));
         command.setCommandAttributes(new HashMap<>());
-        CommandId commandId = new CommandId("superApp", miniAppName, UUID.randomUUID().toString());
+        CommandId commandId = new CommandId("2023b.gil.azani", "foodApp", "fbd05d72-3af9-43c6-9935-cae2f70c59b8");
         command.setCommandId(commandId);
 
         // WHEN a POST request is sent to invoke the mini app command
         MiniAppCommandBoundary response = this.restTemplate.postForObject(
                 this.baseUrl + "/superapp/miniapp/{miniAppName}",
-                command ,
+                command,
                 MiniAppCommandBoundary.class,
                 miniAppName
         );
@@ -80,16 +76,5 @@ public class miniAppCommandTests {
         assertNotNull(response);
         assertNotNull(response.getCommandId());
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }
