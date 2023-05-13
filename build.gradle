@@ -18,8 +18,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.json:json:20230227'
-	implementation 'com.google.code.gson:gson:2.10.1'
-	implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 }
 
 ext['spring-framework.version'] = '6.0.8'

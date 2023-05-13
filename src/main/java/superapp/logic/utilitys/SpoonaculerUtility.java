@@ -1,71 +1,58 @@
 package superapp.logic.utilitys;
 
-import java.io.IOException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+
 
 import superapp.data.subEntity.IngridientEntity;
+import superapp.logic.service.SpoonaculerService;
 
-public class SpoonaculerUtility {
-	private static SpoonaculerUtility instance;
+@Service
+public class SpoonaculerUtility implements SpoonaculerService{
+	
+	//private ObjectMapper jackson; //add if needed
+	private RestTemplate restTemplate;
+
 	
 	private String API_KEY;
-	private String API_URL;
+	private String API_BASE_URL;
 	
-	private SpoonaculerUtility() {
-		//TODO - find a way to inject the values
+	public SpoonaculerUtility() {
+		//TODO - find a way to inject the API key
 		API_KEY = "4484a885c6ed4e6281e94718c241a20e";
-		API_URL = "https://api.spoonacular.com/food/ingredients";
-	}
-	public static SpoonaculerUtility getInstance() {
-		if (instance == null) {
-            instance = new SpoonaculerUtility();
-        }
-        return instance;
+		
+		API_BASE_URL = "https://api.spoonacular.com";
+		//this.jackson = new ObjectMapper();
+		this.restTemplate = new RestTemplate();
 	}
 	
-	public IngridientEntity getIngredientDataByName(String ingredientName) throws IOException {
-	    String urlType = "/search";
-	    String resultJSON = getDataFromAPI(urlType, "&query=" + ingredientName);
+	@Override
+	public IngridientEntity getIngredientDataByName(String ingredientName) {
+	    String resultJSON = this.restTemplate
+				.getForObject(API_BASE_URL + "/food/ingredients/search" +
+	    "?query=" + ingredientName + "&apiKey=" + API_KEY, String.class);
+	    
 	    Integer id = getIdOfTheFirstResult(resultJSON);
-	    System.err.println(id);
+	    System.err.println(resultJSON);
 	    return getIngredientDataById(id);
 	}
 	
-	public IngridientEntity getIngredientDataById(Integer id) throws IOException {
-		Gson gson = new Gson();
-		String ingredientJSON = getDataFromAPI("/" + id.toString() + "/information", "");
-		 System.err.println(ingredientJSON);
-		return gson.fromJson(ingredientJSON, IngridientEntity.class);
-	}
 	
-	
-	private String getDataFromAPI(String urlType, String urlParam) throws IOException {
-		//urlParam can be empty if it not needed
-		OkHttpClient client = new OkHttpClient();
-		
-
-		
-		String urlWithParams = API_URL + urlType + "?apiKey=" + API_KEY  + urlParam;
-
-        // Create the HTTP request object
-        Request request = new Request.Builder()
-                .url(urlWithParams)
-                .build();
-        
-        // Send the HTTP request and get the response
-        Response response = client.newCall(request).execute();
-
-        // Get the response body as a string
-        return response.body().string();
-		
+	@Override
+	public IngridientEntity getIngredientDataById(Integer id) {
+		//TODO - add units and amount
+		System.err.println(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=100&unit=grams");
+		System.err.println(this.restTemplate
+				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=100&unit=grams",
+						String.class, id));
+		return this.restTemplate
+				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=100&unit=grams",
+						IngridientEntity.class, id);
 	}
 
 	
@@ -83,5 +70,9 @@ public class SpoonaculerUtility {
         }
         return -1;//can change to throw a new resultemptyException
 	}
+
+
+	
+
 	
 }

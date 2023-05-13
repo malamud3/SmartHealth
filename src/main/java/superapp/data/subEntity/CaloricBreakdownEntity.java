@@ -6,6 +6,11 @@ public class CaloricBreakdownEntity {
 	private float percentCarbs;
 
 
+	
+	public CaloricBreakdownEntity() {
+		super();
+	}
+
 	// Getter Methods 
 
 	public float getPercentProtein() {
