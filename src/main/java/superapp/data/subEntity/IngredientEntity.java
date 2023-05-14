@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import superapp.data.subEntity.optionalSubEntity.EstimatedCostEntity;
 
-public class IngridientEntity {
+public class IngredientEntity {
 
 
 
@@ -25,12 +25,12 @@ public class IngridientEntity {
 	//private String aisle;
 	//private String image;
 	//ArrayList < Object > meta = new ArrayList < Object > ();
-	Nutrition nutrition;
-	ArrayList < Object > categoryPath = new ArrayList < Object > ();
+	NutritionEntity nutrition;
+	ArrayList < String > categoryPath = new ArrayList < String > ();
 
 	
 	
-	public IngridientEntity() {
+	public IngredientEntity() {
 		super();
 	}
 
@@ -96,25 +96,25 @@ public class IngridientEntity {
 
 
 
-	public Nutrition getNutrition() {
+	public NutritionEntity getNutrition() {
 		return nutrition;
 	}
 
 
 
-	public void setNutrition(Nutrition nutrition) {
+	public void setNutrition(NutritionEntity nutrition) {
 		this.nutrition = nutrition;
 	}
 
 
 
-	public ArrayList<Object> getCategoryPath() {
+	public ArrayList<String> getCategoryPath() {
 		return categoryPath;
 	}
 
 
 
-	public void setCategoryPath(ArrayList<Object> categoryPath) {
+	public void setCategoryPath(ArrayList<String> categoryPath) {
 		this.categoryPath = categoryPath;
 	}
 

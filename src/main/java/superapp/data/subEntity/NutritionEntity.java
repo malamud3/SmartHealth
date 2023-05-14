@@ -2,35 +2,35 @@ package superapp.data.subEntity;
 
 import java.util.ArrayList;
 
-public class Nutrition {
-	ArrayList < Object > nutrients = new ArrayList < Object > ();
-	ArrayList < Object > properties = new ArrayList < Object > ();
+public class NutritionEntity {
+	ArrayList < NutrientEntity > nutrients = new ArrayList < NutrientEntity > ();
+	ArrayList < PropertyEntity > properties = new ArrayList < PropertyEntity > ();
 	//ArrayList < Object > flavonoids = new ArrayList < Object > ();
 	//WeightPerServingEntity WeightPerServingObject;
 	CaloricBreakdownEntity caloricBreakdown = new CaloricBreakdownEntity();
 
 
-	public Nutrition() {
+	public NutritionEntity() {
 		super();
 	}
 
 
-	public ArrayList<Object> getNutrients() {
+	public ArrayList<NutrientEntity> getNutrients() {
 		return nutrients;
 	}
 
 
-	public void setNutrients(ArrayList<Object> nutrients) {
+	public void setNutrients(ArrayList<NutrientEntity> nutrients) {
 		this.nutrients = nutrients;
 	}
 
 
-	public ArrayList<Object> getProperties() {
+	public ArrayList<PropertyEntity> getProperties() {
 		return properties;
 	}
 
 
-	public void setProperties(ArrayList<Object> properties) {
+	public void setProperties(ArrayList<PropertyEntity> properties) {
 		this.properties = properties;
 	}
 

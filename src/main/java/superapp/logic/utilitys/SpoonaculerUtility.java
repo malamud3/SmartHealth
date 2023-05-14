@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 
-import superapp.data.subEntity.IngridientEntity;
+import superapp.data.subEntity.IngredientEntity;
 import superapp.logic.service.SpoonaculerService;
 
 @Service
@@ -32,7 +32,7 @@ public class SpoonaculerUtility implements SpoonaculerService{
 	}
 	
 	@Override
-	public IngridientEntity getIngredientDataByName(String ingredientName) {
+	public IngredientEntity getIngredientDataByName(String ingredientName) {
 	    String resultJSON = this.restTemplate
 				.getForObject(API_BASE_URL + "/food/ingredients/search" +
 	    "?query=" + ingredientName + "&apiKey=" + API_KEY, String.class);
@@ -44,15 +44,15 @@ public class SpoonaculerUtility implements SpoonaculerService{
 	
 	
 	@Override
-	public IngridientEntity getIngredientDataById(Integer id) {
-		//TODO - add units and amount
+	public IngredientEntity getIngredientDataById(Integer id) {
+		//100 grams as default 
 		System.err.println(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=100&unit=grams");
 		System.err.println(this.restTemplate
 				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=100&unit=grams",
 						String.class, id));
 		return this.restTemplate
 				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=100&unit=grams",
-						IngridientEntity.class, id);
+						IngredientEntity.class, id);
 	}
 
 	

@@ -1,11 +1,11 @@
 package superapp.logic.service;
 
-import superapp.data.subEntity.IngridientEntity;
+import superapp.data.subEntity.IngredientEntity;
 
 public interface SpoonaculerService {
 
-	public IngridientEntity getIngredientDataByName(String ingredientName);
+	public IngredientEntity getIngredientDataByName(String ingredientName);
 	
-	public IngridientEntity getIngredientDataById(Integer id);
+	public IngredientEntity getIngredientDataById(Integer id);
 	
 }
