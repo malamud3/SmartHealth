@@ -46,17 +46,28 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
     public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
         try {
             validatMiniappCommand(miniAppCommandBoundary);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
-        miniAppCommandBoundary.getCommandId().setSuperapp(springApplicationName);
-        miniAppCommandBoundary.getCommandId().setInternalCommandId(UUID.randomUUID().toString());
+
+        CommandId commandId = miniAppCommandBoundary.getCommandId();
+        if (commandId == null || commandId.getInternalCommandId() == null) {
+            // Handle the case where CommandId or InternalCommandId is not provided by the client
+            // You can choose to generate a default CommandId or handle it in a different way
+            // Here, we are setting default values for CommandId
+            commandId = new CommandId(springApplicationName, "default-miniapp", UUID.randomUUID().toString());
+            miniAppCommandBoundary.setCommandId(commandId);
+        } else if (commandId.getSuperapp() == null) {
+            // Handle the case where Superapp is not provided by the client
+            // You can set a default value or handle it in a different way based on your requirements
+            commandId.setSuperapp(springApplicationName);
+        }
+
         miniAppCommandBoundary.setInvocationTimestamp(new Date());
+
         MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
         entity = this.repository.save(entity);
         return this.entityToBoundary(entity);
-
-
     }
 
 

@@ -59,7 +59,7 @@ public class MiniAppCommandTests {
         command.setInvocationTimestamp(Date.from(Instant.parse("2023-05-09T14:32:07.905Z")));
         command.setInvokedBy(new InvokedBy(new UserId("2023b.gil.azani", "45555@example.com")));
         command.setCommandAttributes(new HashMap<>());
-        CommandId commandId = new CommandId("2023b.gil.azani", "foodApp", "fbd05d72-3af9-43c6-9935-cae2f70c59b8");
+        CommandId commandId = new CommandId();
         command.setCommandId(commandId);
 
         // WHEN a POST request is sent to invoke the mini app command
