@@ -1,4 +1,4 @@
-package superapp.logic.mockup;
+package superapp.logic.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,6 @@ import superapp.Boundary.User.UserId;
 import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
-import superapp.logic.service.UsersService;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
 import superapp.logic.utilitys.GeneralUtility;
@@ -23,13 +22,13 @@ import superapp.logic.utilitys.UserUtility;
 
 @Service
 
-public class UsersServiceMockup implements UsersService {
+public class UsersServiceRepo implements UsersService {
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
     private String springAppName;
 
     @Autowired
-    public UsersServiceMockup(UserRepository userRepository, MongoTemplate mongoTemplate) {
+    public UsersServiceRepo(UserRepository userRepository, MongoTemplate mongoTemplate) {
         this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
     }

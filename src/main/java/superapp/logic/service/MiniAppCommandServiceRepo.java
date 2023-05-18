@@ -1,13 +1,11 @@
-package superapp.logic.mockup;
+package superapp.logic.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
 import superapp.data.mainEntity.MiniAppCommandEntity;
-import superapp.logic.service.MiniAppCommandService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,7 @@ import superapp.logic.utilitys.GeneralUtility;
 import java.util.*;
 import java.util.stream.Collectors;
 @Service
-public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
+public class MiniAppCommandServiceRepo implements MiniAppCommandService {
 
     private  String springApplicationName;
     private final MiniAppCommandRepository repository;
@@ -36,8 +34,8 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
     }
 
     @Autowired
-    public MiniAppCommandServiceMockUp(MongoTemplate mongoTemplate,
-                                       MiniAppCommandRepository repository) {
+    public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
+                                     MiniAppCommandRepository repository) {
 
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;

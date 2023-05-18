@@ -1,4 +1,4 @@
-package superapp.logic.mockup;
+package superapp.logic.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import superapp.Boundary.superAppObjectBoundary;
@@ -6,24 +6,22 @@ import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
 import superapp.logic.Exceptions.ObjectNotFoundException;
-import superapp.logic.service.ObjectsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelationshipService {
+public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelationshipService {
 
     private final SuperAppObjectRepository objectRepository;
     private String springAppName;
 
 
     @Autowired
-    public ObjectServiceMockup(SuperAppObjectRepository objectRepository) {
+    public ObjectServiceRepo(SuperAppObjectRepository objectRepository) {
 
         this.objectRepository = objectRepository;
     }
