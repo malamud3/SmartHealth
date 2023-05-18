@@ -1,4 +1,4 @@
-package superapp.logic.service;
+package superapp.logic.Mongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -9,6 +9,7 @@ import superapp.data.mainEntity.MiniAppCommandEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import superapp.logic.service.MiniAppCommandService;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;

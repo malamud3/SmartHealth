@@ -89,8 +89,7 @@ public class SuperAppObjectsAPIController {
     //PUT: Bind an existing object to an existing child object
     @PutMapping(
             path = "/superapp/objects/{superapp}/{internalObjectId}/children",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public void bindObjectToChild(
             @PathVariable("superapp") String superapp,
@@ -110,7 +109,6 @@ public class SuperAppObjectsAPIController {
     //GET: Get all children of an existing object
     @GetMapping(
             path = "/superapp/objects/{superapp}/{internalObjectId}/children",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<superAppObjectBoundary> getAllObjectChildren(

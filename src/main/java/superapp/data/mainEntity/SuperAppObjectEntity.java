@@ -132,6 +132,11 @@ public class SuperAppObjectEntity {
         childObject.addParentObject(this);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(objectId, type, alias, active, creationTimestamp, location, createdBy, objectDetails, parentObjects, childObjects);
+    }
+
     public void removeParentObject(SuperAppObjectEntity parentObject) {
         if (parentObjects != null) {
             parentObjects.remove(parentObject);

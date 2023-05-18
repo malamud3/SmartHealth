@@ -12,6 +12,8 @@ import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+
 @Document(collection = "COMMAND")
 public class MiniAppCommandEntity {
     @Id
@@ -45,7 +47,19 @@ public class MiniAppCommandEntity {
     public CommandId getCommandId() {
         return commandId;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MiniAppCommandEntity that)) return false;
+        return Objects.equals(commandId, that.commandId) && Objects.equals(command, that.command) && Objects.equals(targetObject, that.targetObject) && Objects.equals(invocationTimestamp, that.invocationTimestamp) && Objects.equals(invokedBy, that.invokedBy) && Objects.equals(commandAttributes, that.commandAttributes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(commandId, command, targetObject, invocationTimestamp, invokedBy, commandAttributes);
+    }
+
     public String getCommand() {
         return command;
     }

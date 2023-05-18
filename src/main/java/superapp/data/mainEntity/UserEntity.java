@@ -8,6 +8,8 @@ import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.data.Enum.UserRole;
 
+import java.util.Objects;
+
 @Document(collection = "USERS")
 public class UserEntity {
 	@Id
@@ -58,5 +60,17 @@ public class UserEntity {
 
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof UserEntity that)) return false;
+		return Objects.equals(userId, that.userId) && role == that.role && Objects.equals(username, that.username) && Objects.equals(avatar, that.avatar);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(userId, role, username, avatar);
 	}
 }

@@ -9,6 +9,7 @@ import superapp.logic.service.MiniAppCommandService;
 import superapp.logic.service.ObjectsService;
 import superapp.logic.service.UsersService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -83,34 +84,41 @@ public class AdminRelatedAPIController {
         }
     }
 
-
     //GET: Get All MiniApps Commands History
     @RequestMapping(
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-
-    public List<MiniAppCommandBoundary> exportAllMiniAppsHistory() throws RuntimeException {
+    public List<MiniAppCommandBoundary> exportAllMiniAppsHistory() {
         try {
-            return miniAppCommandService.getAllCommands();
+            List<MiniAppCommandBoundary> commands = miniAppCommandService.getAllCommands();
+            if (commands.isEmpty()) {
+                return new ArrayList<>();
+            } else {
+                return commands;
+            }
         } catch (RuntimeException e) {
-            throw new RuntimeException("cant get all commands: " + e.getMessage());
+            System.err.println("Failed to get all commands: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
-
 
     //GET: Get Specific MiniApp Command History
     @RequestMapping(
             path = {"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-
-    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp)
-            throws RuntimeException {
+    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp) {
         try {
-            return miniAppCommandService.getAllMiniAppCommands(miniapp);
+            List<MiniAppCommandBoundary> miniappCommands = miniAppCommandService.getAllMiniAppCommands(miniapp);
+            if (miniappCommands.isEmpty()) {
+                return new ArrayList<>();
+            } else {
+                return miniappCommands;
+            }
         } catch (RuntimeException e) {
-            throw new RuntimeException("can't get miniapp history: " + e.getMessage());
+            System.err.println("Failed to get miniapp history: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 }

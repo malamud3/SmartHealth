@@ -1,4 +1,4 @@
-package superapp.logic.service;
+package superapp.logic.Mongo;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +17,7 @@ import superapp.data.Enum.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
+import superapp.logic.service.UsersService;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 
