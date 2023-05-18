@@ -1,13 +1,11 @@
 package superapp.Boundary;
 
 
-import superapp.Boundary.User.UserId;
-
 import java.util.Date;
 import java.util.Map;
 
 
-public class ObjectBoundary {
+public class superAppObjectBoundary {
 	
     private ObjectId objectId;
     private String type;
@@ -18,12 +16,12 @@ public class ObjectBoundary {
     private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
     
-	public ObjectBoundary(String superapp,String internalObjectId) {
+	public superAppObjectBoundary(String superapp, String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);
 		
 	}
 	
-	public ObjectBoundary() {
+	public superAppObjectBoundary() {
 		
 	}
 	
@@ -97,7 +95,7 @@ public class ObjectBoundary {
 	
 	@Override
 	public boolean equals(Object obj) {
-		ObjectBoundary other = (ObjectBoundary) obj;
+		superAppObjectBoundary other = (superAppObjectBoundary) obj;
 		return objectId.equals(other.objectId);
 	}
 }

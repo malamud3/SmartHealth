@@ -1,7 +1,7 @@
 package superapp.logic.mockup;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import superapp.Boundary.ObjectBoundary;
+import superapp.Boundary.superAppObjectBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
@@ -34,7 +34,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
 
     @Override
-    public ObjectBoundary createObject(ObjectBoundary obj) throws RuntimeException {
+    public superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException {
         try {
             validateObject(obj);
         } catch (IllegalArgumentException e) {
@@ -47,7 +47,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         return entityToBoundary(entity);
     }
 
-    private void validateObject(ObjectBoundary obj) {
+    private void validateObject(superAppObjectBoundary obj) {
         GeneralUtility generalUtility = new GeneralUtility();
         // Check if alias is valid
         if (generalUtility.isStringEmptyOrNull(obj.getAlias())){
@@ -63,7 +63,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         }
     }
     @Override
-    public ObjectBoundary updateObject(String superAppId, String internal_obj_id, ObjectBoundary update) {
+    public superAppObjectBoundary updateObject(String superAppId, String internal_obj_id, superAppObjectBoundary update) {
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
         if (optionalEntity.isEmpty()) {
             throw new NullPointerException("internal id not exist");
@@ -99,13 +99,13 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
 
     @Override
-    public Optional<ObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
+    public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
         return optionalEntity.map(this::entityToBoundary);
     }
 
     @Override
-    public List<ObjectBoundary> getAllObjects() {
+    public List<superAppObjectBoundary> getAllObjects() {
         List<SuperAppObjectEntity> entities = objectRepository.findAll();
         return entities.stream()
                 .map(this::entityToBoundary)
@@ -139,10 +139,10 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         }
     }
     @Override
-    public Set<ObjectBoundary> getAllChildren(String objectId) {
+    public Set<superAppObjectBoundary> getAllChildren(String objectId) {
         SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new ObjectNotFoundException("object not found"));
 
-        Set<ObjectBoundary> children = new HashSet<>();
+        Set<superAppObjectBoundary> children = new HashSet<>();
 
         if (!parent.getChildObjects().isEmpty()){
             children.addAll(parent.getChildObjects().stream().map(this::entityToBoundary).toList());
@@ -153,11 +153,11 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         return children;
     }
     @Override
-    public Set<ObjectBoundary> getAllParents(String objectId) {
+    public Set<superAppObjectBoundary> getAllParents(String objectId) {
 
         SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new ObjectNotFoundException("object not found"));
 
-        Set<ObjectBoundary> parents = new HashSet<>();
+        Set<superAppObjectBoundary> parents = new HashSet<>();
         if (!child.getParentObjects().isEmpty()){
             parents.addAll(child.getParentObjects().stream().map(this::entityToBoundary).toList());
         }else {
@@ -169,8 +169,8 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
 
 
-    public ObjectBoundary entityToBoundary( SuperAppObjectEntity entity) {
-        ObjectBoundary obj = new ObjectBoundary();
+    public superAppObjectBoundary entityToBoundary(SuperAppObjectEntity entity) {
+        superAppObjectBoundary obj = new superAppObjectBoundary();
 
         // convert entity to boundary
         obj.setObjectId(entity.getObjectId());
@@ -185,7 +185,7 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
     }
 
 
-    public SuperAppObjectEntity boundaryToEntity (ObjectBoundary obj) {
+    public SuperAppObjectEntity boundaryToEntity (superAppObjectBoundary obj) {
         SuperAppObjectEntity rv = new SuperAppObjectEntity();
 
         rv.setObjectId(obj.getObjectId());
