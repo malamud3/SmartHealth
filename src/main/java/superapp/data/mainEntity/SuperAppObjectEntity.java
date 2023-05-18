@@ -18,7 +18,7 @@ public class SuperAppObjectEntity {
     private Boolean active;
     private Date creationTimestamp;
     private Location location;
-    private UserId createdBy;
+    private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
 
     @DBRef
@@ -72,10 +72,10 @@ public class SuperAppObjectEntity {
     public void setLocation(Location location) {
         this.location = location;
     }
-    public UserId getCreatedBy() {
+    public CreatedBy getCreatedBy() {
         return this.createdBy;
     }
-    public void setCreatedBy(UserId createdBy) {
+    public void setCreatedBy(CreatedBy createdBy) {
         this.createdBy = createdBy;
     }
 

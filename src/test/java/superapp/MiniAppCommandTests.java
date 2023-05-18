@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
-import superapp.Boundary.CommandId;
-import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.Boundary.ObjectId;
+import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.controller.MiniAppCommandApiController;
 import java.time.Instant;
@@ -57,9 +55,9 @@ public class MiniAppCommandTests {
         // GIVEN a mini app command
         MiniAppCommandBoundary command = new MiniAppCommandBoundary();
         command.setCommand("example-command");
-        command.setTargetObject(new ObjectId("2023b.gil.azani", "bdde6835-67e9-4ef5-8d39-705f71c8e8c5"));
+        command.setTargetObject(new TargetObject( new ObjectId("2023b.gil.azani", "bdde6835-67e9-4ef5-8d39-705f71c8e8c5")));
         command.setInvocationTimestamp(Date.from(Instant.parse("2023-05-09T14:32:07.905Z")));
-        command.setInvokedBy(new UserId("2023b.gil.azani", "45555@example.com"));
+        command.setInvokedBy(new InvokedBy(new UserId("2023b.gil.azani", "45555@example.com")));
         command.setCommandAttributes(new HashMap<>());
         CommandId commandId = new CommandId("2023b.gil.azani", "foodApp", "fbd05d72-3af9-43c6-9935-cae2f70c59b8");
         command.setCommandId(commandId);

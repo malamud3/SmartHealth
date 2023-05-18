@@ -4,6 +4,10 @@ public class SuperAppObjectIdBoundary {
     private String superapp;
     private String internalObjectId;
 
+    public SuperAppObjectIdBoundary(){
+
+    }
+
     public SuperAppObjectIdBoundary(String superapp, String internalObjectId) {
         this.superapp = superapp;
         this.internalObjectId = internalObjectId;

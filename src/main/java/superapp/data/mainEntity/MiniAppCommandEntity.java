@@ -1,10 +1,11 @@
 package superapp.data.mainEntity;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import superapp.Boundary.CommandId;
+import superapp.Boundary.InvokedBy;
 import superapp.Boundary.ObjectId;
+import superapp.Boundary.TargetObject;
 import superapp.Boundary.User.UserId;
 
 
@@ -16,17 +17,17 @@ public class MiniAppCommandEntity {
     @Id
     private CommandId commandId;
     private String command;
-    private ObjectId targetObject;
+    private TargetObject targetObject;
     private Date invocationTimestamp;
-    private UserId invokedBy;
+    private InvokedBy invokedBy;
     private Map<String, Object> commandAttributes; // key-value
 
 
     public MiniAppCommandEntity() {
     }
 
-    public MiniAppCommandEntity(CommandId commandId, String command, ObjectId targetObject, Date invocationTimestamp,
-                                  UserId invokedBy, Map<String, Object> commandAttributes) {
+    public MiniAppCommandEntity(CommandId commandId, String command, TargetObject targetObject, Date invocationTimestamp,
+                                  InvokedBy invokedBy, Map<String, Object> commandAttributes) {
         this.commandId = commandId;
         this.command = command;
         this.targetObject = targetObject;
@@ -35,7 +36,7 @@ public class MiniAppCommandEntity {
         this.commandAttributes = commandAttributes;
     }
 
-    public MiniAppCommandEntity(String command, ObjectId targetObject, Date invocationTimestamp, UserId invokedBy,
+    public MiniAppCommandEntity(String command, TargetObject targetObject, Date invocationTimestamp, InvokedBy invokedBy,
                                   Map<String, Object> commandAttributes) {
         this(null, command, targetObject, invocationTimestamp, invokedBy, commandAttributes);
     }
@@ -49,7 +50,7 @@ public class MiniAppCommandEntity {
         return command;
     }
 
-    public ObjectId getTargetObject() {
+    public TargetObject getTargetObject() {
         return targetObject;
     }
 
@@ -57,7 +58,7 @@ public class MiniAppCommandEntity {
         return invocationTimestamp;
     }
 
-    public UserId getInvokedBy() {
+    public InvokedBy getInvokedBy() {
         return invokedBy;
     }
 
@@ -74,7 +75,7 @@ public class MiniAppCommandEntity {
         this.command = command;
     }
 
-    public void setTargetObject(ObjectId targetObject) {
+    public void setTargetObject(TargetObject targetObject) {
         this.targetObject = targetObject;
     }
 
@@ -82,7 +83,7 @@ public class MiniAppCommandEntity {
         this.invocationTimestamp = invocationTimestamp;
     }
 
-    public void setInvokedBy(UserId invokedBy) {
+    public void setInvokedBy(InvokedBy invokedBy) {
         this.invokedBy = invokedBy;
     }
 

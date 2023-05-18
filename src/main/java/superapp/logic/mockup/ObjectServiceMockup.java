@@ -57,8 +57,8 @@ public class ObjectServiceMockup implements ObjectsService, SuperAppObjectRelati
         if (generalUtility.isStringEmptyOrNull(obj.getType())){
             throw new RuntimeException("alias is empty");
         // Check if created by is valid
-        }if (generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getEmail()) ||
-                generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getSuperapp()) ){
+        }if (generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getUserId().getEmail()) ||
+                generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getUserId().getSuperapp()) ){
             throw new RuntimeException("created by is empty");
         }
     }

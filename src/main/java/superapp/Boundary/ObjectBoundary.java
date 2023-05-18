@@ -15,7 +15,7 @@ public class ObjectBoundary {
     private Boolean active;
     private Date creationTimestamp;
     private Location location;
-    private UserId createdBy;
+    private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
     
 	public ObjectBoundary(String superapp,String internalObjectId) {
@@ -75,11 +75,11 @@ public class ObjectBoundary {
 		this.location = location;
 	}
 	
-	public UserId getCreatedBy() {
+	public CreatedBy getCreatedBy() {
 		return createdBy;
 	}
 	
-	public void setCreatedBy(UserId createdBy) {
+	public void setCreatedBy(CreatedBy createdBy) {
 		this.createdBy = createdBy;
 	}
 	

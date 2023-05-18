@@ -69,12 +69,12 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
         if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getCommand())) {
             throw new RuntimeException("Command details are missing");
         }
-        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getEmail()) ||
-        generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getSuperapp())) {
+        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getEmail()) ||
+        generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp())) {
             throw new RuntimeException("Invoked by is missing");
         }
-        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getInternalObjectId()) ||
-                generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getSuperapp())) {
+        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId()) ||
+                generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp())) {
             throw new RuntimeException("Target object is missing");
         }
     }
@@ -148,14 +148,14 @@ public class MiniAppCommandServiceMockUp implements MiniAppCommandService {
 
 
         if (obj.getTargetObject() == null) {
-            entity.setTargetObject(new ObjectId());
+            entity.setTargetObject(new TargetObject(new ObjectId()));
         }
         else
             entity.setTargetObject(obj.getTargetObject());
 
 
         if (obj.getInvokedBy() == null) {
-            entity.setInvokedBy(new UserId());
+            entity.setInvokedBy(new InvokedBy(new UserId()));
         }else {
             entity.setInvokedBy(obj.getInvokedBy());
         }
