@@ -1,10 +1,12 @@
 package superapp.logic.Mongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import superapp.Boundary.CreatedBy;
 import superapp.Boundary.superAppObjectBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.data.mainEntity.SuperAppObjectEntity;
+import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -91,6 +93,14 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
             dirtyFlag=true;
         }
 
+        if (update.getCreatedBy() != null) {
+            CreatedBy createdBy = update.getCreatedBy();
+            if (createdBy.getUserId() != null) {
+                entity.getCreatedBy().setUserId(createdBy.getUserId());
+                dirtyFlag = true;
+            }
+        }
+
         if(dirtyFlag){
             entity = objectRepository.save(entity);
         }
@@ -100,6 +110,12 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
 
     @Override
     public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+
+    @Override
+    public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) {
+        // Perform the necessary authentication or authorization checks using the userSuperApp and userEmail parameters
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
         return optionalEntity.map(this::entityToBoundary);
     }
@@ -116,6 +132,8 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
     public void deleteAllObjects() {
         objectRepository.deleteAll();
     }
+
+
     @Override
     public void bindParentAndChild(String parentId, String childId) throws RuntimeException{
         if (childId.equals(parentId)){

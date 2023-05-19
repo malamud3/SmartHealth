@@ -82,11 +82,6 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
     @JmsListener(destination = "InvocationMiniAppQueue")
     public void handleInvokeMiniApp(String json) {
         try {
-            // convert json to boundary
-            // than convert boundary to entity
-            // than store entity in database
-            // than convert entity back to boundary
-            // than print the boundary to the console
             System.err.println(
                     this.entityToBoundary(
                             this.mongoTemplate

@@ -42,35 +42,40 @@ public class SuperAppObjectsAPIController {
 
     }
 
-    //PUT: Update Object
+    // PUT: Update Object
     @RequestMapping(
-            path = {"/superapp/objects/{superapp}/{internalObjectId}"},
-            method = {RequestMethod.PUT},
-            consumes = {MediaType.APPLICATION_JSON_VALUE})
-
-    public void updateObject(@PathVariable("superapp") String superapp,
-                             @PathVariable("internalObjectId") String internalObjectid,
-                             @RequestBody superAppObjectBoundary superAppObjectBoundary) throws  RuntimeException{
+            path = "/superapp/objects/{superapp}/{internalObjectId}",
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public void updateObject(
+            @PathVariable("superapp") String superapp,
+            @PathVariable("internalObjectId") String internalObjectId,
+            @RequestParam("userSuperApp") String userSuperApp,
+            @RequestParam("userEmail") String userEmail,
+            @RequestBody superAppObjectBoundary superAppObjectBoundary
+    ) {
         try {
-            objectsService.updateObject(superapp, internalObjectid, superAppObjectBoundary);
-        }catch (RuntimeException e){
-            throw new RuntimeException("can't update objects:" +e.getMessage());
-        }
 
+            objectsService.updateObject(superapp, internalObjectId, superAppObjectBoundary);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Can't update objects: " + e.getMessage());
+        }
     }
 
-    //GET: Get Object
+    // GET: Get specific Object
     @RequestMapping(
             path = {"/superapp/objects/{superapp}/{internalObjectId}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public superAppObjectBoundary retrieveObject(@PathVariable("superapp") String superapp,
-                                                 @PathVariable("internalObjectId") String internalObjectId) throws RuntimeException{
-        return objectsService.getSpecificObject(superapp, internalObjectId)
-                .orElseThrow(() -> new RuntimeException("could not find object with id: " + superapp + "_" + internalObjectId));
-
+    public superAppObjectBoundary retrieveObject(
+            @PathVariable("superapp") String superapp,
+            @PathVariable("internalObjectId") String internalObjectId,
+            @RequestParam("userSuperApp") String userSuperApp,
+            @RequestParam("userEmail") String userEmail) throws RuntimeException {
+        return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail)
+                .orElseThrow(() -> new RuntimeException("Could not find object with id: " + superapp + "_" + internalObjectId));
     }
-
 
     //GET: Get All Objects
     @RequestMapping(
