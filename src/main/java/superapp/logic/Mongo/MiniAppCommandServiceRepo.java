@@ -40,24 +40,30 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
     public void init() {
         if (!mongoTemplate.collectionExists("COMMAND")) {
             mongoTemplate.createCollection("COMMAND");
+            this.jackson = new ObjectMapper();
+
         }
     }
 
     @Autowired
     public void setJmsTemplate(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
-        this.jmsTemplate.setDeliveryDelay(2000L);
+        this.jmsTemplate.setDeliveryDelay(5000L);
     }
 
 
     @Override
     public MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
         miniAppCommandBoundary.setCommandId(new CommandId(miniAppCommandBoundary.getCommandId().getSuperapp(),miniAppCommandBoundary.getCommandId().getMiniapp(),miniAppCommandBoundary.getCommandId().getInternalCommandId()));
-        miniAppCommandBoundary.setInvocationTimestamp(new Date());
+        miniAppCommandBoundary.setInvocationTimestamp(miniAppCommandBoundary.getInvocationTimestamp());
         if (miniAppCommandBoundary.getCommandAttributes() == null) {
             miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
         }
         miniAppCommandBoundary.getCommandAttributes().put("status", "in-process...");
+        miniAppCommandBoundary.setCommand(miniAppCommandBoundary.getCommand());
+        miniAppCommandBoundary.setTargetObject(new TargetObject(miniAppCommandBoundary.getTargetObject().getObjectId()));
+        miniAppCommandBoundary.setInvokedBy(new InvokedBy(miniAppCommandBoundary.getInvokedBy().getUserId()));
+
         try {
             String json = this.jackson
                     .writeValueAsString(miniAppCommandBoundary);
@@ -66,7 +72,6 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
             System.err.println("*** sending: " + json);
             this.jmsTemplate
                     .convertAndSend("InvocationMiniAppQueue", json);
-
             return miniAppCommandBoundary;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -107,26 +112,29 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
 
     @Autowired
     public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-                                     MiniAppCommandRepository repository) {
+                                     MiniAppCommandRepository repository, ObjectMapper jackson) {
 
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
+        this.jackson = jackson;
     }
 
     @Override
     public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
-        try {
-            validatMiniappCommand(miniAppCommandBoundary);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+//        try {
+//            validatMiniappCommand(miniAppCommandBoundary);
+//        } catch (RuntimeException e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
 
         CommandId commandId = miniAppCommandBoundary.getCommandId();
-        if (commandId == null || commandId.getInternalCommandId() == null) {
-            commandId = new CommandId(springApplicationName, "default-miniapp", UUID.randomUUID().toString());
+        if (commandId.getInternalCommandId() == null) {
+            commandId = new CommandId(springApplicationName, miniAppCommandBoundary.getCommandId().getMiniapp(), UUID.randomUUID().toString());
             miniAppCommandBoundary.setCommandId(commandId);
         } else if (commandId.getSuperapp() == null) {
             commandId.setSuperapp(springApplicationName);
+        } else if (commandId.getMiniapp()==null) {
+            throw new RuntimeException("need to specify mini-app");
         }
         miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(),miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
         miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(),miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
