@@ -14,6 +14,7 @@ public class MiniAppCommandApiController
 
     private final MiniAppCommandService miniAppCommandService;
 
+
     @Autowired
     public MiniAppCommandApiController(MiniAppCommandService miniAppCommandService) {
         this.miniAppCommandService = miniAppCommandService;
@@ -34,7 +35,5 @@ public class MiniAppCommandApiController
        }catch (RuntimeException e){
            throw new RuntimeException("can't invoke mini app: "+e.getMessage());
        }
-
     }
-
 }

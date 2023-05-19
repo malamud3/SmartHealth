@@ -8,15 +8,18 @@ public class UserId {
 	private String superapp;
 	private String email;
 	
-	public UserId() {
-		
-	}
 
-	public UserId(@Value("${spring.application.name}") String superapp,String email) {
-		super();
+
+	public UserId(String superapp,String email) {
 		this.email = email;
 		this.superapp = superapp;
 	}
+
+	public UserId() {
+
+	}
+
+
 
 
 	public String getSuperapp() {

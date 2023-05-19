@@ -14,10 +14,10 @@ public class TargetObject {
     }
 
     public ObjectId getObjectId() {
-        return objectId;
+        return new ObjectId(objectId.getSuperapp(), objectId.getInternalObjectId());
     }
 
     public void setObjectId(ObjectId objectId) {
-        this.objectId = objectId;
+        this.objectId = new ObjectId(objectId.getSuperapp(), objectId.getInternalObjectId());
     }
 }

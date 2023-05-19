@@ -1,7 +1,10 @@
 package superapp.logic.Mongo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
@@ -21,6 +24,12 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
     private final MiniAppCommandRepository repository;
     private final MongoTemplate mongoTemplate;
 
+    private JmsTemplate jmsTemplate;
+
+    private ObjectMapper jackson;
+
+
+
     // this method injects a configuration value of spring
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
     public void setSpringApplicationName(String springApplicationName) {
@@ -32,6 +41,68 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
         if (!mongoTemplate.collectionExists("COMMAND")) {
             mongoTemplate.createCollection("COMMAND");
         }
+    }
+
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+        this.jmsTemplate.setDeliveryDelay(2000L);
+    }
+
+
+    @Override
+    public MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
+        miniAppCommandBoundary.setCommandId(new CommandId(miniAppCommandBoundary.getCommandId().getSuperapp(),miniAppCommandBoundary.getCommandId().getMiniapp(),miniAppCommandBoundary.getCommandId().getInternalCommandId()));
+        miniAppCommandBoundary.setInvocationTimestamp(new Date());
+        if (miniAppCommandBoundary.getCommandAttributes() == null) {
+            miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+        }
+        miniAppCommandBoundary.getCommandAttributes().put("status", "in-process...");
+        try {
+            String json = this.jackson
+                    .writeValueAsString(miniAppCommandBoundary);
+
+            // send json to afekaMessageQueue
+            System.err.println("*** sending: " + json);
+            this.jmsTemplate
+                    .convertAndSend("InvocationMiniAppQueue", json);
+
+            return miniAppCommandBoundary;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @JmsListener(destination = "InvocationMiniAppQueue")
+    public void handleInvokeMiniApp(String json) {
+        try {
+            // convert json to boundary
+            // than convert boundary to entity
+            // than store entity in database
+            // than convert entity back to boundary
+            // than print the boundary to the console
+            System.err.println(
+                    this.entityToBoundary(
+                            this.mongoTemplate
+                                    .save(
+                                            this.boundaryToEntity(
+                                                    this.setStatus(
+                                                            this.jackson
+                                                                    .readValue(json, MiniAppCommandBoundary.class),
+                                                            "remotely-accepted")))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private MiniAppCommandBoundary setStatus(MiniAppCommandBoundary miniAppCommandBoundary, String status) {
+        if (miniAppCommandBoundary.getCommandAttributes() == null) {
+            miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+        }
+        miniAppCommandBoundary.getCommandAttributes().put("status", status);
+
+        return miniAppCommandBoundary;
     }
 
     @Autowired
@@ -52,17 +123,13 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
 
         CommandId commandId = miniAppCommandBoundary.getCommandId();
         if (commandId == null || commandId.getInternalCommandId() == null) {
-            // Handle the case where CommandId or InternalCommandId is not provided by the client
-            // You can choose to generate a default CommandId or handle it in a different way
-            // Here, we are setting default values for CommandId
             commandId = new CommandId(springApplicationName, "default-miniapp", UUID.randomUUID().toString());
             miniAppCommandBoundary.setCommandId(commandId);
         } else if (commandId.getSuperapp() == null) {
-            // Handle the case where Superapp is not provided by the client
-            // You can set a default value or handle it in a different way based on your requirements
             commandId.setSuperapp(springApplicationName);
         }
-
+        miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(),miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
+        miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(),miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
         miniAppCommandBoundary.setInvocationTimestamp(new Date());
 
         MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
@@ -79,8 +146,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
         if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getCommand())) {
             throw new RuntimeException("Command details are missing");
         }
-        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getEmail()) ||
-        generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp())) {
+        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp()) ||
+        generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())) {
             throw new RuntimeException("Invoked by is missing");
         }
         if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId()) ||
@@ -165,7 +232,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
 
 
         if (obj.getInvokedBy() == null) {
-            entity.setInvokedBy(new InvokedBy(new UserId()));
+            entity.setInvokedBy(new InvokedBy());
         }else {
             entity.setInvokedBy(obj.getInvokedBy());
         }
