@@ -121,29 +121,38 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandService {
 
     @Override
     public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
-//        try {
-//            validatMiniappCommand(miniAppCommandBoundary);
-//        } catch (RuntimeException e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
+        try {
+            validatMiniappCommand(miniAppCommandBoundary);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
 
         CommandId commandId = miniAppCommandBoundary.getCommandId();
-        if (commandId.getInternalCommandId() == null) {
+        if (commandId.getInternalCommandId() == null || commandId.getInternalCommandId().isEmpty()) {
             commandId = new CommandId(springApplicationName, miniAppCommandBoundary.getCommandId().getMiniapp(), UUID.randomUUID().toString());
             miniAppCommandBoundary.setCommandId(commandId);
-        } else if (commandId.getSuperapp() == null) {
-            commandId.setSuperapp(springApplicationName);
-        } else if (commandId.getMiniapp()==null) {
-            throw new RuntimeException("need to specify mini-app");
         }
-        miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(),miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
-        miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(),miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
-        miniAppCommandBoundary.setInvocationTimestamp(new Date());
+        if (commandId.getSuperapp() == null || commandId.getSuperapp().isEmpty()) {
+            commandId.setSuperapp(springApplicationName);
+        }
+        if (commandId.getMiniapp() == null || commandId.getMiniapp().isEmpty()) {
+            throw new RuntimeException("Need to specify mini-app");
+        }
+
+        miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
+        miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
+        if (miniAppCommandBoundary.getInvocationTimestamp() == null) {
+            miniAppCommandBoundary.setInvocationTimestamp(new Date());
+        }
+        if (miniAppCommandBoundary.getCommandAttributes() == null) {
+            miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+        }
 
         MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
         entity = this.repository.save(entity);
         return this.entityToBoundary(entity);
     }
+
 
 
     private void validatMiniappCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
