@@ -115,10 +115,21 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
 
     @Override
     public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) {
-        // Perform the necessary authentication or authorization checks using the userSuperApp and userEmail parameters
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
+        if (optionalEntity.isEmpty()) {
+            throw new RuntimeException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
+        }
+        SuperAppObjectEntity entity = optionalEntity.get();
+
+        // Check if userSuperApp and userEmail match the createdBy information
+        if (!entity.getCreatedBy().getUserId().getSuperapp().equals(userSuperApp) ||
+                !entity.getCreatedBy().getUserId().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Access denied. Invalid user credentials.");
+        }
+
         return optionalEntity.map(this::entityToBoundary);
     }
+
 
     @Override
     public List<superAppObjectBoundary> getAllObjects() {
