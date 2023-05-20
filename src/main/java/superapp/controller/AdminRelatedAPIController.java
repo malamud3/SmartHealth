@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.logic.service.MiniAppCommandServiceWithAdminPermission;
-import superapp.logic.service.ObjectsService;
+import superapp.logic.service.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.UsersServiceWithAdminPermission;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +16,11 @@ import java.util.List;
 public class AdminRelatedAPIController {
     private UsersServiceWithAdminPermission userService;
     private MiniAppCommandServiceWithAdminPermission miniAppCommandService;
-    private ObjectsService objectsService;
+    private ObjectsServiceWithAdminPermission objectsService;
 
     @Autowired
     public AdminRelatedAPIController(UsersServiceWithAdminPermission userService,
-    		MiniAppCommandServiceWithAdminPermission miniAppCommandService, ObjectsService objectsService) {
+    		MiniAppCommandServiceWithAdminPermission miniAppCommandService, ObjectsServiceWithAdminPermission objectsService) {
         this.userService = userService;
         this.miniAppCommandService = miniAppCommandService;
         this.objectsService = objectsService;
@@ -43,12 +43,11 @@ public class AdminRelatedAPIController {
             path = {"/superapp/admin/objects"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllObjects() throws RuntimeException {
-        try {
-            objectsService.deleteAllObjects();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("can't delete all objects: " + e.getMessage());
-        }
+    public void deleteAllObjects(
+    		@RequestParam(name="userSuperapp") String userSuperapp, 
+			@RequestParam(name="userEmail") String userEmail){
+    	
+    	objectsService.deleteAllObjects(new UserId(userSuperapp, userEmail));
 
     }
 

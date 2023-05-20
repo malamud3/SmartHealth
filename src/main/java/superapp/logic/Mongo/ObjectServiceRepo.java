@@ -5,15 +5,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import superapp.Boundary.CreatedBy;
 import superapp.Boundary.superAppObjectBoundary;
+import superapp.Boundary.User.UserId;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
+import superapp.dal.UserRepository;
+import superapp.data.Enum.UserRole;
 import superapp.data.mainEntity.SuperAppObjectEntity;
+import superapp.data.mainEntity.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
+import superapp.logic.Exceptions.PermissionDeniedException;
+import superapp.logic.Exceptions.UserNotFoundException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import superapp.logic.service.ObjectServicePaginationSupported;
-import superapp.logic.service.ObjectsService;
+import superapp.logic.service.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 
@@ -21,16 +27,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelationshipService , ObjectServicePaginationSupported {
+public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService {
 
     private final SuperAppObjectRepository objectRepository;
+    private final UserRepository userRepository;//for permission checks
     private String springAppName;
 
 
     @Autowired
-    public ObjectServiceRepo(SuperAppObjectRepository objectRepository) {
+    public ObjectServiceRepo(SuperAppObjectRepository objectRepository,UserRepository userRepository) {
 
         this.objectRepository = objectRepository;
+        this.userRepository = userRepository;
     }
 
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -112,6 +120,7 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
     }
 
     @Override
+    @Deprecated
     public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
         throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
@@ -134,6 +143,12 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
     }
 
 
+    @Override
+    @Deprecated
+    public List<superAppObjectBoundary> getAllObjects() {
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+    
     //pagination Support
     @Override
     public List<superAppObjectBoundary> getAllObjects(int size, int page) {
@@ -144,15 +159,24 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
                 .toList();
     }
 
-    @Override
-    public List<superAppObjectBoundary> getAllObjects() {
-        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
-    }
 
     @Override
+    @Deprecated
     public void deleteAllObjects() {
         objectRepository.deleteAll();
     }
+    
+    @Override
+    public void deleteAllObjects(UserId userId) {
+	UserEntity userEntity = this.userRepository.findById(userId)
+			.orElseThrow(()->new UserNotFoundException("inserted id: " 
+	+ userId.toString() + " does not exist"));
+		
+	if (userEntity.getRole() != UserRole.ADMIN) {
+		throw new PermissionDeniedException("You do not have permission to delete all users");
+	}
+	this.objectRepository.deleteAll();
+}
 
 
     @Override

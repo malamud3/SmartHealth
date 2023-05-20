@@ -16,6 +16,7 @@ public interface ObjectsService {
         @Deprecated
         public List<superAppObjectBoundary> getAllObjects() throws RuntimeException;
 
+        @Deprecated
         public void deleteAllObjects() throws RuntimeException;
 
 }
