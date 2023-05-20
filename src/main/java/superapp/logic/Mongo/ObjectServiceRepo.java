@@ -129,7 +129,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) {
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
         if (optionalEntity.isEmpty()) {
-            throw new RuntimeException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
+            throw new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
         }
         SuperAppObjectEntity entity = optionalEntity.get();
 

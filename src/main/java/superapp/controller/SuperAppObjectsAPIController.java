@@ -16,18 +16,18 @@ import java.util.Optional;
 public class SuperAppObjectsAPIController {
 
 
-    private final ObjectsService objectsService;
+    private final ObjectServicePaginationSupported objectsService;
     private final SuperAppObjectRelationshipService superAppObjectRelationshipService;
 
-    private final ObjectServicePaginationSupported objectServicePaginationSupported;
+    //private final ObjectServicePaginationSupported objectServicePaginationSupported;
 
     @Autowired
-    public SuperAppObjectsAPIController(ObjectsService objectsService,
-                                        SuperAppObjectRelationshipService superAppObjectRelationshipService, ObjectServicePaginationSupported objectServicePaginationSupported) {
+    public SuperAppObjectsAPIController(ObjectServicePaginationSupported objectsService,
+                                        SuperAppObjectRelationshipService superAppObjectRelationshipService) {
         this.objectsService = objectsService;
         this.superAppObjectRelationshipService = superAppObjectRelationshipService;
 
-        this.objectServicePaginationSupported = objectServicePaginationSupported;
+        //this.objectServicePaginationSupported = objectServicePaginationSupported;
     }
 
 
@@ -78,7 +78,8 @@ public class SuperAppObjectsAPIController {
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam(name="userSuperApp") String userSuperApp,
             @RequestParam(name="userEmail") String userEmail) throws RuntimeException {
-        return objectServicePaginationSupported.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail)
+    	
+        return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail)
                 .orElseThrow(() -> new RuntimeException("Could not find object with id: " + superapp + "_" + internalObjectId));
     }
 
@@ -94,7 +95,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page) {
         try {
             // Call the service method to retrieve all objects with the specified size and page
-            return objectServicePaginationSupported.getAllObjects(size,page);
+            return objectsService.getAllObjects(size,page);
         } catch (RuntimeException e) {
             throw new RuntimeException("Can't get all objects: " + e.getMessage());
         }
