@@ -19,13 +19,13 @@ import superapp.data.Enum.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
-import superapp.logic.service.UsersServiceWithPermissions;
+import superapp.logic.service.UsersServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 
 @Service
 
-public class UsersServiceRepo implements UsersServiceWithPermissions {
+public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
     private String springAppName;

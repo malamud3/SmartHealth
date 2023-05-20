@@ -8,20 +8,18 @@ import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.logic.service.MiniAppCommandService;
 import superapp.logic.service.ObjectsService;
-import superapp.logic.service.UsersService;
-import superapp.logic.service.UsersServiceWithPermissions;
-
+import superapp.logic.service.UsersServiceWithAdminPermission;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class AdminRelatedAPIController {
-    private UsersServiceWithPermissions userService;
+    private UsersServiceWithAdminPermission userService;
     private MiniAppCommandService miniAppCommandService;
     private ObjectsService objectsService;
 
     @Autowired
-    public AdminRelatedAPIController(UsersServiceWithPermissions userService, MiniAppCommandService miniAppCommandService, ObjectsService objectsService) {
+    public AdminRelatedAPIController(UsersServiceWithAdminPermission userService, MiniAppCommandService miniAppCommandService, ObjectsService objectsService) {
         this.userService = userService;
         this.miniAppCommandService = miniAppCommandService;
         this.objectsService = objectsService;
