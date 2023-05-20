@@ -17,6 +17,7 @@ public interface UsersService {
 	
 	public List<UserBoundary> getAllUsers() throws RuntimeException;
 
+	@Deprecated
 	public void deleteAllUsers() throws RuntimeException;
 
 

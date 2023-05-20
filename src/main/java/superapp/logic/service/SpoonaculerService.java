@@ -6,6 +6,8 @@ public interface SpoonaculerService {
 
 	public IngredientEntity getIngredientDataByName(String ingredientName);
 	
-	public IngredientEntity getIngredientDataById(Integer id);
+	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, int amountInGrams);
+
+	IngredientEntity getIngredientDataByName(String ingredientName, int amountInGrams);
 	
 }

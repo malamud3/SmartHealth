@@ -5,21 +5,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import superapp.Boundary.User.UserBoundary;
+import superapp.Boundary.User.UserId;
 import superapp.logic.service.MiniAppCommandService;
 import superapp.logic.service.ObjectsService;
 import superapp.logic.service.UsersService;
+import superapp.logic.service.UsersServiceWithPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class AdminRelatedAPIController {
-    private UsersService userService;
+    private UsersServiceWithPermissions userService;
     private MiniAppCommandService miniAppCommandService;
     private ObjectsService objectsService;
 
     @Autowired
-    public AdminRelatedAPIController(UsersService userService, MiniAppCommandService miniAppCommandService, ObjectsService objectsService) {
+    public AdminRelatedAPIController(UsersServiceWithPermissions userService, MiniAppCommandService miniAppCommandService, ObjectsService objectsService) {
         this.userService = userService;
         this.miniAppCommandService = miniAppCommandService;
         this.objectsService = objectsService;
@@ -31,14 +33,10 @@ public class AdminRelatedAPIController {
             path = {"/superapp/admin/users"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllUsers() throws RuntimeException {
-        try {
-            userService.deleteAllUsers();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Failed to delete all users: " + e.getMessage());
-        }
-
-
+    public void deleteAllUsers(
+    		@RequestParam(name="userSuperapp", required = true) String userSuperapp, 
+			@RequestParam(name="userEmail", required = true) String userEmail){
+    	userService.deleteAllUsers(new UserId(userSuperapp, userEmail));
     }
 
     //DELETE: Delete All Objects

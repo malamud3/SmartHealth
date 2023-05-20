@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
+import superapp.logic.Exceptions.DepreacatedOpterationException;
+import superapp.logic.Exceptions.PermissionDeniedException;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
@@ -17,13 +19,13 @@ import superapp.data.Enum.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
-import superapp.logic.service.UsersService;
+import superapp.logic.service.UsersServiceWithPermissions;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 
 @Service
 
-public class UsersServiceRepo implements UsersService {
+public class UsersServiceRepo implements UsersServiceWithPermissions {
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
     private String springAppName;
@@ -116,12 +118,30 @@ public class UsersServiceRepo implements UsersService {
 
 
     @Override
+    @Deprecated
     public void deleteAllUsers() throws RuntimeException {
-        if (this.userRepository.count() == 0) {
-            throw new RuntimeException("there aren't any users");
-        } else {
-            this.userRepository.deleteAll();
-        }
+    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+    
+    
+    /**
+     * delete all users
+     *
+     * @param userId the user ID of the userId the ID of the user attempting to delete all users
+     * 
+     * @throws UserNotFoundException if the user with the specified ID doesn't exist
+     * @throws PermissionDeniedException if the user doesn't have permission to delete all users
+     */
+    @Override
+    public void deleteAllUsers(UserId userId) throws RuntimeException {
+    	UserEntity userEntity = this.userRepository.findById(userId)
+				.orElseThrow(()->new UserNotFoundException("inserted id: " 
+    	+ userId + " does not exist"));
+    	
+    	if (userEntity.getRole() != UserRole.ADMIN) {
+    		throw new PermissionDeniedException("You do not have permission to delete all users");
+    	}
+    	this.userRepository.deleteAll();
     }
 
 
