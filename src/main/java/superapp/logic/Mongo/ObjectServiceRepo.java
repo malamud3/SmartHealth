@@ -1,6 +1,8 @@
 package superapp.logic.Mongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import superapp.Boundary.CreatedBy;
 import superapp.Boundary.superAppObjectBoundary;
 import superapp.Boundary.ObjectId;
@@ -10,6 +12,7 @@ import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import superapp.logic.service.ObjectServicePaginationSupported;
 import superapp.logic.service.ObjectsService;
 import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
@@ -18,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelationshipService {
+public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelationshipService , ObjectServicePaginationSupported {
 
     private final SuperAppObjectRepository objectRepository;
     private String springAppName;
@@ -131,12 +134,19 @@ public class ObjectServiceRepo implements ObjectsService, SuperAppObjectRelation
     }
 
 
+    //pagination Support
+    @Override
+    public List<superAppObjectBoundary> getAllObjects(int size, int page) {
+        return this.objectRepository
+                .findAll(PageRequest.of(page, size, Sort.Direction.ASC, "creationTimestamp"))
+                .stream()
+                .map(this::entityToBoundary)
+                .toList();
+    }
+
     @Override
     public List<superAppObjectBoundary> getAllObjects() {
-        List<SuperAppObjectEntity> entities = objectRepository.findAll();
-        return entities.stream()
-                .map(this::entityToBoundary)
-                .collect(Collectors.toList());
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
 
     @Override
