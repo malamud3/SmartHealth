@@ -194,7 +194,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
     	+ userId.toString() + " does not exist"));
     	
     	if (userEntity.getRole() != UserRole.ADMIN) {
-    		throw new PermissionDeniedException("You do not have permission to delete all users");
+    		throw new PermissionDeniedException("You do not have permission to delete all commands");
     	}
     	this.repository.deleteAll();
     }
