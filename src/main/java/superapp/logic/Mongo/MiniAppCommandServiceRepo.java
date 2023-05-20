@@ -1,6 +1,7 @@
 package superapp.logic.Mongo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.annotation.JmsListener;
@@ -8,21 +9,28 @@ import org.springframework.jms.core.JmsTemplate;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
+import superapp.dal.UserRepository;
+import superapp.data.Enum.UserRole;
 import superapp.data.mainEntity.MiniAppCommandEntity;
+import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import superapp.logic.service.MiniAppCommandService;
-import superapp.logic.service.MiniAppCommandServiceWithAsyncSupport;
+
+import superapp.logic.Exceptions.DepreacatedOpterationException;
+import superapp.logic.Exceptions.PermissionDeniedException;
+import superapp.logic.Exceptions.UserNotFoundException;
+import superapp.logic.service.MiniAppCommandServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
 import java.util.stream.Collectors;
 @Service
-public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAsyncSupport {
+public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdminPermission {
 
     private  String springApplicationName;
     private final MiniAppCommandRepository repository;
+    private final UserRepository userRepository;//for permission checks
     private final MongoTemplate mongoTemplate;
 
     private JmsTemplate jmsTemplate;
@@ -42,7 +50,9 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAsync
         if (!mongoTemplate.collectionExists("COMMAND")) {
             mongoTemplate.createCollection("COMMAND");
             this.jackson = new ObjectMapper();
-
+        }
+        if (!mongoTemplate.collectionExists("USERS")) {
+            mongoTemplate.createCollection("USERS");
         }
     }
 
@@ -108,9 +118,10 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAsync
 
     @Autowired
     public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-                                     MiniAppCommandRepository repository, ObjectMapper jackson) {
+                                     MiniAppCommandRepository repository, ObjectMapper jackson, UserRepository userRepository) {
 
         this.repository = repository;
+		this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
         this.jackson = jackson;
     }
@@ -171,12 +182,21 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAsync
 
 
     @Override
+    @Deprecated
     public void deleteAllCommands() throws RuntimeException {
-        try {
-            this.repository.deleteAll();
-        }catch (RuntimeException e){
-            throw new RuntimeException(e.getMessage());
-        }
+    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+    
+    @Override
+    public void deleteAllCommands(UserId userId) {
+    	UserEntity userEntity = this.userRepository.findById(userId)
+				.orElseThrow(()->new UserNotFoundException("inserted id: " 
+    	+ userId.toString() + " does not exist"));
+    	
+    	if (userEntity.getRole() != UserRole.ADMIN) {
+    		throw new PermissionDeniedException("You do not have permission to delete all users");
+    	}
+    	this.repository.deleteAll();
     }
 
     @Override

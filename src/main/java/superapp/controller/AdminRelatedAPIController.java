@@ -6,7 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.logic.service.MiniAppCommandService;
+import superapp.logic.service.MiniAppCommandServiceWithAdminPermission;
 import superapp.logic.service.ObjectsService;
 import superapp.logic.service.UsersServiceWithAdminPermission;
 import java.util.ArrayList;
@@ -15,11 +15,12 @@ import java.util.List;
 @RestController
 public class AdminRelatedAPIController {
     private UsersServiceWithAdminPermission userService;
-    private MiniAppCommandService miniAppCommandService;
+    private MiniAppCommandServiceWithAdminPermission miniAppCommandService;
     private ObjectsService objectsService;
 
     @Autowired
-    public AdminRelatedAPIController(UsersServiceWithAdminPermission userService, MiniAppCommandService miniAppCommandService, ObjectsService objectsService) {
+    public AdminRelatedAPIController(UsersServiceWithAdminPermission userService,
+    		MiniAppCommandServiceWithAdminPermission miniAppCommandService, ObjectsService objectsService) {
         this.userService = userService;
         this.miniAppCommandService = miniAppCommandService;
         this.objectsService = objectsService;
@@ -56,13 +57,11 @@ public class AdminRelatedAPIController {
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.DELETE})
 
-    public void deleteAllCommands() throws RuntimeException {
-        try {
-            miniAppCommandService.deleteAllCommands();
-        }catch (RuntimeException e){
-            throw new RuntimeException();
-        }
-
+    public void deleteAllCommands(
+    		@RequestParam(name="userSuperapp") String userSuperapp, 
+			@RequestParam(name="userEmail") String userEmail){
+    	
+    	miniAppCommandService.deleteAllCommands(new UserId(userSuperapp, userEmail));
     }
 
 

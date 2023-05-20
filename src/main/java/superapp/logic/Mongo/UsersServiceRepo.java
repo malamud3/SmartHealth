@@ -136,8 +136,8 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     public void deleteAllUsers(UserId userId) throws RuntimeException {
     	UserEntity userEntity = this.userRepository.findById(userId)
 				.orElseThrow(()->new UserNotFoundException("inserted id: " 
-    	+ userId + " does not exist"));
-    	
+    	+ userId.toString() + " does not exist"));
+    		
     	if (userEntity.getRole() != UserRole.ADMIN) {
     		throw new PermissionDeniedException("You do not have permission to delete all users");
     	}
