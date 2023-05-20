@@ -32,8 +32,8 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllUsers(
-    		@RequestParam(name="userSuperapp", required = true) String userSuperapp, 
-			@RequestParam(name="userEmail", required = true) String userEmail){
+    		@RequestParam(name="userSuperapp") String userSuperapp, 
+			@RequestParam(name="userEmail") String userEmail){
     	userService.deleteAllUsers(new UserId(userSuperapp, userEmail));
     }
 

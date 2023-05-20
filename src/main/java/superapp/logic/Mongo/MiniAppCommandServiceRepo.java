@@ -13,12 +13,13 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import superapp.logic.service.MiniAppCommandService;
+import superapp.logic.service.MiniAppCommandServiceWithAsyncSupport;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
 import java.util.stream.Collectors;
 @Service
-public class MiniAppCommandServiceRepo implements MiniAppCommandService {
+public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAsyncSupport {
 
     private  String springApplicationName;
     private final MiniAppCommandRepository repository;

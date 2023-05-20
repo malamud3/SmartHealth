@@ -7,8 +7,6 @@ import superapp.Boundary.MiniAppCommandBoundary;
 public interface MiniAppCommandService {
 
 
-        MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary);
-
         public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) throws RuntimeException;
         public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException;
         public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException;

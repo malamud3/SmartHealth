@@ -2,6 +2,8 @@ package superapp.controller;
 
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.logic.service.MiniAppCommandService;
+import superapp.logic.service.MiniAppCommandServiceWithAsyncSupport;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class MiniAppCommandApiController
 {
 
-    private final MiniAppCommandService miniAppCommandService;
+    private final MiniAppCommandServiceWithAsyncSupport miniAppCommandService;
 
 
     @Autowired
-    public MiniAppCommandApiController(MiniAppCommandService miniAppCommandService) {
+    public MiniAppCommandApiController(MiniAppCommandServiceWithAsyncSupport miniAppCommandService) {
         this.miniAppCommandService = miniAppCommandService;
 
     }
