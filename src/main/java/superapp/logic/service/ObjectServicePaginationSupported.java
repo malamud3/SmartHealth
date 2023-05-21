@@ -9,4 +9,6 @@ public interface ObjectServicePaginationSupported extends ObjectsService {
     public Optional<superAppObjectBoundary> getSpecificObject(String superapp, String internalObjectId, String userSuperApp, String userEmail);
 
     public List<superAppObjectBoundary> getAllObjects(int size, int page);
+
+
 }

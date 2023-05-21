@@ -1,5 +1,4 @@
 package superapp.logic.Mongo;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -7,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import superapp.logic.Exceptions.DepreacatedOpterationException;
@@ -23,12 +23,15 @@ import superapp.logic.service.UsersServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 
+
 @Service
 
 public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
+    private  JmsTemplate jmsTemplate ;
     private String springAppName;
+
 
     @Autowired
     public UsersServiceRepo(UserRepository userRepository, MongoTemplate mongoTemplate) {
@@ -53,7 +56,6 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
-
         try {
             validateUser(newUser);
         } catch (RuntimeException e) {
@@ -61,27 +63,37 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         }
 
         UserBoundary user = new UserBoundary(newUser, springAppName);
-        UserEntity userEntity = this.boundaryToEntity(user);
-        userEntity = this.userRepository.save(userEntity);
+        UserEntity userEntity = boundaryToEntity(user);
+        userEntity = userRepository.save(userEntity);
 
-        return this.entityToBoundary(userEntity);
+        // Sending JMS message
+        String message = "New user created: " + user.getUserId();
+        jmsTemplate.convertAndSend("userQueue", message);
+
+        return entityToBoundary(userEntity);
     }
-
 
     @Override
     public Optional<UserBoundary> login(String userSuperApp, String userEmail) throws RuntimeException {
         UserId userId = new UserId(userSuperApp, userEmail);
-        UserEntity entity = userRepository.findByUserId(userId).orElseThrow(() -> new UserNotFoundException("could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity entity = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
         UserBoundary boundary = entityToBoundary(entity);
+
+        // Sending JMS message
+        String message = "User logged in: " + boundary.getUserId();
+        jmsTemplate.convertAndSend("userLoginQueue", message);
+
         return Optional.of(boundary);
     }
 
 
+
     @Override
-    public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException{
+    public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException {
         UserId userId = new UserId(userSuperApp, userEmail);
         Optional<UserEntity> optionalUser = userRepository.findByUserId(userId);
-        UserEntity existing = optionalUser.orElseThrow(() -> new UserNotFoundException("could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity existing = optionalUser.orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
 
         boolean dirtyFlag = false;
 
@@ -101,12 +113,15 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         }
 
         if (dirtyFlag) {
-            userRepository.save(existing);
+            existing = userRepository.save(existing);
+
+            // Sending JMS message
+            String message = "User updated: " + existing.getUserId();
+            jmsTemplate.convertAndSend("userUpdateQueue", message);
         }
 
         return entityToBoundary(existing);
     }
-
 
     @Override
     public List<UserBoundary> getAllUsers() throws RuntimeException {
@@ -122,22 +137,22 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     public void deleteAllUsers() throws RuntimeException {
     	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
-    
-    
+
+
     /**
      * delete all users
      *
      * @param userId the user ID of the userId the ID of the user attempting to delete all users
-     * 
+     *
      * @throws UserNotFoundException if the user with the specified ID doesn't exist
      * @throws PermissionDeniedException if the user doesn't have permission to delete all users
      */
     @Override
     public void deleteAllUsers(UserId userId) throws RuntimeException {
     	UserEntity userEntity = this.userRepository.findById(userId)
-				.orElseThrow(()->new UserNotFoundException("inserted id: " 
+				.orElseThrow(()->new UserNotFoundException("inserted id: "
     	+ userId.toString() + " does not exist"));
-    		
+
     	if (userEntity.getRole() != UserRole.ADMIN) {
     		throw new PermissionDeniedException("You do not have permission to delete all users");
     	}
