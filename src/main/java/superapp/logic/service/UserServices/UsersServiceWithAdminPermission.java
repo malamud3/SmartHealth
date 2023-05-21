@@ -1,7 +1,8 @@
-package superapp.logic.service;
+package superapp.logic.service.UserServices;
 
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.User.UserBoundary;
+import superapp.logic.service.UserServices.UsersService;
 
 import java.util.List;
 

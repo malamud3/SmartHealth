@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.PermissionDeniedException;
 import superapp.logic.Exceptions.UserNotFoundException;
-import superapp.logic.service.MiniAppCommandServiceWithAdminPermission;
+import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
@@ -186,13 +186,13 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
     public void deleteAllCommands() throws RuntimeException {
     	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
-    
+
     @Override
     public void deleteAllCommands(UserId userId) {
     	UserEntity userEntity = this.userRepository.findById(userId)
-				.orElseThrow(()->new UserNotFoundException("inserted id: " 
+				.orElseThrow(()->new UserNotFoundException("inserted id: "
     	+ userId.toString() + " does not exist"));
-    	
+
     	if (userEntity.getRole() != UserRole.ADMIN) {
     		throw new PermissionDeniedException("You do not have permission to delete all commands");
     	}

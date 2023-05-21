@@ -2,7 +2,7 @@ package superapp.controller;
 
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.NewUserBoundary;
-import superapp.logic.service.UsersService;
+import superapp.logic.service.UserServices.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -55,10 +55,7 @@ public class UsersRelatedAPIController {
 		}catch (RuntimeException e){
 			throw new RuntimeException("can't login: "+ e.getMessage());
 		}
-
-
-		}
-
+	}
 
 		//PUT: Update User
 		@RequestMapping(

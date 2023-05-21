@@ -9,10 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.PermissionDeniedException;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
@@ -22,7 +22,7 @@ import superapp.data.Enum.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
-import superapp.logic.service.UsersServiceWithAdminPermission;
+import superapp.logic.service.UserServices.UsersServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 
@@ -61,7 +61,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         }
     }
 
-
+    @Async
     @Override
     public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
         try {

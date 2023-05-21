@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.Map;
 
 
-public class superAppObjectBoundary {
-	
+public class SuperAppObjectBoundary {
+
     private ObjectId objectId;
     private String type;
     private String alias;
@@ -15,87 +15,87 @@ public class superAppObjectBoundary {
     private Location location;
     private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
-    
-	public superAppObjectBoundary(String superapp, String internalObjectId) {
+
+	public SuperAppObjectBoundary(String superapp, String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);
-		
+
 	}
-	
-	public superAppObjectBoundary() {
-		
+
+	public SuperAppObjectBoundary() {
+
 	}
-	
+
 	public ObjectId getObjectId() {
 		return objectId;
 	}
-	
+
 	public void setObjectId(ObjectId objectId) {
 		this.objectId = objectId;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
-	
+
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public String getAlias() {
 		return alias;
 	}
-	
+
 	public void setAlias(String alias) {
 		this.alias = alias;
 	}
-	
+
 	public Boolean getActive() {
 		return active;
 	}
-	
+
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
-	
+
 	public Date getCreationTimestamp() {
 		return creationTimestamp;
 	}
-	
+
 	public void setCreationTimestamp(Date creationTimestamp) {
 		this.creationTimestamp = creationTimestamp;
 	}
-	
+
 	public Location getLocation() {
 		return location;
 	}
-	
+
 	public void setLocation(Location location) {
 		this.location = location;
 	}
-	
+
 	public CreatedBy getCreatedBy() {
 		return createdBy;
 	}
-	
+
 	public void setCreatedBy(CreatedBy createdBy) {
 		this.createdBy = createdBy;
 	}
-	
+
 
 
 
 	public Map<String, Object> getObjectDetails() {
 		return objectDetails;
 	}
-	
+
 	public void setObjectDetails(Map<String, Object> objectDetails) {
 		this.objectDetails = objectDetails;
 	}
-	
-	
+
+
 	@Override
 	public boolean equals(Object obj) {
-		superAppObjectBoundary other = (superAppObjectBoundary) obj;
+		SuperAppObjectBoundary other = (SuperAppObjectBoundary) obj;
 		return objectId.equals(other.objectId);
 	}
 }

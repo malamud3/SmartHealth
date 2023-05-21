@@ -6,9 +6,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.logic.service.MiniAppCommandServiceWithAdminPermission;
-import superapp.logic.service.ObjectsServiceWithAdminPermission;
-import superapp.logic.service.UsersServiceWithAdminPermission;
+import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPermission;
+import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
+import superapp.logic.service.UserServices.UsersServiceWithAdminPermission;
 import java.util.ArrayList;
 import java.util.List;
 
