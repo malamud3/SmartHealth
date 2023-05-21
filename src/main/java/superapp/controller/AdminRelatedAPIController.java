@@ -66,15 +66,15 @@ public class AdminRelatedAPIController {
 
     //GET: Get All Users
     @RequestMapping(
-            path = {"/superapp/admin/users/userSuperapp={superapp}&userEmail={email}&size={size}&page={page}"},
+            path = {"/superapp/admin/users"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
          public List<UserBoundary> exportAllUsers(
-                @RequestParam("userSuperApp") String userSuperApp,
-                @RequestParam("email") String email,
-                @RequestParam("size") int size,
-                @RequestParam("page") int page)
+                @RequestParam(name = "userSuperApp",required = true) String userSuperApp,
+                @RequestParam(name ="email",required = true) String email,
+                @RequestParam(name = "size" , required = false , defaultValue = "8") int size,
+                @RequestParam(name = "page" , required = false , defaultValue = "0") int page)
               throws RuntimeException {
             try {
                 return userService.exportAllUsers(userSuperApp, email, size, page);
@@ -83,15 +83,18 @@ public class AdminRelatedAPIController {
             }
         }
 
-    //GET: Get All MiniApps Commands History
+    //GET: Get All MiniApps Commands History(export all commands)
     @RequestMapping(
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<MiniAppCommandBoundary> exportAllMiniAppsHistory(
-    ) {
+            @RequestParam(name = "userSuperapp" , required = true ) String userSuperApp,
+            @RequestParam(name ="userEmail",required = true ) String userEmail,
+            @RequestParam(name="size" , defaultValue = "10" , required = false) int size ,
+            @RequestParam(name = "page", defaultValue = "0" , required = false) int page){
         try {
-            List<MiniAppCommandBoundary> commands = miniAppCommandService.getAllCommands();
+            List<MiniAppCommandBoundary> commands = miniAppCommandService.exportAllCommands(userSuperApp,userEmail,size,page);
             if (commands.isEmpty()) {
                 return new ArrayList<>();
             } else {
@@ -108,9 +111,11 @@ public class AdminRelatedAPIController {
             path = {"/superapp/admin/miniapp/{miniAppName}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp) {
+    public List<MiniAppCommandBoundary> getSpecificMiniAppHistory(@PathVariable("miniAppName") String miniapp , @RequestParam(name = "userSuperapp" , required = true ) String userSuperApp, @RequestParam(name ="userEmail",required = true ) String userEmail, @RequestParam(name="size" , defaultValue = "10" , required = false) int size ,
+                                                                  @RequestParam(name = "page", defaultValue = "0" , required = false) int page)
+    {
         try {
-            List<MiniAppCommandBoundary> miniappCommands = miniAppCommandService.getAllMiniAppCommands(miniapp);
+            List<MiniAppCommandBoundary> miniappCommands = miniAppCommandService.exportSpecificCommands(miniapp,userSuperApp,userEmail,size,page);
             if (miniappCommands.isEmpty()) {
                 return new ArrayList<>();
             } else {
