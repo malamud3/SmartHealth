@@ -9,7 +9,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 import superapp.Boundary.CreatedBy;
 import superapp.Boundary.Location;
-import superapp.Boundary.SuperAppObjectBoundary;
+import superapp.Boundary.superAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.controller.SuperAppObjectsAPIController;
 import java.util.*;
@@ -48,7 +48,7 @@ public class superAppObjectTests {
     @DisplayName("Test create Object")
     public void testCreateObject() {
         // GIVEN an object boundary
-        SuperAppObjectBoundary superAppObjectBoundary = new SuperAppObjectBoundary("superapp", "123");
+        superAppObjectBoundary superAppObjectBoundary = new superAppObjectBoundary("superapp", "123");
         superAppObjectBoundary.setType("exampleType");
         superAppObjectBoundary.setAlias("exampleAlias");
         superAppObjectBoundary.setActive(true);
@@ -59,10 +59,10 @@ public class superAppObjectTests {
         superAppObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
 
         // WHEN a POST request is sent to create the object
-        SuperAppObjectBoundary response = this.restTemplate.postForObject(
+        superapp.Boundary.superAppObjectBoundary response = this.restTemplate.postForObject(
                 this.baseUrl + "/superapp/objects",
                 superAppObjectBoundary,
-                SuperAppObjectBoundary.class
+                superapp.Boundary.superAppObjectBoundary.class
         );
 
         // THEN verify the response is not null and has the same fields as the input
@@ -82,7 +82,7 @@ public class superAppObjectTests {
     @DisplayName("Test Update Object")
     public void testUpdateObject() {
         // create an object and save it to the service
-        SuperAppObjectBoundary superAppObjectBoundary = new SuperAppObjectBoundary("superapp", "1");
+        superAppObjectBoundary superAppObjectBoundary = new superAppObjectBoundary("superapp", "1");
         superAppObjectBoundary.setType("type1");
         superAppObjectBoundary.setAlias("alias1");
         superAppObjectBoundary.setActive(true);
@@ -92,10 +92,10 @@ public class superAppObjectTests {
         Map<String, Object> objectDetails = new HashMap<>();
         objectDetails.put("key1", "value1");
         superAppObjectBoundary.setObjectDetails(objectDetails);
-        SuperAppObjectBoundary createdObject = this.restTemplate.postForObject(
+        superapp.Boundary.superAppObjectBoundary createdObject = this.restTemplate.postForObject(
                 "http://localhost:" + this.port + "/superapp/objects",
                 superAppObjectBoundary,
-                SuperAppObjectBoundary.class);
+                superapp.Boundary.superAppObjectBoundary.class);
 
         // update the created object
         createdObject.setAlias("alias2");
@@ -108,9 +108,9 @@ public class superAppObjectTests {
                 createdObject.getObjectId().getInternalObjectId());
 
         // verify that the object was updated
-        SuperAppObjectBoundary updatedObject = this.restTemplate.getForObject(
+        superapp.Boundary.superAppObjectBoundary updatedObject = this.restTemplate.getForObject(
                 this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}",
-                SuperAppObjectBoundary.class,
+                superapp.Boundary.superAppObjectBoundary.class,
                 createdObject.getObjectId().getSuperapp(),
                 createdObject.getObjectId().getInternalObjectId());
         assertNotNull(updatedObject);
@@ -124,7 +124,7 @@ public class superAppObjectTests {
     @DisplayName("Test GET Object")
     public void testRetrieveObject() {
         // create an object and save it to the service
-        SuperAppObjectBoundary superAppObjectBoundary = new SuperAppObjectBoundary("superapp", "123");
+        superAppObjectBoundary superAppObjectBoundary = new superAppObjectBoundary("superapp", "123");
         superAppObjectBoundary.setType("exampleType");
         superAppObjectBoundary.setAlias("exampleAlias");
         superAppObjectBoundary.setActive(true);
@@ -134,13 +134,13 @@ public class superAppObjectTests {
         Map<String, Object> objectDetails = new HashMap<>();
         objectDetails.put("exampleKey", "exampleValue");
         superAppObjectBoundary.setObjectDetails(objectDetails);
-        SuperAppObjectBoundary createdObject = this.restTemplate.postForObject(
-                "http://localhost:" + this.port + "/superapp/objects", superAppObjectBoundary, SuperAppObjectBoundary.class);
+        superapp.Boundary.superAppObjectBoundary createdObject = this.restTemplate.postForObject(
+                "http://localhost:" + this.port + "/superapp/objects", superAppObjectBoundary, superapp.Boundary.superAppObjectBoundary.class);
 
         // retrieve the created object
-        SuperAppObjectBoundary retrievedObject = this.restTemplate.getForObject(
+        superapp.Boundary.superAppObjectBoundary retrievedObject = this.restTemplate.getForObject(
                 this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}",
-                SuperAppObjectBoundary.class, createdObject.getObjectId().getSuperapp(), createdObject.getObjectId().getInternalObjectId());
+                superapp.Boundary.superAppObjectBoundary.class, createdObject.getObjectId().getSuperapp(), createdObject.getObjectId().getInternalObjectId());
         assertNotNull(retrievedObject);
         assertEquals(createdObject.getType(), retrievedObject.getType());
         assertEquals(createdObject.getAlias(), retrievedObject.getAlias());

@@ -2,11 +2,12 @@ package superapp.controller;
 
 import superapp.Boundary.*;
 import superapp.logic.Exceptions.ObjectNotFoundException;
-import superapp.logic.service.ObjectServicePaginationSupported;
+import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupported;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import superapp.logic.service.SuperAppObjectRelationshipService;
+import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
+import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,13 +19,16 @@ public class SuperAppObjectsAPIController {
     private final ObjectServicePaginationSupported objectsService;
     private final SuperAppObjectRelationshipService superAppObjectRelationshipService;
 
+    private final ObjectsServiceWithAdminPermission objectsServiceWithAdminPermission;
+
 
     @Autowired
     public SuperAppObjectsAPIController(ObjectServicePaginationSupported objectsService,
-                                        SuperAppObjectRelationshipService superAppObjectRelationshipService) {
+                                        SuperAppObjectRelationshipService superAppObjectRelationshipService, ObjectsServiceWithAdminPermission objectsServiceWithAdminPermission) {
         this.objectsService = objectsService;
         this.superAppObjectRelationshipService = superAppObjectRelationshipService;
 
+        this.objectsServiceWithAdminPermission = objectsServiceWithAdminPermission;
     }
 
     //POST: Create Object
@@ -58,7 +62,7 @@ public class SuperAppObjectsAPIController {
     ) {
         try {
 
-            objectsService.updateObject(superapp, internalObjectId, superAppObjectBoundary);
+            objectsServiceWithAdminPermission.updateObject(superapp, internalObjectId, superAppObjectBoundary , userSuperApp , userEmail);
         } catch (RuntimeException e) {
             throw new RuntimeException("Can't update objects: " + e.getMessage());
         }
@@ -175,7 +179,7 @@ public class SuperAppObjectsAPIController {
             path     = "/superapp/objects/search/byAlias/{alias}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<SuperAppObjectBoundary> searchByAlias(
+    public List<superAppObjectBoundary> searchByAlias(
             @PathVariable("alias") String alias,
             @RequestParam("superapp") String superapp,
             @RequestParam("userEmail") String email,
@@ -189,7 +193,7 @@ public class SuperAppObjectsAPIController {
             path     = "/superapp/objects/search/byType/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<SuperAppObjectBoundary> searchByType(
+    public List<superAppObjectBoundary> searchByType(
             @PathVariable("type") String type,
             @RequestParam("superapp") String superapp,
             @RequestParam("userEmail") String email,
@@ -203,7 +207,7 @@ public class SuperAppObjectsAPIController {
             path = "/superapp/objects/search/byLocation/{lat}/{lng}/{distance}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<SuperAppObjectBoundary> searchByLocation(
+    public List<superAppObjectBoundary> searchByLocation(
             @PathVariable("lat") double latitude,
             @PathVariable("lng") double longitude,
             @PathVariable("distance") double distance,
