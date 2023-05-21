@@ -157,6 +157,16 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
                 .toList();
     }
 
+    @Override
+    public Set<superAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
+        return null;
+    }
+
+    @Override
+    public Set<superAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
+        return null;
+    }
+
 
     @Override
     @Deprecated
@@ -213,6 +223,12 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
         return children;
     }
+
+    @Override
+    public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) {
+
+    }
+
     @Override
     public Set<superAppObjectBoundary> getAllParents(String objectId) {
 
