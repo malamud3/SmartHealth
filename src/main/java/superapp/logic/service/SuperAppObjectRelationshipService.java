@@ -1,4 +1,4 @@
-package superapp.logic.service.SuperAppObject;
+package superapp.logic.service;
 
 import superapp.Boundary.superAppObjectBoundary;
 

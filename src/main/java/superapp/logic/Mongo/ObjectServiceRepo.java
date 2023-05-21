@@ -19,11 +19,12 @@ import superapp.logic.Exceptions.UserNotFoundException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import superapp.logic.service.SuperAppObject.ObjectsServiceWithAdminPermission;
-import superapp.logic.service.SuperAppObject.SuperAppObjectRelationshipService;
+import superapp.logic.service.ObjectsServiceWithAdminPermission;
+import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService {
@@ -146,7 +147,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     public List<superAppObjectBoundary> getAllObjects() {
         throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
-
+    
     //pagination Support
     @Override
     public List<superAppObjectBoundary> getAllObjects(int size, int page) {
@@ -173,13 +174,13 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     public void deleteAllObjects() {
         objectRepository.deleteAll();
     }
-
+    
     @Override
     public void deleteAllObjects(UserId userId) {
 	UserEntity userEntity = this.userRepository.findById(userId)
-			.orElseThrow(()->new UserNotFoundException("inserted id: "
+			.orElseThrow(()->new UserNotFoundException("inserted id: " 
 	+ userId.toString() + " does not exist"));
-
+		
 	if (userEntity.getRole() != UserRole.ADMIN) {
 		throw new PermissionDeniedException("You do not have permission to delete all users");
 	}

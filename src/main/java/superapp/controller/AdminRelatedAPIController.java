@@ -6,8 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.logic.service.miniAppCommand.MiniAppCommandServiceWithAdminPermission;
-import superapp.logic.service.SuperAppObject.ObjectsServiceWithAdminPermission;
+import superapp.logic.service.MiniAppCommandServiceWithAdminPermission;
+import superapp.logic.service.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.UsersServiceWithAdminPermission;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +33,9 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllUsers(
-    		@RequestParam(name="userSuperapp") String userSuperapp,
+    		@RequestParam(name="userSuperapp") String userSuperapp, 
 			@RequestParam(name="userEmail") String userEmail){
-    	userService.deleteAllUsers(userSuperapp, userEmail);
+    	userService.deleteAllUsers(new UserId(userSuperapp, userEmail));
     }
 
     //DELETE: Delete All Objects
@@ -44,9 +44,9 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllObjects(
-    		@RequestParam(name="userSuperapp") String userSuperapp,
+    		@RequestParam(name="userSuperapp") String userSuperapp, 
 			@RequestParam(name="userEmail") String userEmail){
-
+    	
     	objectsService.deleteAllObjects(new UserId(userSuperapp, userEmail));
 
     }
@@ -57,27 +57,22 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllCommands(
-    		@RequestParam(name="userSuperapp") String userSuperapp,
+    		@RequestParam(name="userSuperapp") String userSuperapp, 
 			@RequestParam(name="userEmail") String userEmail){
-
+    	
     	miniAppCommandService.deleteAllCommands(new UserId(userSuperapp, userEmail));
     }
 
 
     //GET: Get All Users
     @RequestMapping(
-            path = {"/superapp/admin/users/userSuperapp={superapp}&userEmail={email}&size={size}&page={page}"},
+            path = {"/superapp/admin/users"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<UserBoundary> exportAllUsers(
-            @PathVariable("superapp") String userSuperApp,
-            @PathVariable("email") String email,
-            @PathVariable("size") int size,
-            @PathVariable("page") int page)
-      throws RuntimeException {
+    public List<UserBoundary> getAllUsers() throws RuntimeException {
         try {
-            return userService.exportAllUsers( userSuperApp,  email,  size,  page);
+            return userService.getAllUsers();
         } catch (RuntimeException e) {
             throw new RuntimeException("Failed to get all users: " + e.getMessage());
         }
