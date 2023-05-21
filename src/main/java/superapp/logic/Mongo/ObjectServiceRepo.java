@@ -127,18 +127,17 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) {
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
+                .orElseThrow(()->new UserNotFoundException("inserted id: "
+                        +userEmail + userSuperApp + " does not exist"));
         Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
         if (optionalEntity.isEmpty()) {
             throw new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
         }
-        SuperAppObjectEntity entity = optionalEntity.get();
-
-        // Check if userSuperApp and userEmail match the createdBy information
-        if (!entity.getCreatedBy().getUserId().getSuperapp().equals(userSuperApp) ||
-                !entity.getCreatedBy().getUserId().getEmail().equals(userEmail)) {
-            throw new RuntimeException("Access denied. Invalid user credentials.");
+        if (userEntity.getRole() != UserRole.SUPERAPP_USER  || (userEntity.getRole() == UserRole.MINIAPP_USER &&  optionalEntity.get().getActive()!=true))
+        {
+            throw new PermissionDeniedException("User do not have permission to getSpecificObject");
         }
-
         return optionalEntity.map(this::entityToBoundary);
     }
 
