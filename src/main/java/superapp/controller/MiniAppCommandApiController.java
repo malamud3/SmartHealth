@@ -1,8 +1,7 @@
 package superapp.controller;
 
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.logic.service.MiniAppCommandService;
-import superapp.logic.service.MiniAppCommandServiceWithAsyncSupport;
+import superapp.logic.service.miniAppCommand.MiniAppCommandServiceWithAsyncSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

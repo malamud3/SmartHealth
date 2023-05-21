@@ -1,4 +1,4 @@
-package superapp.logic.service;
+package superapp.logic.service.SuperAppObject;
 
 import java.util.List;
 import java.util.Optional;

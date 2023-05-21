@@ -5,10 +5,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.PermissionDeniedException;
 import superapp.Boundary.User.NewUserBoundary;
@@ -39,6 +42,11 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         this.mongoTemplate = mongoTemplate;
     }
 
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+        this.jmsTemplate.setDeliveryDelay(5000L);
+    }
 
     // this method injects a configuration value of spring
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -78,6 +86,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         UserId userId = new UserId(userSuperApp, userEmail);
         UserEntity entity = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+
         UserBoundary boundary = entityToBoundary(entity);
 
         // Sending JMS message
@@ -124,39 +133,56 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     }
 
     @Override
-    public List<UserBoundary> getAllUsers() throws RuntimeException {
-        List<UserEntity> userEntities = userRepository.findAll();
-        return userEntities.stream()
+    public List<UserBoundary> exportAllUsers(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
+        UserId userId = new UserId(userSuperApp, userEmail);
+        UserEntity userEntity = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+
+        if (userEntity.getRole() != UserRole.ADMIN) {
+            throw new PermissionDeniedException("You do not have permission to get all users");
+        }
+
+        Page<UserEntity> userPage = userRepository.findAll(PageRequest.of(page, size));
+
+        return userPage.getContent().stream()
                 .map(this::entityToBoundary)
                 .collect(Collectors.toList());
     }
 
 
-    @Override
-    @Deprecated
-    public void deleteAllUsers() throws RuntimeException {
-    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
-    }
-
 
     /**
      * delete all users
      *
-     * @param userId the user ID of the userId the ID of the user attempting to delete all users
+     * @param  userSuperApp and  userEmail ate user ID of the userId the ID of the user attempting to delete all users
      *
      * @throws UserNotFoundException if the user with the specified ID doesn't exist
      * @throws PermissionDeniedException if the user doesn't have permission to delete all users
      */
+
     @Override
-    public void deleteAllUsers(UserId userId) throws RuntimeException {
-    	UserEntity userEntity = this.userRepository.findById(userId)
-				.orElseThrow(()->new UserNotFoundException("inserted id: "
-    	+ userId.toString() + " does not exist"));
+    public void deleteAllUsers(String userSuperApp, String userEmail) throws RuntimeException {
+        UserId userId = new UserId(userSuperApp, userEmail);
+        UserEntity userEntity = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
 
     	if (userEntity.getRole() != UserRole.ADMIN) {
     		throw new PermissionDeniedException("You do not have permission to delete all users");
     	}
     	this.userRepository.deleteAll();
+    }
+
+
+    @Override
+    public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page ) throws RuntimeException{
+
+        return null;
+    }
+
+    @Override
+    public MiniAppCommandBoundary exportSpecificCommands(String userSuperApp, String userEmail,  int size, int page) throws RuntimeException {
+
+        return null;
     }
 
 

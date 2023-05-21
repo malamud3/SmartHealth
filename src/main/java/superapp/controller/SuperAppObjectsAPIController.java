@@ -2,12 +2,11 @@ package superapp.controller;
 
 import superapp.Boundary.*;
 import superapp.logic.Exceptions.ObjectNotFoundException;
-import superapp.logic.service.ObjectServicePaginationSupported;
-import superapp.logic.service.ObjectsService;
+import superapp.logic.service.SuperAppObject.ObjectServicePaginationSupported;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import superapp.logic.service.SuperAppObjectRelationshipService;
+import superapp.logic.service.SuperAppObject.SuperAppObjectRelationshipService;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +77,7 @@ public class SuperAppObjectsAPIController {
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam(name="userSuperApp") String userSuperApp,
             @RequestParam(name="userEmail") String userEmail) throws RuntimeException {
-    	
+
         return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail)
                 .orElseThrow(() -> new RuntimeException("Could not find object with id: " + superapp + "_" + internalObjectId));
     }
