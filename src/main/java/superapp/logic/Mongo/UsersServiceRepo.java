@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -142,7 +143,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
             throw new PermissionDeniedException("You do not have permission to get all users");
         }
 
-        Page<UserEntity> userPage = userRepository.findAll(PageRequest.of(page, size));
+        Page<UserEntity> userPage = userRepository.findAll(PageRequest.of(page,size, Sort.Direction.ASC , "id"));
 
         return userPage.getContent().stream()
                 .map(this::entityToBoundary)
@@ -173,17 +174,6 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     }
 
 
-    @Override
-    public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page ) throws RuntimeException{
-
-        return null;
-    }
-
-    @Override
-    public MiniAppCommandBoundary exportSpecificCommands(String userSuperApp, String userEmail,  int size, int page) throws RuntimeException {
-
-        return null;
-    }
 
 
     /**

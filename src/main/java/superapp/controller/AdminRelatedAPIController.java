@@ -44,7 +44,7 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllObjects(
-    		@RequestParam(name="userSuperapp") String userSuperapp,
+    		@RequestParam(name="userSuperApp") String userSuperapp,
 			@RequestParam(name="userEmail") String userEmail){
 
     	objectsService.deleteAllObjects(new UserId(userSuperapp, userEmail));
@@ -57,7 +57,7 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllCommands(
-    		@RequestParam(name="userSuperapp") String userSuperapp,
+    		@RequestParam(name="userSuperApp") String userSuperapp,
 			@RequestParam(name="userEmail") String userEmail){
 
     	miniAppCommandService.deleteAllCommands(new UserId(userSuperapp, userEmail));
@@ -71,10 +71,10 @@ public class AdminRelatedAPIController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
          public List<UserBoundary> exportAllUsers(
-                  @PathVariable("superapp") String userSuperApp,
-                  @PathVariable("email") String email,
-                  @PathVariable("size") int size,
-                  @PathVariable("page") int page)
+                @RequestParam("userSuperApp") String userSuperApp,
+                @RequestParam("email") String email,
+                @RequestParam("size") int size,
+                @RequestParam("page") int page)
               throws RuntimeException {
             try {
                 return userService.exportAllUsers(userSuperApp, email, size, page);
@@ -88,7 +88,8 @@ public class AdminRelatedAPIController {
             path = {"/superapp/admin/miniapp"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<MiniAppCommandBoundary> exportAllMiniAppsHistory() {
+    public List<MiniAppCommandBoundary> exportAllMiniAppsHistory(
+    ) {
         try {
             List<MiniAppCommandBoundary> commands = miniAppCommandService.getAllCommands();
             if (commands.isEmpty()) {

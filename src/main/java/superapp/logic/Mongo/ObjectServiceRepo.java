@@ -29,7 +29,7 @@ import superapp.logic.utilitys.GeneralUtility;
 import java.util.*;
 
 @Service
-public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService , ObjectServicePaginationSupported {
+public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService , ObjectServicePaginationSupported {
 
     private final SuperAppObjectRepository objectRepository;
     private final UserRepository userRepository;//for permission checks
@@ -167,7 +167,11 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     //pagination Support
     @Override
-    public List<superAppObjectBoundary> getAllObjects(int size, int page) {
+    public List<superAppObjectBoundary> getAllObjects(String userSuperApp, String userEmail, int size, int page) {
+        UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp,userEmail))
+                .orElseThrow(()->new UserNotFoundException("inserted user not exist"));
+        if(userEntity.getRole() != UserRole.SUPERAPP_USER)
+            throw new  PermissionDeniedException("User Cant getAllObjects");
         return this.objectRepository
                 .findAll(PageRequest.of(page, size, Sort.Direction.DESC, "creationTimestamp","id"))
                 .stream()

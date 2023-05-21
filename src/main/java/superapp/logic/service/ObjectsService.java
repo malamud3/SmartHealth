@@ -8,7 +8,6 @@ import superapp.Boundary.superAppObjectBoundary;
 public interface ObjectsService {
         public superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException;
 
-
         @Deprecated
         public superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update) throws RuntimeException;
 
