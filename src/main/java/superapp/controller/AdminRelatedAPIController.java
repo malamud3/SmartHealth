@@ -33,9 +33,9 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllUsers(
-    		@RequestParam(name="userSuperapp") String userSuperapp, 
+    		@RequestParam(name="userSuperapp") String userSuperapp,
 			@RequestParam(name="userEmail") String userEmail){
-    	userService.deleteAllUsers(new UserId(userSuperapp, userEmail));
+    	userService.deleteAllUsers(userSuperapp, userEmail);
     }
 
     //DELETE: Delete All Objects
@@ -44,9 +44,9 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllObjects(
-    		@RequestParam(name="userSuperapp") String userSuperapp, 
+    		@RequestParam(name="userSuperapp") String userSuperapp,
 			@RequestParam(name="userEmail") String userEmail){
-    	
+
     	objectsService.deleteAllObjects(new UserId(userSuperapp, userEmail));
 
     }
@@ -57,26 +57,31 @@ public class AdminRelatedAPIController {
             method = {RequestMethod.DELETE})
 
     public void deleteAllCommands(
-    		@RequestParam(name="userSuperapp") String userSuperapp, 
+    		@RequestParam(name="userSuperapp") String userSuperapp,
 			@RequestParam(name="userEmail") String userEmail){
-    	
+
     	miniAppCommandService.deleteAllCommands(new UserId(userSuperapp, userEmail));
     }
 
 
     //GET: Get All Users
     @RequestMapping(
-            path = {"/superapp/admin/users"},
+            path = {"/superapp/admin/users/userSuperapp={superapp}&userEmail={email}&size={size}&page={page}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public List<UserBoundary> getAllUsers() throws RuntimeException {
-        try {
-            return userService.getAllUsers();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Failed to get all users: " + e.getMessage());
+         public List<UserBoundary> exportAllUsers(
+                  @PathVariable("superapp") String userSuperApp,
+                  @PathVariable("email") String email,
+                  @PathVariable("size") int size,
+                  @PathVariable("page") int page)
+              throws RuntimeException {
+            try {
+                return userService.exportAllUsers(userSuperApp, email, size, page);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Failed to get all users: " + e.getMessage());
+            }
         }
-    }
 
     //GET: Get All MiniApps Commands History
     @RequestMapping(
