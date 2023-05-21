@@ -11,9 +11,4 @@ public interface UsersServiceWithAdminPermission extends UsersService {
 	public void deleteAllUsers(String userSuperApp, String userEmail) throws RuntimeException;
 
 	public List<UserBoundary> exportAllUsers(String userSuperApp, String userEmail, int size, int page ) throws RuntimeException;
-
-	public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page ) throws RuntimeException;
-
-	public MiniAppCommandBoundary exportSpecificCommands(String userSuperApp,String userEmail,int size, int page ) throws RuntimeException;
-
 }

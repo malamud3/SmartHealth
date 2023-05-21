@@ -3,6 +3,9 @@ package superapp.logic.Mongo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
@@ -200,27 +203,55 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
     }
 
     @Override
-    public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException {
-        List<MiniAppCommandEntity> entities = this.repository.findAll();
-        if (entities.isEmpty()){
-            throw new RuntimeException("there aren't any commands");
+    public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "_id");
+        Page<MiniAppCommandEntity> commandPage = repository.findAll(pageRequest);
+
+        if (commandPage.isEmpty()) {
+            throw new RuntimeException("There aren't any commands");
         }
-        List<MiniAppCommandBoundary> boundaries = new ArrayList<>();
-        for (MiniAppCommandEntity entity : entities) {
-            boundaries.add(this.entityToBoundary(entity));
+
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
+                .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
+
+        if (userEntity.getRole() != UserRole.ADMIN) {
+            throw new PermissionDeniedException("User doesn't have permission to export all commands");
         }
+
+        List<MiniAppCommandBoundary> boundaries = commandPage.getContent().stream()
+                .map(this::entityToBoundary)
+                .collect(Collectors.toList());
+
         return boundaries;
     }
 
     @Override
-    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException {
-        List<MiniAppCommandEntity> entities = repository.findAllByCommandIdMiniapp(miniAppName);
-        if (entities.isEmpty()){
-            throw new RuntimeException("mini app history is empty");
+    public List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException {
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
+                .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
+
+        if (userEntity.getRole() != UserRole.ADMIN) {
+            throw new PermissionDeniedException("User doesn't have permission to access all commands");
         }
-        return entities.stream()
-                .map(this::entityToBoundary)
-                .collect(Collectors.toList());
+
+        return this.repository
+                .findAllByCommandIdMiniapp(miniAppName,
+                        PageRequest.of(page, size, Sort.Direction.ASC, "command", "invocationTimestamp", "commandId"))
+                .stream() // Stream<CommandEntity>
+                .map(this::entityToBoundary) // Stream<CommandBoundary>
+                .toList(); // List<CommandBoundary>
+    }
+
+    @Override
+    @Deprecated
+    public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException {
+        throw new DepreacatedOpterationException("Dont use this methode anymore");
+    }
+
+    @Override
+    @Deprecated
+    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException {
+        throw new DepreacatedOpterationException();
     }
 
 

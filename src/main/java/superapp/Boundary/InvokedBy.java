@@ -8,6 +8,7 @@ public class InvokedBy{
     private UserId userId;
 
     public InvokedBy() {
+        this.userId=new UserId();
     }
     public InvokedBy(UserId userId) {
         this.userId=userId;

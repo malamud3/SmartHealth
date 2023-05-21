@@ -6,6 +6,7 @@ public class TargetObject {
 
 
     public TargetObject(){
+        this.objectId = new ObjectId();
 
     }
 

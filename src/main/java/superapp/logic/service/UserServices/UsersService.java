@@ -13,5 +13,6 @@ public interface UsersService {
 
 	public Optional<UserBoundary> login(String userSuperApp, String userEmail) throws RuntimeException;
 
+
 	public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException;
 }

@@ -8,7 +8,12 @@ public interface MiniAppCommandService {
 
 
         public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) throws RuntimeException;
+
+
+        @Deprecated
         public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException;
+
+        @Deprecated
         public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException;
 
         @Deprecated

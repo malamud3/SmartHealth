@@ -2,11 +2,11 @@ package superapp.controller;
 
 import superapp.Boundary.*;
 import superapp.logic.Exceptions.ObjectNotFoundException;
-import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupported;
+import superapp.logic.service.ObjectServicePaginationSupported;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
+import superapp.logic.service.SuperAppObjectRelationshipService;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +34,7 @@ public class SuperAppObjectsAPIController {
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public SuperAppObjectBoundary createObject(@RequestBody SuperAppObjectBoundary superAppObjectBoundary) throws RuntimeException {
+    public superAppObjectBoundary createObject(@RequestBody superAppObjectBoundary superAppObjectBoundary) throws RuntimeException {
         try {
             return objectsService.createObject(superAppObjectBoundary);
         }catch (RuntimeException e){
@@ -54,7 +54,7 @@ public class SuperAppObjectsAPIController {
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam("userSuperapp") String userSuperApp,
             @RequestParam("userEmail") String userEmail,
-            @RequestBody SuperAppObjectBoundary superAppObjectBoundary
+            @RequestBody superAppObjectBoundary superAppObjectBoundary
     ) {
         try {
 
@@ -69,7 +69,7 @@ public class SuperAppObjectsAPIController {
             path = {"/superapp/objects/{superapp}/{internalObjectId}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public SuperAppObjectBoundary retrieveObject(
+    public superAppObjectBoundary retrieveObject(
             @PathVariable("superapp") String superapp,
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam(name="userSuperapp") String userSuperApp,
@@ -84,14 +84,14 @@ public class SuperAppObjectsAPIController {
             path = {"/superapp/objects"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<SuperAppObjectBoundary> getAllObjects(
+    public List<superAppObjectBoundary> getAllObjects(
             @RequestParam(name = "userSuperapp") String userSuperapp,
             @RequestParam(name = "userEmail") String userEmail,
             @RequestParam(name ="size" , required = false , defaultValue = "12") int size,
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page) {
         try {
             // Call the service method to retrieve all objects with the specified size and page
-            return objectsService.getAllObjects(size,page);
+            return objectsService.getAllObjects(userSuperapp,userEmail,size,page);
         } catch (RuntimeException e) {
             throw new RuntimeException("Can't get all objects: " + e.getMessage());
         }
@@ -112,7 +112,7 @@ public class SuperAppObjectsAPIController {
             @RequestBody SuperAppObjectIdBoundary objectIdBoundary
     ) throws RuntimeException {
         try {
-            Optional<SuperAppObjectBoundary> objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
+            Optional<superAppObjectBoundary> objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
             assert objectBoundaryParent.orElse(null) != null;
             superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.get().getObjectId().getInternalObjectId(), objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
         } catch (RuntimeException e) {
@@ -135,7 +135,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
         {
         try {
-            Optional<SuperAppObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId , userSuperapp , userEmail );
+            Optional<superAppObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId , userSuperapp , userEmail );
             return Collections
                     .singletonList(superAppObjectRelationshipService.getAllChildren(objectBoundary.orElseThrow(() -> new ObjectNotFoundException("could not find Object with id:" + internalObjectId)).getObjectId().getInternalObjectId(),userSuperapp,userEmail, size, page)
                     .stream()
@@ -152,7 +152,7 @@ public class SuperAppObjectsAPIController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<SuperAppObjectBoundary> getAllObjectParents(
+    public List<superAppObjectBoundary> getAllObjectParents(
             @PathVariable("superapp") String superapp,
             @PathVariable("internalObjectId") String internalObjectId ,
             @RequestParam(name = "userSuperapp") String userSuperapp,
@@ -161,13 +161,14 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
             throws RuntimeException {
         try {
-            Optional<SuperAppObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId,userSuperapp,userEmail);
+            Optional<superAppObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId,userSuperapp,userEmail);
             return superAppObjectRelationshipService.getAllParents(objectBoundary
                     .orElseThrow(() -> new ObjectNotFoundException("could not find Object with id:" + internalObjectId))
                     .getObjectId().getInternalObjectId(),userSuperapp,userEmail,size,page).stream().toList();
         } catch (RuntimeException e) {
             throw new RuntimeException("can't get all parents: " + e.getMessage());
         }
+
     }
 
     @GetMapping(

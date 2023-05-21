@@ -15,6 +15,8 @@ public class MiniAppCommandBoundary
     private Map<String, Object> commandAttributes; // key-value
 
     public MiniAppCommandBoundary() {
+        this.commandId = new CommandId();
+        this.invokedBy=new InvokedBy();
     }
 
 
