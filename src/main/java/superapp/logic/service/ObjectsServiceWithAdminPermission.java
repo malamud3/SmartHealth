@@ -1,9 +1,21 @@
 package superapp.logic.service;
 
 import superapp.Boundary.User.UserId;
+import superapp.Boundary.superAppObjectBoundary;
 
-public interface ObjectsServiceWithAdminPermission extends ObjectServicePaginationSupported{
+import java.util.List;
+import java.util.Optional;
+
+public interface ObjectsServiceWithAdminPermission extends  ObjectsService , ObjectServicePaginationSupported{
+
+	//pagination Support
+	List<superAppObjectBoundary> getAllObjects(int size, int page);
 
 	public void deleteAllObjects(UserId userId) throws RuntimeException;
+
+	public Optional<superAppObjectBoundary> getSpecificObject(String superapp, String internalObjectId, String userSuperApp, String userEmail);
+
+
+	public superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update , String userSuperApp , String userEmail) throws RuntimeException;
 
 }

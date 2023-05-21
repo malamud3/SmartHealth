@@ -1,6 +1,8 @@
 package superapp.logic.Mongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import superapp.Boundary.CreatedBy;
@@ -19,15 +21,15 @@ import superapp.logic.Exceptions.UserNotFoundException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import superapp.logic.service.ObjectServicePaginationSupported;
 import superapp.logic.service.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService {
+public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService , ObjectServicePaginationSupported {
 
     private final SuperAppObjectRepository objectRepository;
     private final UserRepository userRepository;//for permission checks
@@ -48,11 +50,17 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException {
+        UserEntity userEntity = this.userRepository.findById(new UserId(obj.getCreatedBy().getUserId().getSuperapp(),obj.getCreatedBy().getUserId().getEmail()))
+                .orElseThrow(()->new UserNotFoundException("inserted user not exist"));
         try {
             validateObject(obj);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getMessage());
         }
+
+        if (userEntity.getRole() != UserRole.SUPERAPP_USER)
+            throw new PermissionDeniedException("User do not have permission to createObject");
+
         obj.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
         obj.setCreationTimestamp(new Date());
         SuperAppObjectEntity entity = boundaryToEntity(obj);
@@ -76,11 +84,22 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
         }
     }
     @Override
+    @Deprecated
     public superAppObjectBoundary updateObject(String superAppId, String internal_obj_id, superAppObjectBoundary update) {
-        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
-        if (optionalEntity.isEmpty()) {
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+
+    @Override
+    public superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update, String userSuperApp, String userEmail) throws RuntimeException {
+        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(update.getObjectId().getSuperapp(), internal_obj_id));
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
+                .orElseThrow(()->new UserNotFoundException("inserted user not exist"));
+
+        if (optionalEntity.isEmpty())
             throw new NullPointerException("internal id not exist");
-        }
+        if (userEntity.getRole() != UserRole.SUPERAPP_USER)
+            throw new PermissionDeniedException("User do not have permission to createObject");
+
         SuperAppObjectEntity entity = optionalEntity.get();
         boolean dirtyFlag = false;
         if (update.getType() != null) {
@@ -111,11 +130,9 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
                 dirtyFlag = true;
             }
         }
-
         if(dirtyFlag){
             entity = objectRepository.save(entity);
         }
-
         return entityToBoundary(entity);
     }
 
@@ -152,21 +169,12 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     @Override
     public List<superAppObjectBoundary> getAllObjects(int size, int page) {
         return this.objectRepository
-                .findAll(PageRequest.of(page, size, Sort.Direction.ASC, "creationTimestamp"))
+                .findAll(PageRequest.of(page, size, Sort.Direction.DESC, "creationTimestamp","id"))
                 .stream()
                 .map(this::entityToBoundary)
                 .toList();
     }
 
-    @Override
-    public Set<superAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
-        return null;
-    }
-
-    @Override
-    public Set<superAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
-        return null;
-    }
 
 
     @Override
@@ -189,10 +197,22 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
 
     @Override
+    @Deprecated
     public void bindParentAndChild(String parentId, String childId) throws RuntimeException{
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+
+    @Override
+    public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) throws RuntimeException {
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
+                .orElseThrow(()->new UserNotFoundException("inserted id: "
+                        + userEmail + userSuperApp + " does not exist"));
         if (childId.equals(parentId)){
             throw new RuntimeException("can't bind the same object");
         }
+        if(userEntity.getRole() != UserRole.SUPERAPP_USER)
+            throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
+
         SuperAppObjectEntity parent  = objectRepository.findById(new ObjectId(springAppName, parentId)).orElseThrow(()
                 -> new ObjectNotFoundException("could not find object with id: "+parentId ));
         SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, childId)).orElseThrow(()
@@ -210,41 +230,83 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
             throw new RuntimeException("child and parent already bind");
         }
     }
+
     @Override
+    @Deprecated
     public Set<superAppObjectBoundary> getAllChildren(String objectId) {
-        SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new ObjectNotFoundException("object not found"));
+        throw  new DepreacatedOpterationException("dont use this func ");
+    }
 
-        Set<superAppObjectBoundary> children = new HashSet<>();
+    @Override
+    public List<superAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
 
-        if (!parent.getChildObjects().isEmpty()){
-            children.addAll(parent.getChildObjects().stream().map(this::entityToBoundary).toList());
-        }else {
-            throw new RuntimeException("object doesn't have children");
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
+                .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userEmail + userSuperApp + " does not exist"));
+
+        SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
+                .orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+
+        if (userEntity.getRole() != UserRole.SUPERAPP_USER)
+            throw new PermissionDeniedException("User cannot getAllChildren");
+
+        if (parent.getChildObjects().isEmpty()) {
+            throw new RuntimeException("Object doesn't have children");
         }
 
-        return children;
+        List<SuperAppObjectEntity> childObjects = new ArrayList<>(parent.getChildObjects());
+
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, childObjects.size());
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        Page<SuperAppObjectEntity> childPage = new PageImpl<>(childObjects, pageRequest, childObjects.size());
+        List<SuperAppObjectEntity> paginatedChildren = childPage.getContent();
+
+        return paginatedChildren.stream()
+                .map(this::entityToBoundary)
+                .toList();
     }
 
-    @Override
-    public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) {
-
-    }
 
     @Override
+    @Deprecated
     public Set<superAppObjectBoundary> getAllParents(String objectId) {
-
-        SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, objectId)).orElseThrow(()->new ObjectNotFoundException("object not found"));
-
-        Set<superAppObjectBoundary> parents = new HashSet<>();
-        if (!child.getParentObjects().isEmpty()){
-            parents.addAll(child.getParentObjects().stream().map(this::entityToBoundary).toList());
-        }else {
-            throw new RuntimeException("object doesn't have parents");
-        }
-
-        return parents;
+        throw new DepreacatedOpterationException("Dont Use This Methode AnyMore");
 
     }
+
+
+    @Override
+    public List<superAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
+        SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
+                .orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp,userEmail))
+                .orElseThrow(()->new UserNotFoundException("inserted id: "
+                        + userEmail + userSuperapp + " does not exist"));
+        if (child.getParentObjects().isEmpty()) {
+            throw new RuntimeException("Object doesn't have parents");
+        }
+        if(userEntity.getRole() != UserRole.SUPERAPP_USER)
+            throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
+
+        List<SuperAppObjectEntity> parentObjects = new ArrayList<>(child.getParentObjects());
+
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, parentObjects.size());
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        Page<SuperAppObjectEntity> pageResult = new PageImpl<>(parentObjects.subList(startIndex, endIndex), pageRequest, parentObjects.size());
+        return pageResult.stream()
+                .map(this::entityToBoundary)
+                .toList();
+    }
+
+
+
 
 
     public superAppObjectBoundary entityToBoundary(SuperAppObjectEntity entity) {
