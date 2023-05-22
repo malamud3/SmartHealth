@@ -26,7 +26,6 @@ import superapp.logic.service.SuperAppObjService.ObjectsService;
 import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
     private final SuperAppObjectRepository objectRepository;
     private final UserRepository userRepository;//for permission checks
     private String springAppName;
+
 
 
     @Autowired
@@ -153,11 +153,20 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         if (optionalEntity.isEmpty()) {
             throw new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
         }
-        if (userEntity.getRole() != UserRole.SUPERAPP_USER  || (userEntity.getRole() == UserRole.MINIAPP_USER &&  optionalEntity.get().getActive()!=true))
+        if (userEntity.getRole() == UserRole.SUPERAPP_USER)
         {
-            throw new PermissionDeniedException("User do not have permission to getSpecificObject");
+            return optionalEntity.map(this::entityToBoundary);
+
         }
-        return optionalEntity.map(this::entityToBoundary);
+        else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
+            SuperAppObjectEntity objectEntity = optionalEntity.get();
+            if (objectEntity.getActive()) {
+                superAppObjectBoundary objectBoundary = entityToBoundary(objectEntity);
+                return Optional.of(objectBoundary);
+            }
+            throw new ObjectNotFoundException("User does not have permission to getSpecificObject");
+        }
+        throw new PermissionDeniedException("User do not have permission to getSpecificObject");
     }
 
     @Override
@@ -173,18 +182,24 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
     }
 
     //pagination Support
+
     @Override
     public List<superAppObjectBoundary> getAllObjects(String userSuperapp, String userEmail, int size, int page) {
-        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp,userEmail))
-                .orElseThrow(()->new UserNotFoundException("inserted id: "
-                        +userSuperapp +"_" + userEmail + " does not exist"));
-        if(userEntity.getRole() != UserRole.SUPERAPP_USER)
-            throw new PermissionDeniedException("User do not have permission to getAllObjects");
-        return this.objectRepository
-                .findAll(PageRequest.of(page, size, Sort.Direction.DESC, "creationTimestamp","id"))
-                .stream()
-                .map(this::entityToBoundary)
-                .toList();
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
+                .orElseThrow(() -> new UserNotFoundException("inserted id: "
+                        + userSuperapp + "_" + userEmail + " does not exist"));
+
+        if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
+            return this.objectRepository
+                    .findAll(PageRequest.of(page, size, Sort.Direction.DESC, "creationTimestamp", "id"))
+                    .stream()
+                    .map(this::entityToBoundary)
+                    .toList();
+        } else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
+            return getActiveObjects();
+        } else {
+            throw new ObjectNotFoundException("Not Found");
+        }
     }
 
 
@@ -243,6 +258,14 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
     }
 
 
+    public List<superAppObjectBoundary> getActiveObjects() {
+        List<SuperAppObjectEntity> activeObjects = this.objectRepository.findByActiveTrue();
+        return activeObjects.stream()
+                .map(this::entityToBoundary)
+                .toList();
+    }
+
+
     @Deprecated
     public Set<superAppObjectBoundary> getAllChildren(String objectId) {
         throw  new DepreacatedOpterationException("dont use this func ");
@@ -257,61 +280,79 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
                 .orElseThrow(() -> new ObjectNotFoundException("Object not found"));
 
-        if (userEntity.getRole() != UserRole.SUPERAPP_USER)
-            throw new PermissionDeniedException("User cannot getAllChildren");
-
         if (parent.getChildObjects().isEmpty()) {
             throw new RuntimeException("Object doesn't have children");
         }
 
-        List<SuperAppObjectEntity> childObjects = new ArrayList<>(parent.getChildObjects());
-        Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
 
-        Page<SuperAppObjectEntity> childPage = new PageImpl<>(childObjects, pageRequest, childObjects.size());
-        List<SuperAppObjectEntity> paginatedChildren = childPage.getContent();
+            List<SuperAppObjectEntity> childObjects = new ArrayList<>(parent.getChildObjects());
+            Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
+            PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        return paginatedChildren.stream()
-                .map(this::entityToBoundary)
-                .toList();
+            Page<SuperAppObjectEntity> childPage = new PageImpl<>(childObjects, pageRequest, childObjects.size());
+            List<SuperAppObjectEntity> paginatedChildren = childPage.getContent();
+
+            return paginatedChildren.stream()
+                    .map(this::entityToBoundary)
+                    .toList();
+        }
+        else if (userEntity.getRole() == UserRole.MINIAPP_USER)
+        {
+           return getActiveObjects();
+
+        }
+        throw new ObjectNotFoundException("Object Not Found");
     }
-
 
     @Override
     public List<superAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
         SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
                 .orElseThrow(() -> new ObjectNotFoundException("Object not found"));
-        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp,userEmail))
-                .orElseThrow(()->new UserNotFoundException("inserted id: "
+        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
+                .orElseThrow(() -> new UserNotFoundException("inserted id: "
                         + userEmail + userSuperapp + " does not exist"));
         if (child.getParentObjects().isEmpty()) {
             throw new RuntimeException("Object doesn't have parents");
         }
-        if(userEntity.getRole() != UserRole.SUPERAPP_USER)
-            throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
+        if (userEntity.getRole() != UserRole.SUPERAPP_USER) {
+            List<SuperAppObjectEntity> parentObjects = new ArrayList<>(child.getParentObjects());
 
-        List<SuperAppObjectEntity> parentObjects = new ArrayList<>(child.getParentObjects());
+            int startIndex = page * size;
+            int endIndex = Math.min(startIndex + size, parentObjects.size());
 
-        int startIndex = page * size;
-        int endIndex = Math.min(startIndex + size, parentObjects.size());
+            Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
+            PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-
-        Page<SuperAppObjectEntity> pageResult = new PageImpl<>(parentObjects.subList(startIndex, endIndex), pageRequest, parentObjects.size());
-        return pageResult.stream()
-                .map(this::entityToBoundary)
-                .toList();
+            Page<SuperAppObjectEntity> pageResult = new PageImpl<>(parentObjects.subList(startIndex, endIndex), pageRequest, parentObjects.size());
+            return pageResult.stream()
+                    .map(this::entityToBoundary)
+                    .toList();
+        } else if (userEntity.getRole() == UserRole.MINIAPP_USER)
+        {
+            return  getActiveObjects();
+        }
+        throw  new ObjectNotFoundException("Object Not Found");
     }
 
     public List<superAppObjectBoundary> searchByAlias(String alias, String userSuperapp, String userEmail, int size, int page) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<SuperAppObjectEntity> objectPage = objectRepository.findByAlias(alias, pageRequest);
 
-        return objectPage.getContent()
-                .stream()
-                .map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
-                .collect(Collectors.toList());
+
+        UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
+                .orElseThrow(() -> new UserNotFoundException("inserted id: "
+                        + userEmail + userSuperapp + " does not exist"));
+        if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
+            return objectPage.getContent()
+                    .stream()
+                    .map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
+                    .collect(Collectors.toList());
+        } else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
+            return getActiveObjects();
+        } else {
+            throw new ObjectNotFoundException("Object Not Found");
+        }
     }
 
     public List<superAppObjectBoundary> searchByType(String alias, String userSuperapp, String userEmail, int size, int page) {

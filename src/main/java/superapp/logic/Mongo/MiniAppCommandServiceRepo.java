@@ -12,17 +12,17 @@ import org.springframework.jms.core.JmsTemplate;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
+import superapp.dal.SuperAppObjectRepository;
 import superapp.dal.UserRepository;
 import superapp.data.Enum.UserRole;
 import superapp.data.mainEntity.MiniAppCommandEntity;
+import superapp.data.mainEntity.SuperAppObjectEntity;
 import superapp.data.mainEntity.UserEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import superapp.logic.Exceptions.DepreacatedOpterationException;
-import superapp.logic.Exceptions.PermissionDeniedException;
-import superapp.logic.Exceptions.UserNotFoundException;
+import superapp.logic.Exceptions.*;
 import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 
@@ -35,6 +35,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
     private final MiniAppCommandRepository repository;
     private final UserRepository userRepository;//for permission checks
     private final MongoTemplate mongoTemplate;
+
+    private final SuperAppObjectRepository objectRepository;
 
     private JmsTemplate jmsTemplate;
 
@@ -121,12 +123,24 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
     @Autowired
     public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-                                     MiniAppCommandRepository repository, ObjectMapper jackson, UserRepository userRepository) {
+                                     MiniAppCommandRepository repository, ObjectMapper jackson, UserRepository userRepository, SuperAppObjectRepository objectRepository) {
 
         this.repository = repository;
 		this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
         this.jackson = jackson;
+        this.objectRepository = objectRepository;
+    }
+
+
+    public boolean isObjectActive(ObjectId objectId) {
+        Optional<SuperAppObjectEntity> optionalEntity = this.objectRepository.findById(objectId);
+        if (optionalEntity.isPresent()) {
+            SuperAppObjectEntity objectEntity = optionalEntity.get();
+            return objectEntity.getActive();
+        } else {
+            throw new ObjectNotFoundException("Could not find object with ID: " + objectId);
+        }
     }
 
     @Override
@@ -137,30 +151,35 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
             throw new RuntimeException(e.getMessage());
         }
 
-        CommandId commandId = miniAppCommandBoundary.getCommandId();
-        if (commandId.getInternalCommandId() == null || commandId.getInternalCommandId().isEmpty()) {
-            commandId = new CommandId(springApplicationName, miniAppCommandBoundary.getCommandId().getMiniapp(), UUID.randomUUID().toString());
-            miniAppCommandBoundary.setCommandId(commandId);
-        }
-        if (commandId.getSuperapp() == null || commandId.getSuperapp().isEmpty()) {
-            commandId.setSuperapp(springApplicationName);
-        }
-        if (commandId.getMiniapp() == null || commandId.getMiniapp().isEmpty()) {
-            throw new RuntimeException("Need to specify mini-app");
-        }
+        UserEntity userEntity = this.userRepository.findByUserId(miniAppCommandBoundary.getInvokedBy().getUserId())
+                .orElseThrow();
+        if(userEntity.getRole() != UserRole.MINIAPP_USER && isObjectActive (miniAppCommandBoundary.getTargetObject().getObjectId())) {
+            CommandId commandId = miniAppCommandBoundary.getCommandId();
+            if (commandId.getInternalCommandId() == null || commandId.getInternalCommandId().isEmpty()) {
+                commandId = new CommandId(springApplicationName, miniAppCommandBoundary.getCommandId().getMiniapp(), UUID.randomUUID().toString());
+                miniAppCommandBoundary.setCommandId(commandId);
+            }
+            if (commandId.getSuperapp() == null || commandId.getSuperapp().isEmpty()) {
+                commandId.setSuperapp(springApplicationName);
+            }
+            if (commandId.getMiniapp() == null || commandId.getMiniapp().isEmpty()) {
+                throw new RuntimeException("Need to specify mini-app");
+            }
 
-        miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
-        miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
-        if (miniAppCommandBoundary.getInvocationTimestamp() == null) {
-            miniAppCommandBoundary.setInvocationTimestamp(new Date());
-        }
-        if (miniAppCommandBoundary.getCommandAttributes() == null) {
-            miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-        }
+            miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
+            miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
+            if (miniAppCommandBoundary.getInvocationTimestamp() == null) {
+                miniAppCommandBoundary.setInvocationTimestamp(new Date());
+            }
+            if (miniAppCommandBoundary.getCommandAttributes() == null) {
+                miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+            }
 
-        MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
-        entity = this.repository.save(entity);
-        return this.entityToBoundary(entity);
+            MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
+            entity = this.repository.save(entity);
+            return this.entityToBoundary(entity);
+        }
+        throw new ObjectBadRequest("Cnat invoke");
     }
 
 
@@ -194,7 +213,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
     public void deleteAllCommands(UserId userId) {
     	UserEntity userEntity = this.userRepository.findById(userId)
 				.orElseThrow(()->new UserNotFoundException("inserted id: "
-    	+ userId.toString() + " does not exist"));
+    	+ userId + " does not exist"));
 
     	if (userEntity.getRole() != UserRole.ADMIN) {
     		throw new PermissionDeniedException("You do not have permission to delete all commands");
