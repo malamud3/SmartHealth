@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import superapp.Boundary.MiniAppCommandBoundary;
+import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.PermissionDeniedException;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
@@ -133,6 +134,13 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         return entityToBoundary(existing);
     }
 
+    @Deprecated
+    @Override
+	public List<UserBoundary> getAllUsers() {
+		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+	}
+    
+    
     @Override
     public List<UserBoundary> exportAllUsers(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
         UserId userId = new UserId(userSuperApp, userEmail);
@@ -151,7 +159,14 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     }
 
 
-
+    
+    
+    @Override
+    @Deprecated
+	public void deleteAllUsers() {
+    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+	}
+    
     /**
      * delete all users
      *
