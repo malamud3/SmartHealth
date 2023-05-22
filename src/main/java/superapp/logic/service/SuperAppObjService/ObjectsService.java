@@ -8,20 +8,20 @@ import superapp.Boundary.superAppObjectBoundary;
 
         @Service
         public interface ObjectsService {
-                public superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException;
+                 superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException;
 
 
                 @Deprecated
-                public superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update) throws RuntimeException;
+                 superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update) throws RuntimeException;
 
                 @Deprecated
-                public Optional<superAppObjectBoundary> getSpecificObject(String obj, String internal_obj_id) throws RuntimeException;
+                 Optional<superAppObjectBoundary> getSpecificObject(String obj, String internal_obj_id) throws RuntimeException;
 
                 @Deprecated
-                public List<superAppObjectBoundary> getAllObjects() throws RuntimeException;
+                 List<superAppObjectBoundary> getAllObjects() throws RuntimeException;
 
                 @Deprecated
-                public void deleteAllObjects() throws RuntimeException;
+                 void deleteAllObjects() throws RuntimeException;
 
                 @Deprecated
                 void bindParentAndChild(String parentId, String childId) throws RuntimeException;
