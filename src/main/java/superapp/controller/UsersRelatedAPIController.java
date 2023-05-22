@@ -66,7 +66,8 @@ public class UsersRelatedAPIController {
 			but the userService's method 'updatedUser' returns user boundary, so to avoid troubles this method doesn't return User
 			Boundary as a JSON*/
 
-		public UserBoundary updateUser(@PathVariable("superapp") String superapp,
+		public UserBoundary updateUser(
+				@PathVariable("superapp") String superapp,
 				@PathVariable("userEmail") String email,
 				@RequestBody UserBoundary updatedUser) throws RuntimeException{
 			try {
