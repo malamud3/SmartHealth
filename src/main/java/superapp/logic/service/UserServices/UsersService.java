@@ -15,4 +15,10 @@ public interface UsersService {
 
 
 	public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException;
+	
+	@Deprecated
+	public List<UserBoundary> getAllUsers();
+	
+	@Deprecated
+	public void deleteAllUsers();
 }
