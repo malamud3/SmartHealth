@@ -177,7 +177,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
     public List<superAppObjectBoundary> getAllObjects(String userSuperapp, String userEmail, int size, int page) {
         UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp,userEmail))
                 .orElseThrow(()->new UserNotFoundException("inserted id: "
-                       +userSuperapp +"_" + userEmail + " does not exist"));
+                        +userSuperapp +"_" + userEmail + " does not exist"));
         if(userEntity.getRole() != UserRole.SUPERAPP_USER)
             throw new PermissionDeniedException("User do not have permission to getAllObjects");
         return this.objectRepository
