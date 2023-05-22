@@ -93,8 +93,10 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
     @Override
     public superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update, String userSuperApp, String userEmail) throws RuntimeException {
-        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(update.getObjectId().getSuperapp(), internal_obj_id));
-        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
+        Optional<SuperAppObjectEntity> optionalEntity = objectRepository
+                .findById(new ObjectId(update.getObjectId().getSuperapp(), internal_obj_id));
+        UserEntity userEntity = this.userRepository
+                .findById(new UserId(userSuperApp,userEmail))
                 .orElseThrow(()->new UserNotFoundException("inserted user not exist"));
 
         if (optionalEntity.isEmpty())
@@ -149,7 +151,8 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
                 .orElseThrow(()->new UserNotFoundException("inserted id: "
                         +userEmail + userSuperApp + " does not exist"));
-        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.findById(new ObjectId(superAppId, internal_obj_id));
+        Optional<SuperAppObjectEntity> optionalEntity = objectRepository.
+                findById(new ObjectId(superAppId, internal_obj_id));
         if (optionalEntity.isEmpty()) {
             throw new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
         }
@@ -191,12 +194,13 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
         if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
             return this.objectRepository
-                    .findAll(PageRequest.of(page, size, Sort.Direction.DESC, "creationTimestamp", "id"))
+                    .findAll(PageRequest.of(page, size, Sort
+                            .Direction.DESC, "creationTimestamp", "_id"))
                     .stream()
                     .map(this::entityToBoundary)
                     .toList();
         } else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
-            return getActiveObjects();
+            return getActiveObjects(page, size);
         } else {
             throw new ObjectNotFoundException("Not Found");
         }
@@ -213,7 +217,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
     public void deleteAllObjects(UserId userId) {
         UserEntity userEntity = this.userRepository.findById(userId)
                 .orElseThrow(()->new UserNotFoundException("inserted id: "
-                        + userId.toString() + " does not exist"));
+                        + userId + " does not exist"));
 
         if (userEntity.getRole() != UserRole.ADMIN) {
             throw new PermissionDeniedException("You do not have permission to delete all users");
@@ -258,12 +262,25 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
     }
 
 
-    public List<superAppObjectBoundary> getActiveObjects() {
+    public List<superAppObjectBoundary> getActiveObjects(int page, int size) {
         List<SuperAppObjectEntity> activeObjects = this.objectRepository.findByActiveTrue();
-        return activeObjects.stream()
+        PageRequest pageRequest = PageRequest.of(page, size, Sort
+                .Direction.DESC, "creationTimestamp", "type");
+
+        List<SuperAppObjectEntity> objectsOnPage = getPage(activeObjects, pageRequest);
+        List<superAppObjectBoundary> activeObjectBoundaries = objectsOnPage.stream()
                 .map(this::entityToBoundary)
                 .toList();
+        return activeObjectBoundaries;
     }
+
+    private List<SuperAppObjectEntity> getPage(List<SuperAppObjectEntity> objects, PageRequest pageRequest) {
+        int startIndex = pageRequest.getPageNumber() * pageRequest.getPageSize();
+        int endIndex = Math.min(startIndex + pageRequest.getPageSize(), objects.size());
+        return objects.subList(startIndex, endIndex);
+    }
+
+
 
 
     @Deprecated
@@ -287,9 +304,8 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
 
             List<SuperAppObjectEntity> childObjects = new ArrayList<>(parent.getChildObjects());
-            Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
-            PageRequest pageRequest = PageRequest.of(page, size, sort);
-
+            PageRequest pageRequest = PageRequest.of(page, size, Sort
+                    .Direction.ASC , "creationTimestamp", "_id");
             Page<SuperAppObjectEntity> childPage = new PageImpl<>(childObjects, pageRequest, childObjects.size());
             List<SuperAppObjectEntity> paginatedChildren = childPage.getContent();
 
@@ -299,7 +315,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         }
         else if (userEntity.getRole() == UserRole.MINIAPP_USER)
         {
-           return getActiveObjects();
+           return getActiveObjects(page, size);
 
         }
         throw new ObjectNotFoundException("Object Not Found");
@@ -321,7 +337,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
             int startIndex = page * size;
             int endIndex = Math.min(startIndex + size, parentObjects.size());
 
-            Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "id");
+            Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "_id");
             PageRequest pageRequest = PageRequest.of(page, size, sort);
 
             Page<SuperAppObjectEntity> pageResult = new PageImpl<>(parentObjects.subList(startIndex, endIndex), pageRequest, parentObjects.size());
@@ -330,33 +346,33 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
                     .toList();
         } else if (userEntity.getRole() == UserRole.MINIAPP_USER)
         {
-            return  getActiveObjects();
+            return  getActiveObjects(page, size);
         }
         throw  new ObjectNotFoundException("Object Not Found");
     }
 
     public List<superAppObjectBoundary> searchByAlias(String alias, String userSuperapp, String userEmail, int size, int page) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<SuperAppObjectEntity> objectPage = objectRepository.findByAlias(alias, pageRequest);
-
-
         UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
                 .orElseThrow(() -> new UserNotFoundException("inserted id: "
                         + userEmail + userSuperapp + " does not exist"));
+
+        PageRequest pageRequest = PageRequest.of(page, size , Sort.Direction.ASC,"_id");
+        Page<SuperAppObjectEntity> objectPage = objectRepository.findByAlias(alias, pageRequest);
+
         if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
             return objectPage.getContent()
                     .stream()
                     .map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
                     .collect(Collectors.toList());
         } else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
-            return getActiveObjects();
+            return getActiveObjects(page, size);
         } else {
             throw new ObjectNotFoundException("Object Not Found");
         }
     }
 
     public List<superAppObjectBoundary> searchByType(String alias, String userSuperapp, String userEmail, int size, int page) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size,  Sort.Direction.ASC,"_id");
         Page<SuperAppObjectEntity> objectPage = objectRepository.searchByType(alias, pageRequest);
 
         return objectPage.getContent()
@@ -379,7 +395,6 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
         // Perform the search by location implementation
         List<superAppObjectBoundary> results = new ArrayList<>();
-
         for (SuperAppObjectEntity entity : objectRepository.findAll()) {
             double objectLat = entity.getLocation().getLat();
             double objectLng = entity.getLocation().getLng();
@@ -408,9 +423,6 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
         return earthRadius * c;
     }
-
-
-
 
     public superAppObjectBoundary entityToBoundary(SuperAppObjectEntity entity) {
         superAppObjectBoundary obj = new superAppObjectBoundary();
