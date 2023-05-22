@@ -153,7 +153,6 @@ public class SuperAppObjectsAPIController {
     //GET: Get all parents of an existing object
     @GetMapping(
             path = "/superapp/objects/{superapp}/{internalObjectId}/parents",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<superAppObjectBoundary> getAllObjectParents(
@@ -175,13 +174,14 @@ public class SuperAppObjectsAPIController {
 
     }
 
+  //GET: Get all user's objects by alias
     @GetMapping(
             path     = "/superapp/objects/search/byAlias/{alias}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<superAppObjectBoundary> searchByAlias(
             @PathVariable("alias") String alias,
-            @RequestParam("superapp") String superapp,
+            @RequestParam("userSuperapp") String superapp,
             @RequestParam("userEmail") String email,
             @RequestParam("size") int size,
             @RequestParam("page") int page
@@ -189,13 +189,14 @@ public class SuperAppObjectsAPIController {
         return  objectsService.searchByAlias(alias, superapp, email, size, page);
     }
 
+    //GET: Get all user's objects by type
     @GetMapping(
             path     = "/superapp/objects/search/byType/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<superAppObjectBoundary> searchByType(
             @PathVariable("type") String type,
-            @RequestParam("superapp") String superapp,
+            @RequestParam("userSuperapp") String superapp,
             @RequestParam("userEmail") String email,
             @RequestParam("size") int size,
             @RequestParam("page") int page
@@ -203,6 +204,7 @@ public class SuperAppObjectsAPIController {
         return objectsService.searchByType(type, superapp, email, size, page);
     }
 
+  //GET: Get all user's objects by location
     @GetMapping(
             path = "/superapp/objects/search/byLocation/{lat}/{lng}/{distance}",
             produces = MediaType.APPLICATION_JSON_VALUE

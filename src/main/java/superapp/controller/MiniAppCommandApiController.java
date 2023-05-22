@@ -29,9 +29,10 @@ public class MiniAppCommandApiController
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public MiniAppCommandBoundary invokeMiniApp(@PathVariable("miniAppName") String miniAppName,
-                                                @RequestParam(value = "async", defaultValue = "false") boolean asyncFlag
-            ,@RequestBody MiniAppCommandBoundary miniAppCommand) throws RuntimeException {
+    public MiniAppCommandBoundary invokeMiniApp(
+    		@PathVariable("miniAppName") String miniAppName,
+             @RequestParam(value = "async", defaultValue = "false") boolean asyncFlag,
+             @RequestBody MiniAppCommandBoundary miniAppCommand) throws RuntimeException {
         miniAppCommand.getCommandId().setMiniapp(miniAppName);
         try {
 
