@@ -214,11 +214,10 @@ public class SuperAppObjectsAPIController {
             @PathVariable("lng") double longitude,
             @PathVariable("distance") double distance,
             @RequestParam(value = "units", defaultValue = "NEUTRAL") String distanceUnits,
-            @RequestParam("userSuperapp") String superapp,
-            @RequestParam("userEmail") String email,
-            @RequestParam("size") int size,
-            @RequestParam("page") int page
-    ) {
+            @RequestParam(name = "userSuperapp") String superapp,
+            @RequestParam(name = "userEmail") String email,
+            @RequestParam(name = "size" , required = false) int size,
+            @RequestParam(name = "page" , required = false) int page) {
         return objectsService.searchByLocation(latitude, longitude, distance, distanceUnits, superapp, email, size, page);
     }
 

@@ -106,7 +106,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
                                                     this.setStatus(
                                                             this.jackson
                                                                     .readValue(json, MiniAppCommandBoundary.class),
-                                                            "remotely-accepted")))));
+                                                            "accepted..AsyncDone")))));
         } catch (Exception e) {
             e.printStackTrace();
         }
