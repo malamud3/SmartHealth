@@ -156,12 +156,12 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         if (optionalEntity.isEmpty()) {
             throw new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
         }
-        if (userEntity.getRole() == UserRole.SUPERAPP_USER)
+        if (userEntity.getRole().equals(UserRole.SUPERAPP_USER))
         {
             return optionalEntity.map(this::entityToBoundary);
 
         }
-        else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
+        else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
             SuperAppObjectEntity objectEntity = optionalEntity.get();
             if (objectEntity.getActive()) {
                 superAppObjectBoundary objectBoundary = entityToBoundary(objectEntity);
@@ -192,14 +192,14 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
                 .orElseThrow(() -> new UserNotFoundException("inserted id: "
                         + userSuperapp + "_" + userEmail + " does not exist"));
 
-        if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
+        if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
             return this.objectRepository
                     .findAll(PageRequest.of(page, size, Sort
                             .Direction.DESC, "creationTimestamp", "_id"))
                     .stream()
                     .map(this::entityToBoundary)
                     .toList();
-        } else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
+        } else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
             return getActiveObjects(page, size);
         } else {
             throw new ObjectNotFoundException("Not Found");
@@ -301,7 +301,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
             throw new RuntimeException("Object doesn't have children");
         }
 
-        if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
+        if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
 
             List<SuperAppObjectEntity> childObjects = new ArrayList<>(parent.getChildObjects());
             PageRequest pageRequest = PageRequest.of(page, size, Sort
@@ -313,7 +313,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
                     .map(this::entityToBoundary)
                     .toList();
         }
-        else if (userEntity.getRole() == UserRole.MINIAPP_USER)
+        else if (userEntity.getRole().equals(UserRole.MINIAPP_USER))
         {
            return getActiveObjects(page, size);
 
@@ -331,25 +331,23 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         if (child.getParentObjects().isEmpty()) {
             throw new RuntimeException("Object doesn't have parents");
         }
-        if (userEntity.getRole() != UserRole.SUPERAPP_USER) {
-            List<SuperAppObjectEntity> parentObjects = new ArrayList<>(child.getParentObjects());
 
-            int startIndex = page * size;
-            int endIndex = Math.min(startIndex + size, parentObjects.size());
-
+        if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
             Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "_id");
             PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-            Page<SuperAppObjectEntity> pageResult = new PageImpl<>(parentObjects.subList(startIndex, endIndex), pageRequest, parentObjects.size());
-            return pageResult.stream()
+            // Query to get parent objects with pagination
+            List<SuperAppObjectEntity> parentObjects = objectRepository.findByChildObjectId(child.getObjectId(), pageRequest);
+
+            return parentObjects.stream()
                     .map(this::entityToBoundary)
                     .toList();
-        } else if (userEntity.getRole() == UserRole.MINIAPP_USER)
-        {
-            return  getActiveObjects(page, size);
+        } else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
+            return getActiveObjects(page, size);
         }
-        throw  new ObjectNotFoundException("Object Not Found");
+        throw new ObjectNotFoundException("Object Not Found");
     }
+
 
     public List<superAppObjectBoundary> searchByAlias(String alias, String userSuperapp, String userEmail, int size, int page) {
         UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
@@ -359,12 +357,12 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
         PageRequest pageRequest = PageRequest.of(page, size , Sort.Direction.ASC,"_id");
         Page<SuperAppObjectEntity> objectPage = objectRepository.findByAlias(alias, pageRequest);
 
-        if (userEntity.getRole() == UserRole.SUPERAPP_USER) {
+        if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
             return objectPage.getContent()
                     .stream()
                     .map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
                     .collect(Collectors.toList());
-        } else if (userEntity.getRole() == UserRole.MINIAPP_USER) {
+        } else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)){
             return getActiveObjects(page, size);
         } else {
             throw new ObjectNotFoundException("Object Not Found");
