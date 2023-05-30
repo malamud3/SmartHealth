@@ -188,7 +188,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
 			return getActiveObjects(page, size);
 		} else {
-			throw new ObjectNotFoundException("Not Found");
+			throw new PermissionDeniedException("User do not have permission to get all objects");
 		}
 	}
 
@@ -206,7 +206,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 						+ userId + " does not exist"));
 
 		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
-			throw new PermissionDeniedException("You do not have permission to delete all users");
+			throw new PermissionDeniedException("You do not have permission to delete all objects");
 		}
 		this.objectRepository.deleteAll();
 	}
@@ -304,7 +304,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 			return getActiveObjects(page, size);
 
 		}
-		throw new ObjectNotFoundException("Object Not Found");
+		throw new PermissionDeniedException("User do not have permission to get all children");
 	}
 
 	@Override
@@ -331,7 +331,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
 			return getActiveObjects(page, size);
 		}
-		throw new ObjectNotFoundException("Object Not Found");
+		throw new PermissionDeniedException("User do not have permission to get all parents");
 	}
 
 
@@ -351,11 +351,12 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)){
 			return getActiveObjects(page, size);
 		} else {
-			throw new ObjectNotFoundException("Object Not Found");
+			throw new PermissionDeniedException("User do not have permission to search by alias");
 		}
 	}
 
 	public List<superAppObjectBoundary> searchByType(String alias, String userSuperapp, String userEmail, int size, int page) {
+		
 		PageRequest pageRequest = PageRequest.of(page, size,  Sort.Direction.ASC,"_id");
 		Page<SuperAppObjectEntity> objectPage = objectRepository.searchByType(alias, pageRequest);
 
