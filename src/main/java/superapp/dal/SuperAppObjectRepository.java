@@ -1,6 +1,8 @@
 package superapp.dal;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import superapp.Boundary.ObjectId;
@@ -16,6 +18,10 @@ public interface  SuperAppObjectRepository
 	Optional<SuperAppObjectEntity> findByObjectId(ObjectId objectId);
     
 	List<SuperAppObjectEntity> findByActiveIsTrue();
+	
+	List<SuperAppObjectEntity> findByLocationNear(Point location, Distance distance, Pageable pageable);
+	
+	List<SuperAppObjectEntity> findByLocationNearAndActiveIsTrue(Point location, Distance distance, Pageable pageable);
 	
     Page<SuperAppObjectEntity> findByAlias(String alias, Pageable pageable);
     

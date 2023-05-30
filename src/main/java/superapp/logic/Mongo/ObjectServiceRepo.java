@@ -5,6 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+
 import superapp.Boundary.CreatedBy;
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
@@ -365,31 +369,39 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 				.collect(Collectors.toList());
 	}
 
-	public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude, double distance, String distanceUnits, String superapp, String email, int size, int page) {
-		// Convert distance units as needed
-		double radius;
-
-		if (distanceUnits.equalsIgnoreCase("KILOMETERS")) {
-			radius = distance; // Distance is already in kilometers
-		} else if (distanceUnits.equalsIgnoreCase("MILES")) {
-			radius = distance * 1.60934; // Convert distance to kilometers
-		} else {
-			radius = distance; // Assume neutral units or invalid value (treated as kilometers)
+	public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude,
+			double distance, String distanceUnits, String userSuperapp, String userEmail, int size, int page) {
+		
+		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
+				.orElseThrow(() -> new UserNotFoundException("inserted id: "
+						+ userEmail + userSuperapp + " does not exist"));
+		
+		GeneralUtility generalUtility = new GeneralUtility();
+		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
+			
+			return this.objectRepository
+					.findByLocationNear(new Point(latitude, longitude),
+							new Distance(distance, generalUtility.parseDistanceUnit(distanceUnits)),
+							PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp", "_id"))
+					.stream()
+					.map(this::entityToBoundary)
+					.toList();
+			
+		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
+			return this.objectRepository
+					.findByLocationNearAndActiveIsTrue(new Point(latitude, longitude),
+							new Distance(distance, generalUtility.parseDistanceUnit(distanceUnits)),
+							PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp", "_id"))
+					.stream()
+					.map(this::entityToBoundary)
+					.toList();
 		}
+		throw new PermissionDeniedException("User do not have permission to search by location");
+		
 
-		// Perform the search by location implementation
-		List<SuperAppObjectBoundary> results = new ArrayList<>();
-		for (SuperAppObjectEntity entity : objectRepository.findAll()) {
-			double objectLat = entity.getLocation().getLat();
-			double objectLng = entity.getLocation().getLng();
-
-			double objectDistance = calculateDistance(latitude, longitude, objectLat, objectLng);
-
-			if (objectDistance <= radius) {
-				results.add(entityToBoundary(entity));
-			}
-		}
-		return results;
+		
 	}
 
 	private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
