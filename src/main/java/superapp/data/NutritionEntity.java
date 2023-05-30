@@ -1,10 +1,10 @@
-package superapp.data.subEntity;
+package superapp.data;
 
 import java.util.ArrayList;
 
 public class NutritionEntity {
-	ArrayList < NutrientEntity > nutrients = new ArrayList < NutrientEntity > ();
-	ArrayList < PropertyEntity > properties = new ArrayList < PropertyEntity > ();
+	ArrayList <NutrientEntity> nutrients = new ArrayList < NutrientEntity > ();
+	ArrayList <PropertyEntity> properties = new ArrayList < PropertyEntity > ();
 	//ArrayList < Object > flavonoids = new ArrayList < Object > ();
 	//WeightPerServingEntity WeightPerServingObject;
 	CaloricBreakdownEntity caloricBreakdown = new CaloricBreakdownEntity();

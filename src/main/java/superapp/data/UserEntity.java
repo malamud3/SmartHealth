@@ -1,13 +1,10 @@
-package superapp.data.mainEntity;
+package superapp.data;
 
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.scheduling.annotation.EnableAsync;
-import superapp.Boundary.User.NewUserBoundary;
-import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.data.Enum.UserRole;
 
 import java.util.Objects;
 

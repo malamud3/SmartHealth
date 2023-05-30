@@ -2,18 +2,16 @@ package superapp.logic.Mongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import superapp.Boundary.CreatedBy;
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.dal.UserRepository;
-import superapp.data.Enum.UserRole;
-import superapp.data.mainEntity.SuperAppObjectEntity;
-import superapp.data.mainEntity.UserEntity;
+import superapp.data.UserRole;
+import superapp.data.SuperAppObjectEntity;
+import superapp.data.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
@@ -245,7 +243,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 
 	public List<SuperAppObjectBoundary> getActiveObjects(int page, int size) {
-		List<SuperAppObjectEntity> activeObjects = this.objectRepository.findByActiveTrue();
+		List<SuperAppObjectEntity> activeObjects = this.objectRepository.findByActiveIsTrue();
 		PageRequest pageRequest = PageRequest.of(page, size, Sort
 				.Direction.DESC, "creationTimestamp", "type");
 
@@ -273,31 +271,32 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	@Override
 	public List<SuperAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
 
-		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
+		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userEmail + userSuperApp + " does not exist"));
 
 		SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
 				.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
 
-		if (parent.getChildObjects().isEmpty()) {
-			throw new RuntimeException("Object doesn't have children");
-		}
 
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
 
-			List<SuperAppObjectEntity> childObjects = new ArrayList<>(parent.getChildObjects());
-			PageRequest pageRequest = PageRequest.of(page, size, Sort
-					.Direction.ASC , "creationTimestamp", "_id");
-			Page<SuperAppObjectEntity> childPage = new PageImpl<>(childObjects, pageRequest, childObjects.size());
-			List<SuperAppObjectEntity> paginatedChildren = childPage.getContent();
-
-			return paginatedChildren.stream()
+			return this.objectRepository
+					.findByParentObjects_ObjectId(parent.getObjectId(), PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp", "_id"))
+					.stream()
 					.map(this::entityToBoundary)
 					.toList();
+			
+			
 		}
 		else if (userEntity.getRole().equals(UserRole.MINIAPP_USER))
 		{
-			return getActiveObjects(page, size);
+			return this.objectRepository
+					.findByParentObjects_ObjectIdAndActiveIsTrue(parent.getObjectId(),PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp", "_id"))
+					.stream()
+					.map(this::entityToBoundary)
+					.toList();
 
 		}
 		throw new PermissionDeniedException("User do not have permission to get all children");
@@ -307,25 +306,27 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	public List<SuperAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
 		SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
 				.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+		
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("inserted id: "
 						+ userEmail + userSuperapp + " does not exist"));
-		if (child.getParentObjects().isEmpty()) {
-			throw new RuntimeException("Object doesn't have parents");
-		}
+	
 
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
-			Sort sort = Sort.by(Sort.Direction.DESC, "creationTimestamp", "_id");
-			PageRequest pageRequest = PageRequest.of(page, size, sort);
-
-			// Query to get parent objects with pagination
-			List<SuperAppObjectEntity> parentObjects = objectRepository.findByChildObjects(child.getObjectId(), pageRequest);
-
-			return parentObjects.stream()
+			return this.objectRepository
+					.findByChildObjects_ObjectId(child.getObjectId(), PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp", "_id"))
+					.stream()
 					.map(this::entityToBoundary)
 					.toList();
+			
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
-			return getActiveObjects(page, size);
+			return this.objectRepository
+					.findByChildObjects_ObjectIdAndActiveIsTrue(child.getObjectId(), PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp", "_id"))
+					.stream()
+					.map(this::entityToBoundary)
+					.toList();
 		}
 		throw new PermissionDeniedException("User do not have permission to get all parents");
 	}

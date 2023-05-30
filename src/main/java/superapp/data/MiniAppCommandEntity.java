@@ -1,13 +1,10 @@
-package superapp.data.mainEntity;
+package superapp.data;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import superapp.Boundary.CommandId;
 import superapp.Boundary.InvokedBy;
-import superapp.Boundary.ObjectId;
 import superapp.Boundary.TargetObject;
-import superapp.Boundary.User.UserId;
-
 
 
 import java.util.Date;

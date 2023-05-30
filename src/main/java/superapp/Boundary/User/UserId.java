@@ -5,8 +5,8 @@ import org.springframework.data.annotation.Id;
 
 
 public class UserId {
-	private String superapp;
-	private String email;
+		private String superapp;
+		private String email;
 	
 
 

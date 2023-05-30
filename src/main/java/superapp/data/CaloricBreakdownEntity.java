@@ -1,4 +1,4 @@
-package superapp.data.subEntity;
+package superapp.data;
 
 public class CaloricBreakdownEntity {
 	private float percentProtein;

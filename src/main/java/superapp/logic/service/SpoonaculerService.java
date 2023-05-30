@@ -1,6 +1,6 @@
 package superapp.logic.service;
 
-import superapp.data.subEntity.IngredientEntity;
+import superapp.data.IngredientEntity;
 
 public interface SpoonaculerService {
 

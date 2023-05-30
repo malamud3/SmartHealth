@@ -1,4 +1,4 @@
-package superapp.data.subEntity;
+package superapp.data;
 
 public class NutrientEntity {
 	public String name;

@@ -1,8 +1,6 @@
-package superapp.data.subEntity;
+package superapp.data;
 
 import java.util.ArrayList;
-
-import superapp.data.subEntity.optionalSubEntity.EstimatedCostEntity;
 
 public class IngredientEntity {
 

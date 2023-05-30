@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 
-import superapp.data.subEntity.IngredientEntity;
+import superapp.data.IngredientEntity;
 import superapp.logic.service.SpoonaculerService;
 
 @Service

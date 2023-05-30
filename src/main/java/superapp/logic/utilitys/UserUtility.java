@@ -1,6 +1,6 @@
 package superapp.logic.utilitys;
 
-import superapp.data.Enum.UserRole;
+import superapp.data.UserRole;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

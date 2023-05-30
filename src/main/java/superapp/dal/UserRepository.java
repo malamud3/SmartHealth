@@ -2,7 +2,7 @@ package superapp.dal;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import superapp.Boundary.User.UserId;
-import superapp.data.mainEntity.UserEntity;
+import superapp.data.UserEntity;
 
 import java.util.Optional;
 

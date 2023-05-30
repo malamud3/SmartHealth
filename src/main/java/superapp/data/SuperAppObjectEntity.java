@@ -1,11 +1,10 @@
-package superapp.data.mainEntity;
+package superapp.data;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import superapp.Boundary.*;
-import superapp.Boundary.User.UserId;
 
 import java.util.*;
 

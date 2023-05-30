@@ -3,7 +3,6 @@ package superapp.logic.Mongo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,10 +13,10 @@ import superapp.Boundary.User.UserId;
 import superapp.dal.MiniAppCommandRepository;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.dal.UserRepository;
-import superapp.data.Enum.UserRole;
-import superapp.data.mainEntity.MiniAppCommandEntity;
-import superapp.data.mainEntity.SuperAppObjectEntity;
-import superapp.data.mainEntity.UserEntity;
+import superapp.data.UserRole;
+import superapp.data.MiniAppCommandEntity;
+import superapp.data.SuperAppObjectEntity;
+import superapp.data.UserEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,296 +26,290 @@ import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPerm
 import superapp.logic.utilitys.GeneralUtility;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 @Service
 public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdminPermission {
 
-    private  String springApplicationName;
-    private final MiniAppCommandRepository repository;
-    private final UserRepository userRepository;//for permission checks
-    private final MongoTemplate mongoTemplate;
+	private  String springApplicationName;
+	private final MiniAppCommandRepository commandRepository;
+	private final UserRepository userRepository;//for permission checks
+	private final MongoTemplate mongoTemplate;
 
-    private final SuperAppObjectRepository objectRepository;
+	private final SuperAppObjectRepository objectRepository;
 
-    private JmsTemplate jmsTemplate;
+	private JmsTemplate jmsTemplate;
 
-    private ObjectMapper jackson;
-
-
-
-    // this method injects a configuration value of spring
-    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
-    public void setSpringApplicationName(String springApplicationName) {
-        this.springApplicationName = springApplicationName;
-    }
-
-    @PostConstruct
-    public void init() {
-        if (!mongoTemplate.collectionExists("COMMAND")) {
-            mongoTemplate.createCollection("COMMAND");
-            this.jackson = new ObjectMapper();
-        }
-        if (!mongoTemplate.collectionExists("USERS")) {
-            mongoTemplate.createCollection("USERS");
-        }
-    }
-
-    @Autowired
-    public void setJmsTemplate(JmsTemplate jmsTemplate) {
-        this.jmsTemplate = jmsTemplate;
-        this.jmsTemplate.setDeliveryDelay(5000L);
-    }
+	private ObjectMapper jackson;
 
 
-    @Override
-    public MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
-        miniAppCommandBoundary.setInvocationTimestamp(miniAppCommandBoundary.getInvocationTimestamp());
-        if (miniAppCommandBoundary.getCommandAttributes() == null) {
-            miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-        }
-        miniAppCommandBoundary.getCommandAttributes().put("status", "in-process...");
-        miniAppCommandBoundary.setCommand(miniAppCommandBoundary.getCommand());
-        miniAppCommandBoundary.setTargetObject(new TargetObject(miniAppCommandBoundary.getTargetObject().getObjectId()));
-        miniAppCommandBoundary.setInvokedBy(new InvokedBy(miniAppCommandBoundary.getInvokedBy().getUserId()));
 
-        try {
-            String json = this.jackson
-                    .writeValueAsString(miniAppCommandBoundary);
+	// this method injects a configuration value of spring
+	@Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
+	public void setSpringApplicationName(String springApplicationName) {
+		this.springApplicationName = springApplicationName;
+	}
 
-            // send json to afekaMessageQueue
-            System.err.println("*** sending: " + json);
-            this.jmsTemplate
-                    .convertAndSend("InvocationMiniAppQueue", json);
-            return miniAppCommandBoundary;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+	@PostConstruct
+	public void init() {
+		if (!mongoTemplate.collectionExists("COMMAND")) {
+			mongoTemplate.createCollection("COMMAND");
+			this.jackson = new ObjectMapper();
+		}
+		if (!mongoTemplate.collectionExists("USERS")) {
+			mongoTemplate.createCollection("USERS");
+		}
+	}
+
+	@Autowired
+	public void setJmsTemplate(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+		this.jmsTemplate.setDeliveryDelay(5000L);
+	}
 
 
-    @JmsListener(destination = "InvocationMiniAppQueue")
-    public void handleInvokeMiniApp(String json) {
-        try {
-            System.err.println(
-                    this.entityToBoundary(
-                            this.mongoTemplate
-                                    .save(
-                                            this.boundaryToEntity(
-                                                    this.setStatus(
-                                                            this.jackson
-                                                                    .readValue(json, MiniAppCommandBoundary.class),
-                                                            "accepted..AsyncDone")))));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	@Override
+	public MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
+		miniAppCommandBoundary.setInvocationTimestamp(miniAppCommandBoundary.getInvocationTimestamp());
+		if (miniAppCommandBoundary.getCommandAttributes() == null) {
+			miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+		}
+		miniAppCommandBoundary.getCommandAttributes().put("status", "in-process...");
+		miniAppCommandBoundary.setCommand(miniAppCommandBoundary.getCommand());
+		miniAppCommandBoundary.setTargetObject(new TargetObject(miniAppCommandBoundary.getTargetObject().getObjectId()));
+		miniAppCommandBoundary.setInvokedBy(new InvokedBy(miniAppCommandBoundary.getInvokedBy().getUserId()));
 
-    private MiniAppCommandBoundary setStatus(MiniAppCommandBoundary miniAppCommandBoundary, String status) {
-        if (miniAppCommandBoundary.getCommandAttributes() == null) {
-            miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-        }
-        miniAppCommandBoundary.getCommandAttributes().put("status", status);
+		try {
+			String json = this.jackson
+					.writeValueAsString(miniAppCommandBoundary);
 
-        return miniAppCommandBoundary;
-    }
+			// send json to InvocationMiniAppQueue
+			System.err.println("*** sending: " + json);
+			this.jmsTemplate
+			.convertAndSend("InvocationMiniAppQueue", json);
+			return miniAppCommandBoundary;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Autowired
-    public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-                                     MiniAppCommandRepository repository, ObjectMapper jackson, UserRepository userRepository, SuperAppObjectRepository objectRepository) {
 
-        this.repository = repository;
+	@JmsListener(destination = "InvocationMiniAppQueue")
+	public void handleInvokeMiniApp(String json) {
+		try {
+			System.err.println(
+					this.entityToBoundary(
+							this.mongoTemplate
+							.save(
+									this.boundaryToEntity(
+											this.setStatus(
+													this.jackson
+													.readValue(json, MiniAppCommandBoundary.class),
+													"accepted..AsyncDone")))));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private MiniAppCommandBoundary setStatus(MiniAppCommandBoundary miniAppCommandBoundary, String status) {
+		if (miniAppCommandBoundary.getCommandAttributes() == null) {
+			miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+		}
+		miniAppCommandBoundary.getCommandAttributes().put("status", status);
+
+		return miniAppCommandBoundary;
+	}
+
+	@Autowired
+	public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
+			MiniAppCommandRepository repository, ObjectMapper jackson, UserRepository userRepository, SuperAppObjectRepository objectRepository) {
+
+		this.commandRepository = repository;
 		this.userRepository = userRepository;
-        this.mongoTemplate = mongoTemplate;
-        this.jackson = jackson;
-        this.objectRepository = objectRepository;
-    }
+		this.mongoTemplate = mongoTemplate;
+		this.jackson = jackson;
+		this.objectRepository = objectRepository;
+	}
 
 
-    public boolean isObjectActive(ObjectId objectId) {
-        Optional<SuperAppObjectEntity> optionalEntity = this.objectRepository.findById(objectId);
-        if (optionalEntity.isPresent()) {
-            SuperAppObjectEntity objectEntity = optionalEntity.get();
-            return objectEntity.getActive();
-        } else {
-            throw new ObjectNotFoundException("Could not find object with ID: " + objectId);
-        }
-    }
+	public boolean isObjectActive(ObjectId objectId) {
+		Optional<SuperAppObjectEntity> optionalEntity = this.objectRepository.findById(objectId);
+		if (optionalEntity.isPresent()) {
+			SuperAppObjectEntity objectEntity = optionalEntity.get();
+			return objectEntity.getActive();
+		} else {
+			throw new ObjectNotFoundException("Could not find object with ID: " + objectId);
+		}
+	}
 
-    @Override
-    public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
-        try {
-            validatMiniappCommand(miniAppCommandBoundary);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+	@Override
+	public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
+		validatMiniappCommand(miniAppCommandBoundary);
 
-        UserEntity userEntity = this.userRepository.findByUserId(miniAppCommandBoundary.getInvokedBy().getUserId())
-                .orElseThrow();
-        if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
-            miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
-            miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
-            if (miniAppCommandBoundary.getInvocationTimestamp() == null) {
-                miniAppCommandBoundary.setInvocationTimestamp(new Date());
-            }
-            if (miniAppCommandBoundary.getCommandAttributes() == null) {
-                miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-            }
 
-            MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
-            entity = this.repository.save(entity);
-            return this.entityToBoundary(entity);
-        }
-        throw new ObjectBadRequest("Can't invoke");
-    }
+		UserEntity userEntity = this.userRepository.findByUserId(miniAppCommandBoundary.getInvokedBy().getUserId())
+				.orElseThrow();
+		if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
+			miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
+			miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
+			if (miniAppCommandBoundary.getInvocationTimestamp() == null) {
+				miniAppCommandBoundary.setInvocationTimestamp(new Date());
+			}
+			if (miniAppCommandBoundary.getCommandAttributes() == null) {
+				miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+			}
+
+			MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
+			entity = this.commandRepository.save(entity);
+			return this.entityToBoundary(entity);
+		}
+		throw new ObjectBadRequest("Can't invoke");
+	}
 
 
 
-    private void validatMiniappCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
-        GeneralUtility generalUtility = new GeneralUtility();
-        if (miniAppCommandBoundary.getCommandAttributes() == null) {
-            throw new RuntimeException("Command attributes are missing");
-        }
-        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getCommand())) {
-            throw new RuntimeException("Command details are missing");
-        }
-        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp()) ||
-        generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())) {
-            throw new RuntimeException("Invoked by is missing");
-        }
-        if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId()) ||
-                generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp())) {
-            throw new RuntimeException("Target object is missing");
-        }
-    }
+	private void validatMiniappCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
+		GeneralUtility generalUtility = new GeneralUtility();
+		if (miniAppCommandBoundary.getCommandAttributes() == null) {
+			throw new RuntimeException("Command attributes are missing");
+		}
+		if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getCommand())) {
+			throw new RuntimeException("Command details are missing");
+		}
+		if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp()) ||
+				generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())) {
+			throw new RuntimeException("Invoked by is missing");
+		}
+		if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId()) ||
+				generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp())) {
+			throw new RuntimeException("Target object is missing");
+		}
+	}
 
 
-    @Override
-    @Deprecated
-    public void deleteAllCommands() throws RuntimeException {
-    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
-    }
+	@Override
+	@Deprecated
+	public void deleteAllCommands() throws RuntimeException {
+		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+	}
 
-    @Override
-    public void deleteAllCommands(UserId userId) {
-    	UserEntity userEntity = this.userRepository.findById(userId)
+	@Override
+	public void deleteAllCommands(UserId userId) {
+		UserEntity userEntity = this.userRepository.findById(userId)
 				.orElseThrow(()->new UserNotFoundException("inserted id: "
-    	+ userId + " does not exist"));
+						+ userId + " does not exist"));
 
-    	if (!userEntity.getRole().equals(UserRole.ADMIN)) {
-    		throw new PermissionDeniedException("You do not have permission to delete all commands");
-    	}
-    	this.repository.deleteAll();
-    }
+		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
+			throw new PermissionDeniedException("You do not have permission to delete all commands");
+		}
+		this.commandRepository.deleteAll();
+	}
 
-    @Override
-    public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "_id");
-        Page<MiniAppCommandEntity> commandPage = repository.findAll(pageRequest);
+	@Override
+	public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
 
+		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
+				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
 
-        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
-                .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
+		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
+			throw new PermissionDeniedException("User doesn't have permission to export all commands");
+		}
 
-        if (!userEntity.getRole().equals(UserRole.ADMIN)) {
-            throw new PermissionDeniedException("User doesn't have permission to export all commands");
-        }
+		return this.commandRepository
+				.findAll(PageRequest.of(page, size, Sort.Direction.ASC,"commandId"))
+				.stream() // Stream<CommandEntity>
+				.map(this::entityToBoundary) // Stream<CommandBoundary>
+				.toList(); // List<CommandBoundary>
+	}
 
-        List<MiniAppCommandBoundary> boundaries = commandPage.getContent().stream()
-                .map(this::entityToBoundary)
-                .collect(Collectors.toList());
+	@Override
+	public List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException {
+		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
+				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
 
-        return boundaries;
-    }
+		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
+			throw new PermissionDeniedException("User doesn't have permission to access all commands");
+		}
 
-    @Override
-    public List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException {
-        UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
-                .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
+		return this.commandRepository
+				.findAllByCommandIdMiniapp(miniAppName,
+						PageRequest.of(page, size, Sort.Direction.ASC, "command", "invocationTimestamp", "commandId"))
+				.stream() // Stream<CommandEntity>
+				.map(this::entityToBoundary) // Stream<CommandBoundary>
+				.toList(); // List<CommandBoundary>
+	}
 
-        if (!userEntity.getRole().equals(UserRole.ADMIN)) {
-            throw new PermissionDeniedException("User doesn't have permission to access all commands");
-        }
+	@Override
+	@Deprecated
+	public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException {
+		throw new DepreacatedOpterationException("Dont use this methode anymore");
+	}
 
-        return this.repository
-                .findAllByCommandIdMiniapp(miniAppName,
-                        PageRequest.of(page, size, Sort.Direction.ASC, "command", "invocationTimestamp", "commandId"))
-                .stream() // Stream<CommandEntity>
-                .map(this::entityToBoundary) // Stream<CommandBoundary>
-                .toList(); // List<CommandBoundary>
-    }
-
-    @Override
-    @Deprecated
-    public List<MiniAppCommandBoundary> getAllCommands() throws RuntimeException {
-        throw new DepreacatedOpterationException("Dont use this methode anymore");
-    }
-
-    @Override
-    @Deprecated
-    public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException {
-        throw new DepreacatedOpterationException();
-    }
-
-    
+	@Override
+	@Deprecated
+	public List<MiniAppCommandBoundary> getAllMiniAppCommands(String miniAppName) throws RuntimeException {
+		throw new DepreacatedOpterationException();
+	}
 
 
-    public MiniAppCommandBoundary entityToBoundary(MiniAppCommandEntity entity) {
-        MiniAppCommandBoundary boundary = new MiniAppCommandBoundary();
-
-        boundary.setCommandId(entity.getCommandId());
-        boundary.setCommandAttributes(entity.getCommandAttributes());
-        boundary.setCommand(entity.getCommand());
-        boundary.setTargetObject(entity.getTargetObject());
-        boundary.setInvocationTimestamp(entity.getInvocationTimestamp());
-        boundary.setInvokedBy(entity.getInvokedBy());
-
-        return boundary;
-    }
 
 
-    public  MiniAppCommandEntity boundaryToEntity(MiniAppCommandBoundary obj)
-    {
-        MiniAppCommandEntity entity = new MiniAppCommandEntity();
+	public MiniAppCommandBoundary entityToBoundary(MiniAppCommandEntity entity) {
+		MiniAppCommandBoundary boundary = new MiniAppCommandBoundary();
 
-        entity.setCommand(obj.getCommand());
-        if (obj.getCommandId() == null) {
-            entity.setCommandId(new CommandId());
-        }
-        else
-            entity.setCommandId(obj.getCommandId());
+		boundary.setCommandId(entity.getCommandId());
+		boundary.setCommandAttributes(entity.getCommandAttributes());
+		boundary.setCommand(entity.getCommand());
+		boundary.setTargetObject(entity.getTargetObject());
+		boundary.setInvocationTimestamp(entity.getInvocationTimestamp());
+		boundary.setInvokedBy(entity.getInvokedBy());
 
-        if (obj.getCommand() == null) {
-            entity.setCommand("");
-        }
-        else
-            entity.setCommand(obj.getCommand());
+		return boundary;
+	}
 
 
-        if (obj.getTargetObject() == null) {
-            entity.setTargetObject(new TargetObject(new ObjectId()));
-        }
-        else
-            entity.setTargetObject(obj.getTargetObject());
+	public  MiniAppCommandEntity boundaryToEntity(MiniAppCommandBoundary obj)
+	{
+		MiniAppCommandEntity entity = new MiniAppCommandEntity();
+
+		entity.setCommand(obj.getCommand());
+		if (obj.getCommandId() == null) {
+			entity.setCommandId(new CommandId());
+		}
+		else
+			entity.setCommandId(obj.getCommandId());
+
+		if (obj.getCommand() == null) {
+			entity.setCommand("");
+		}
+		else
+			entity.setCommand(obj.getCommand());
 
 
-        if (obj.getInvokedBy() == null) {
-            entity.setInvokedBy(new InvokedBy());
-        }else {
-            entity.setInvokedBy(obj.getInvokedBy());
-        }
-        if (obj.getCommandAttributes() == null){
-            entity.setCommandAttributes(new HashMap<>() {
-            });
-        }else {
-            entity.setCommandAttributes(obj.getCommandAttributes());
-        }
+		if (obj.getTargetObject() == null) {
+			entity.setTargetObject(new TargetObject(new ObjectId()));
+		}
+		else
+			entity.setTargetObject(obj.getTargetObject());
 
-        //Date
-        entity.setInvocationTimestamp(obj.getInvocationTimestamp());
 
-        //Data
-        entity.setCommandAttributes(obj.getCommandAttributes());
+		if (obj.getInvokedBy() == null) {
+			entity.setInvokedBy(new InvokedBy());
+		}else {
+			entity.setInvokedBy(obj.getInvokedBy());
+		}
+		if (obj.getCommandAttributes() == null){
+			entity.setCommandAttributes(new HashMap<>() {
+			});
+		}else {
+			entity.setCommandAttributes(obj.getCommandAttributes());
+		}
 
-        return entity;
-    }
+		//Date
+		entity.setInvocationTimestamp(obj.getInvocationTimestamp());
+
+		//Data
+		entity.setCommandAttributes(obj.getCommandAttributes());
+
+		return entity;
+	}
 }

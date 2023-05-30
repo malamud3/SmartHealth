@@ -1,4 +1,4 @@
-package superapp.data.subEntity;
+package superapp.data;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 public class AmountEntity {
