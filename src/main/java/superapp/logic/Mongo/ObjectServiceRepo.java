@@ -1,23 +1,19 @@
 package superapp.logic.Mongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 
-import superapp.Boundary.CreatedBy;
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.dal.UserRepository;
-import superapp.data.Enum.UserRole;
-import superapp.data.mainEntity.SuperAppObjectEntity;
-import superapp.data.mainEntity.UserEntity;
+import superapp.data.UserRole;
+import superapp.data.SuperAppObjectEntity;
+import superapp.data.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
@@ -31,7 +27,6 @@ import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermissi
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService, ObjectServicePaginationSupported , ObjectsService {
@@ -97,37 +92,35 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 	@Override
 	public SuperAppObjectBoundary updateObject(String superapp, String internal_obj_id, SuperAppObjectBoundary update, String userSuperApp, String userEmail) throws RuntimeException {
-		Optional<SuperAppObjectEntity> optionalEntity = objectRepository
-				.findById(new ObjectId(superapp, internal_obj_id));
+		SuperAppObjectEntity objectEntity = objectRepository
+				.findById(new ObjectId(superapp, internal_obj_id))
+				.orElseThrow(()->new ObjectNotFoundException("Could not find object with id: " + superapp + "_" + internal_obj_id));
 		UserEntity userEntity = this.userRepository
 				.findById(new UserId(userSuperApp,userEmail))
 				.orElseThrow(()->new UserNotFoundException("inserted user not exist"));
 
-		if (optionalEntity.isEmpty())
-			throw new NullPointerException("internal id not exist");
 		if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
 			throw new PermissionDeniedException("User do not have permission to updateObject");
 
-		SuperAppObjectEntity entity = optionalEntity.get();
 		if (update.getType() != null) {
-			entity.setType(update.getType());
+			objectEntity.setType(update.getType());
 		}
 		if (update.getAlias() != null) {
-			entity.setAlias(update.getAlias());
+			objectEntity.setAlias(update.getAlias());
 		}
 		if (update.getActive() != null) {
-			entity.setActive(update.getActive());
+			objectEntity.setActive(update.getActive());
 		}
 		if (update.getLocation() != null) {
-			entity.setLocation(update.getLocation());
+			objectEntity.setLocation(update.getLocation());
 		}
 		if (update.getObjectDetails() != null) {
-			entity.setObjectDetails(update.getObjectDetails());
+			objectEntity.setObjectDetails(update.getObjectDetails());
 		}
 
-		entity = objectRepository.save(entity);
+		objectEntity = objectRepository.save(objectEntity);
 
-		return entityToBoundary(entity);
+		return entityToBoundary(objectEntity);
 	}
 
 	@Override
@@ -149,15 +142,18 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		SuperAppObjectBoundary objectBoundary = entityToBoundary(objectEntity);
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER))
 		{
-			return objectBoundary;
-
+			SuperAppObjectEntity entity = objectRepository
+				    .findByObjectId(new ObjectId(superAppId, internal_obj_id))
+				    .orElseThrow(() -> new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id));
+			
+			return entityToBoundary(entity);
 		}
 		else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
-			if (objectEntity.getActive()) {
-				
-				return objectBoundary;
-			}
-			throw new ObjectNotFoundException("User does not have permission to getSpecificObject");
+			SuperAppObjectEntity entity = objectRepository
+				    .findByObjectIdAndActiveIsTrue(new ObjectId(superAppId, internal_obj_id))
+				    .orElseThrow(() -> new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id));
+			
+			return entityToBoundary(entity);
 		}
 		throw new PermissionDeniedException("User do not have permission to getSpecificObject");
 	}
@@ -186,7 +182,12 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 					.map(this::entityToBoundary)
 					.toList();
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
-			return getActiveObjects(page, size);
+			return this.objectRepository
+					.findByActiveIsTrue(PageRequest.of(page, size, Sort
+							.Direction.DESC, "creationTimestamp", "_id"))
+					.stream()
+					.map(this::entityToBoundary)
+					.toList();
 		} else {
 			throw new PermissionDeniedException("User do not have permission to get all objects");
 		}
@@ -223,9 +224,9 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		if(!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
 			throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
 
-		SuperAppObjectEntity parent  = objectRepository.findById(new ObjectId(springAppName, parentId)).orElseThrow(()
+		SuperAppObjectEntity parent  = objectRepository.findByObjectId(new ObjectId(springAppName, parentId)).orElseThrow(()
 				-> new ObjectNotFoundException("could not find object with id: "+parentId ));
-		SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, childId)).orElseThrow(()
+		SuperAppObjectEntity child = objectRepository.findByObjectId(new ObjectId(springAppName, childId)).orElseThrow(()
 				-> new ObjectNotFoundException("could not find object with id: " +childId));
 
 		boolean isChildAlreadyAssociated = parent.getChildObjects().stream()
@@ -239,25 +240,6 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		}else {
 			throw new RuntimeException("child and parent already bind");
 		}
-	}
-
-
-	public List<SuperAppObjectBoundary> getActiveObjects(int page, int size) {
-		List<SuperAppObjectEntity> activeObjects = this.objectRepository.findByActiveIsTrue();
-		PageRequest pageRequest = PageRequest.of(page, size, Sort
-				.Direction.DESC, "creationTimestamp", "type");
-
-		List<SuperAppObjectEntity> objectsOnPage = getPage(activeObjects, pageRequest);
-		List<SuperAppObjectBoundary> activeObjectBoundaries = objectsOnPage.stream()
-				.map(this::entityToBoundary)
-				.toList();
-		return activeObjectBoundaries;
-	}
-
-	private List<SuperAppObjectEntity> getPage(List<SuperAppObjectEntity> objects, PageRequest pageRequest) {
-		int startIndex = pageRequest.getPageNumber() * pageRequest.getPageSize();
-		int endIndex = Math.min(startIndex + pageRequest.getPageSize(), objects.size());
-		return objects.subList(startIndex, endIndex);
 	}
 
 
@@ -338,29 +320,47 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 						+ userEmail + userSuperapp + " does not exist"));
 
 		PageRequest pageRequest = PageRequest.of(page, size , Sort.Direction.ASC,"_id");
-		Page<SuperAppObjectEntity> objectPage = objectRepository.findByAlias(alias, pageRequest);
 
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
-			return objectPage.getContent()
+			return this.objectRepository
+					.findByAlias(alias, pageRequest)
 					.stream()
 					.map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
-					.collect(Collectors.toList());
+					.toList();
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)){
-			return getActiveObjects(page, size);
+			return this.objectRepository
+					.findByAliasAndActiveIsTrue(alias, pageRequest)
+					.stream()
+					.map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
+					.toList();
 		} else {
 			throw new PermissionDeniedException("User do not have permission to search by alias");
 		}
 	}
 
-	public List<SuperAppObjectBoundary> searchByType(String alias, String userSuperapp, String userEmail, int size, int page) {
+	public List<SuperAppObjectBoundary> searchByType(String type, String userSuperapp, String userEmail, int size, int page) {
 		
-		PageRequest pageRequest = PageRequest.of(page, size,  Sort.Direction.ASC,"_id");
-		Page<SuperAppObjectEntity> objectPage = objectRepository.searchByType(alias, pageRequest);
+		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
+				.orElseThrow(() -> new UserNotFoundException("inserted id: "
+						+ userEmail + userSuperapp + " does not exist"));
 
-		return objectPage.getContent()
-				.stream()
-				.map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
-				.collect(Collectors.toList());
+		PageRequest pageRequest = PageRequest.of(page, size , Sort.Direction.ASC,"_id");
+
+		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
+			return this.objectRepository
+					.findByType(type, pageRequest)
+					.stream()
+					.map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
+					.toList();
+		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)){
+			return this.objectRepository
+					.findByTypeAndActiveIsTrue(type, pageRequest)
+					.stream()
+					.map(this::entityToBoundary) // Convert SuperAppObjectEntity to superAppObjectBoundary
+					.toList();
+		} else {
+			throw new PermissionDeniedException("User do not have permission to search by alias");
+		}
 	}
 
 	public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude,
@@ -398,21 +398,6 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		
 	}
 
-	private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
-		// Calculate the distance between two points using the Haversine formula
-		double earthRadius = 6371; // Earth's radius in kilometers
-
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLng = Math.toRadians(lng2 - lng1);
-
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-				Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-				Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-		return earthRadius * c;
-	}
 
 	public SuperAppObjectBoundary entityToBoundary(SuperAppObjectEntity entity) {
 		SuperAppObjectBoundary obj = new SuperAppObjectBoundary();
