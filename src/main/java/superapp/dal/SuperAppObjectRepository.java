@@ -6,7 +6,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import superapp.Boundary.ObjectId;
-import superapp.data.SuperAppObjectEntity;
+import superapp.data.mainEntity.SuperAppObjectEntity;
 
 
 import java.util.List;
