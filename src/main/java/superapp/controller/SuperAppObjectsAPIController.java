@@ -6,6 +6,9 @@ import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupporte
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
+
 import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 
@@ -117,7 +120,7 @@ public class SuperAppObjectsAPIController {
             path = "/superapp/objects/{superapp}/{internalObjectId}/children",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<Object> getAllObjectChildren(
+    public List<SuperAppObjectBoundary> getAllObjectChildren(
             @PathVariable("superapp") String superapp,
             @PathVariable("internalObjectId") String internalObjectId ,
             @RequestParam(name = "userSuperapp") String userSuperapp,
@@ -125,11 +128,8 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name ="size" , required = false , defaultValue = "12") int size,
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
         {
-            SuperAppObjectBoundary objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId , userSuperapp , userEmail );
-            return Collections
-                    .singletonList(superAppObjectRelationshipService.getAllChildren(objectBoundary.getObjectId().getInternalObjectId(),userSuperapp,userEmail, size, page)
-                    .stream()
-                    .toList());
+            return superAppObjectRelationshipService.getAllChildren(internalObjectId,userSuperapp,userEmail, size, page);
+                 
         
     }
 
@@ -147,9 +147,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name ="size" , required = false , defaultValue = "12") int size,
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
             throws RuntimeException {
-            SuperAppObjectBoundary objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId,userSuperapp,userEmail);
-            return superAppObjectRelationshipService.getAllParents(objectBoundary
-                    .getObjectId().getInternalObjectId(),userSuperapp,userEmail,size,page).stream().toList();
+            return superAppObjectRelationshipService.getAllParents(internalObjectId,userSuperapp,userEmail,size,page);
        
 
     }
@@ -163,8 +161,8 @@ public class SuperAppObjectsAPIController {
             @PathVariable("alias") String alias,
             @RequestParam("userSuperapp") String superapp,
             @RequestParam("userEmail") String email,
-            @RequestParam("size") int size,
-            @RequestParam("page") int page
+            @RequestParam(name = "size", defaultValue = "12") int size,
+            @RequestParam(name ="page", defaultValue = "0") int page
     ) {
         return  objectsService.searchByAlias(alias, superapp, email, size, page);
     }
@@ -178,8 +176,8 @@ public class SuperAppObjectsAPIController {
             @PathVariable("type") String type,
             @RequestParam("userSuperapp") String superapp,
             @RequestParam("userEmail") String email,
-            @RequestParam("size") int size,
-            @RequestParam("page") int page
+            @RequestParam(name = "size", defaultValue = "12") int size,
+            @RequestParam(name = "page", defaultValue = "0") int page
     ) {
         return objectsService.searchByType(type, superapp, email, size, page);
     }
@@ -196,8 +194,8 @@ public class SuperAppObjectsAPIController {
             @RequestParam(value = "units", defaultValue = "NEUTRAL") String distanceUnits,
             @RequestParam(name = "userSuperapp") String superapp,
             @RequestParam(name = "userEmail") String email,
-            @RequestParam(name = "size" , required = false) int size,
-            @RequestParam(name = "page" , required = false) int page) {
+            @RequestParam(name = "size" , defaultValue = "12") int size,
+            @RequestParam(name = "page" , defaultValue = "1") int page) {
     	
         return objectsService.searchByLocation(latitude, longitude, distance, distanceUnits, superapp, email, size, page);
     }

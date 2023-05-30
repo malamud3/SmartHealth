@@ -8,6 +8,7 @@ import org.springframework.data.geo.Point;
 
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
+import superapp.Boundary.Location;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.dal.UserRepository;
@@ -27,6 +28,8 @@ import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermissi
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 import java.util.*;
+
+
 
 @Service
 public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService, ObjectServicePaginationSupported , ObjectsService {
@@ -112,7 +115,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 			objectEntity.setActive(update.getActive());
 		}
 		if (update.getLocation() != null) {
-			objectEntity.setLocation(update.getLocation());
+			objectEntity.setLocation(new Point(update.getLocation().getLat(), update.getLocation().getLng()));
 		}
 		if (update.getObjectDetails() != null) {
 			objectEntity.setObjectDetails(update.getObjectDetails());
@@ -139,7 +142,6 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 				findByObjectId(new ObjectId(superAppId, internal_obj_id))
 				.orElseThrow(() -> new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id) );
 		
-		SuperAppObjectBoundary objectBoundary = entityToBoundary(objectEntity);
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER))
 		{
 			SuperAppObjectEntity entity = objectRepository
@@ -374,10 +376,10 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
 			
 			return this.objectRepository
-					.findByLocationNear(new Point(latitude, longitude),
+					. findByLocationWithinRadius(latitude, longitude,
 							new Distance(distance, generalUtility.parseDistanceUnit(distanceUnits)),
 							PageRequest.of(page, size, Sort
-							.Direction.ASC , "creationTimestamp", "_id"))
+							.Direction.ASC , "creationTimestamp", "objectId"))
 					.stream()
 					.map(this::entityToBoundary)
 					.toList();
@@ -410,7 +412,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		obj.setObjectDetails(entity.getObjectDetails());
 		obj.setCreationTimestamp(entity.getCreationTimestamp());
 		obj.setType(entity.getType());
-		obj.setLocation(entity.getLocation());
+		obj.setLocation(new Location(entity.getLocation().getX(),entity.getLocation().getY()));
 		return obj;
 	}
 
@@ -420,7 +422,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 		rv.setObjectId(obj.getObjectId());
 		rv.setActive(obj.getActive());
-		rv.setLocation(obj.getLocation());
+		rv.setLocation(new Point(obj.getLocation().getLat(), obj.getLocation().getLng()));
 		rv.setType(obj.getType());
 		rv.setObjectDetails(obj.getObjectDetails());
 		rv.setAlias(obj.getAlias());
