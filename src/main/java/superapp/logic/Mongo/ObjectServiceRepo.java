@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import superapp.Boundary.CreatedBy;
-import superapp.Boundary.superAppObjectBoundary;
+import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectRepository;
@@ -51,7 +51,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 	@Override
-	public superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException {
+	public SuperAppObjectBoundary createObject(SuperAppObjectBoundary obj) throws RuntimeException {
 		UserEntity userEntity = this.userRepository.findById(new UserId(obj.getCreatedBy().getUserId().getSuperapp(),obj.getCreatedBy().getUserId().getEmail()))
 				.orElseThrow(()->new UserNotFoundException("inserted user not exist"));
 		try {
@@ -70,7 +70,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		return entityToBoundary(entity);
 	}
 
-	private void validateObject(superAppObjectBoundary obj) {
+	private void validateObject(SuperAppObjectBoundary obj) {
 		GeneralUtility generalUtility = new GeneralUtility();
 		// Check if alias is valid
 		if (generalUtility.isStringEmptyOrNull(obj.getAlias())){
@@ -87,12 +87,12 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 	@Override
 	@Deprecated
-	public superAppObjectBoundary updateObject(String superAppId, String internal_obj_id, superAppObjectBoundary update) {
+	public SuperAppObjectBoundary updateObject(String superAppId, String internal_obj_id, SuperAppObjectBoundary update) {
 		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
 	}
 
 	@Override
-	public superAppObjectBoundary updateObject(String superapp, String internal_obj_id, superAppObjectBoundary update, String userSuperApp, String userEmail) throws RuntimeException {
+	public SuperAppObjectBoundary updateObject(String superapp, String internal_obj_id, SuperAppObjectBoundary update, String userSuperApp, String userEmail) throws RuntimeException {
 		Optional<SuperAppObjectEntity> optionalEntity = objectRepository
 				.findById(new ObjectId(superapp, internal_obj_id));
 		UserEntity userEntity = this.userRepository
@@ -128,52 +128,53 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 	@Override
 	@Deprecated
-	public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
+	public Optional<SuperAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id) {
 		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
 	}
 
 	@Override
-	public Optional<superAppObjectBoundary> getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) {
-		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
+	public SuperAppObjectBoundary getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) throws RuntimeException {
+		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp,userEmail))
 				.orElseThrow(()->new UserNotFoundException("inserted id: "
 						+userEmail + userSuperApp + " does not exist"));
-		Optional<SuperAppObjectEntity> optionalEntity = objectRepository.
-				findById(new ObjectId(superAppId, internal_obj_id));
-		if (optionalEntity.isEmpty()) {
-			throw new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id);
-		}
+		
+		SuperAppObjectEntity objectEntity = objectRepository.
+				findByObjectId(new ObjectId(superAppId, internal_obj_id))
+				.orElseThrow(() -> new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id) );
+		
+		SuperAppObjectBoundary objectBoundary = entityToBoundary(objectEntity);
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER))
 		{
-			return optionalEntity.map(this::entityToBoundary);
+			return objectBoundary;
 
 		}
 		else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
-			SuperAppObjectEntity objectEntity = optionalEntity.get();
 			if (objectEntity.getActive()) {
-				superAppObjectBoundary objectBoundary = entityToBoundary(objectEntity);
-				return Optional.of(objectBoundary);
+				
+				return objectBoundary;
 			}
 			throw new ObjectNotFoundException("User does not have permission to getSpecificObject");
 		}
 		throw new PermissionDeniedException("User do not have permission to getSpecificObject");
 	}
+	
 
 	@Override
-	public List<superAppObjectBoundary> getAllObjects(int size, int page) {
+	public List<SuperAppObjectBoundary> getAllObjects(int size, int page) {
 		return null;
 	}
 
 
 	@Override
 	@Deprecated
-	public List<superAppObjectBoundary> getAllObjects() {
+	public List<SuperAppObjectBoundary> getAllObjects() {
 		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
 	}
 
 	//pagination Support
 
 	@Override
-	public List<superAppObjectBoundary> getAllObjects(String userSuperapp, String userEmail, int size, int page) {
+	public List<SuperAppObjectBoundary> getAllObjects(String userSuperapp, String userEmail, int size, int page) {
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("inserted id: "
 						+ userSuperapp + "_" + userEmail + " does not exist"));
@@ -242,13 +243,13 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 
-	public List<superAppObjectBoundary> getActiveObjects(int page, int size) {
+	public List<SuperAppObjectBoundary> getActiveObjects(int page, int size) {
 		List<SuperAppObjectEntity> activeObjects = this.objectRepository.findByActiveTrue();
 		PageRequest pageRequest = PageRequest.of(page, size, Sort
 				.Direction.DESC, "creationTimestamp", "type");
 
 		List<SuperAppObjectEntity> objectsOnPage = getPage(activeObjects, pageRequest);
-		List<superAppObjectBoundary> activeObjectBoundaries = objectsOnPage.stream()
+		List<SuperAppObjectBoundary> activeObjectBoundaries = objectsOnPage.stream()
 				.map(this::entityToBoundary)
 				.toList();
 		return activeObjectBoundaries;
@@ -264,12 +265,12 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 
 	@Deprecated
-	public Set<superAppObjectBoundary> getAllChildren(String objectId) {
+	public Set<SuperAppObjectBoundary> getAllChildren(String objectId) {
 		throw  new DepreacatedOpterationException("dont use this func ");
 	}
 
 	@Override
-	public List<superAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
+	public List<SuperAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
 
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userEmail + userSuperApp + " does not exist"));
@@ -302,7 +303,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 	@Override
-	public List<superAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
+	public List<SuperAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
 		SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
 				.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
@@ -329,7 +330,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 
-	public List<superAppObjectBoundary> searchByAlias(String alias, String userSuperapp, String userEmail, int size, int page) {
+	public List<SuperAppObjectBoundary> searchByAlias(String alias, String userSuperapp, String userEmail, int size, int page) {
 		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("inserted id: "
 						+ userEmail + userSuperapp + " does not exist"));
@@ -349,7 +350,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		}
 	}
 
-	public List<superAppObjectBoundary> searchByType(String alias, String userSuperapp, String userEmail, int size, int page) {
+	public List<SuperAppObjectBoundary> searchByType(String alias, String userSuperapp, String userEmail, int size, int page) {
 		
 		PageRequest pageRequest = PageRequest.of(page, size,  Sort.Direction.ASC,"_id");
 		Page<SuperAppObjectEntity> objectPage = objectRepository.searchByType(alias, pageRequest);
@@ -360,7 +361,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 				.collect(Collectors.toList());
 	}
 
-	public List<superAppObjectBoundary> searchByLocation(double latitude, double longitude, double distance, String distanceUnits, String superapp, String email, int size, int page) {
+	public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude, double distance, String distanceUnits, String superapp, String email, int size, int page) {
 		// Convert distance units as needed
 		double radius;
 
@@ -373,7 +374,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		}
 
 		// Perform the search by location implementation
-		List<superAppObjectBoundary> results = new ArrayList<>();
+		List<SuperAppObjectBoundary> results = new ArrayList<>();
 		for (SuperAppObjectEntity entity : objectRepository.findAll()) {
 			double objectLat = entity.getLocation().getLat();
 			double objectLng = entity.getLocation().getLng();
@@ -403,8 +404,8 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		return earthRadius * c;
 	}
 
-	public superAppObjectBoundary entityToBoundary(SuperAppObjectEntity entity) {
-		superAppObjectBoundary obj = new superAppObjectBoundary();
+	public SuperAppObjectBoundary entityToBoundary(SuperAppObjectEntity entity) {
+		SuperAppObjectBoundary obj = new SuperAppObjectBoundary();
 
 		// convert entity to boundary
 		obj.setObjectId(entity.getObjectId());
@@ -419,7 +420,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 
-	public SuperAppObjectEntity boundaryToEntity (superAppObjectBoundary obj) {
+	public SuperAppObjectEntity boundaryToEntity (SuperAppObjectBoundary obj) {
 		SuperAppObjectEntity rv = new SuperAppObjectEntity();
 
 		rv.setObjectId(obj.getObjectId());

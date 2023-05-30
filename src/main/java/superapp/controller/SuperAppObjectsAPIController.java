@@ -38,7 +38,7 @@ public class SuperAppObjectsAPIController {
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
 
-    public superAppObjectBoundary createObject(@RequestBody superAppObjectBoundary superAppObjectBoundary) throws RuntimeException {
+    public SuperAppObjectBoundary createObject(@RequestBody SuperAppObjectBoundary superAppObjectBoundary) throws RuntimeException {
         try {
             return objectsService.createObject(superAppObjectBoundary);
         }catch (RuntimeException e){
@@ -58,7 +58,7 @@ public class SuperAppObjectsAPIController {
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam("userSuperapp") String userSuperApp,
             @RequestParam("userEmail") String userEmail,
-            @RequestBody superAppObjectBoundary superAppObjectBoundary
+            @RequestBody SuperAppObjectBoundary superAppObjectBoundary
     ) {
         try {
 
@@ -73,14 +73,17 @@ public class SuperAppObjectsAPIController {
             path = {"/superapp/objects/{superapp}/{internalObjectId}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public superAppObjectBoundary retrieveObject(
+    public SuperAppObjectBoundary retrieveObject(
             @PathVariable("superapp") String superapp,
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam(name="userSuperapp") String userSuperApp,
             @RequestParam(name="userEmail") String userEmail) throws RuntimeException {
 
-        return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail)
-                .orElseThrow(() -> new RuntimeException("Could not find object with id: " + superapp + "_" + internalObjectId));
+    	try {
+        return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail);
+    	}catch(RuntimeException e) {
+    		throw e;
+    	}
     }
 
     // GET: Get All Objects
@@ -88,7 +91,7 @@ public class SuperAppObjectsAPIController {
             path = {"/superapp/objects"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<superAppObjectBoundary> getAllObjects(
+    public List<SuperAppObjectBoundary> getAllObjects(
             @RequestParam(name = "userSuperapp") String userSuperapp,
             @RequestParam(name = "userEmail") String userEmail,
             @RequestParam(name ="size" , required = false , defaultValue = "12") int size,
@@ -116,9 +119,8 @@ public class SuperAppObjectsAPIController {
             @RequestBody SuperAppObjectIdBoundary objectIdBoundary
     ) throws RuntimeException {
         try {
-            Optional<superAppObjectBoundary> objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
-            assert objectBoundaryParent.orElse(null) != null;
-            superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.get().getObjectId().getInternalObjectId(), objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
+            SuperAppObjectBoundary objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
+            superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.getObjectId().getInternalObjectId(), objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
         } catch (RuntimeException e) {
             throw new RuntimeException("could not bind parent and child: " + e.getMessage());
         }
@@ -139,9 +141,9 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
         {
         try {
-            Optional<superAppObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId , userSuperapp , userEmail );
+            SuperAppObjectBoundary objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId , userSuperapp , userEmail );
             return Collections
-                    .singletonList(superAppObjectRelationshipService.getAllChildren(objectBoundary.orElseThrow(() -> new ObjectNotFoundException("could not find Object with id:" + internalObjectId)).getObjectId().getInternalObjectId(),userSuperapp,userEmail, size, page)
+                    .singletonList(superAppObjectRelationshipService.getAllChildren(objectBoundary.getObjectId().getInternalObjectId(),userSuperapp,userEmail, size, page)
                     .stream()
                     .toList());
         } catch (RuntimeException e) {
@@ -155,7 +157,7 @@ public class SuperAppObjectsAPIController {
             path = "/superapp/objects/{superapp}/{internalObjectId}/parents",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<superAppObjectBoundary> getAllObjectParents(
+    public List<SuperAppObjectBoundary> getAllObjectParents(
             @PathVariable("superapp") String superapp,
             @PathVariable("internalObjectId") String internalObjectId ,
             @RequestParam(name = "userSuperapp") String userSuperapp,
@@ -164,9 +166,8 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
             throws RuntimeException {
         try {
-            Optional<superAppObjectBoundary> objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId,userSuperapp,userEmail);
+            SuperAppObjectBoundary objectBoundary = objectsService.getSpecificObject(superapp, internalObjectId,userSuperapp,userEmail);
             return superAppObjectRelationshipService.getAllParents(objectBoundary
-                    .orElseThrow(() -> new ObjectNotFoundException("could not find Object with id:" + internalObjectId))
                     .getObjectId().getInternalObjectId(),userSuperapp,userEmail,size,page).stream().toList();
         } catch (RuntimeException e) {
             throw new RuntimeException("can't get all parents: " + e.getMessage());
@@ -179,7 +180,7 @@ public class SuperAppObjectsAPIController {
             path     = "/superapp/objects/search/byAlias/{alias}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<superAppObjectBoundary> searchByAlias(
+    public List<SuperAppObjectBoundary> searchByAlias(
             @PathVariable("alias") String alias,
             @RequestParam("userSuperapp") String superapp,
             @RequestParam("userEmail") String email,
@@ -194,7 +195,7 @@ public class SuperAppObjectsAPIController {
             path     = "/superapp/objects/search/byType/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<superAppObjectBoundary> searchByType(
+    public List<SuperAppObjectBoundary> searchByType(
             @PathVariable("type") String type,
             @RequestParam("userSuperapp") String superapp,
             @RequestParam("userEmail") String email,
@@ -209,7 +210,7 @@ public class SuperAppObjectsAPIController {
             path = "/superapp/objects/search/byLocation/{lat}/{lng}/{distance}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<superAppObjectBoundary> searchByLocation(
+    public List<SuperAppObjectBoundary> searchByLocation(
             @PathVariable("lat") double latitude,
             @PathVariable("lng") double longitude,
             @PathVariable("distance") double distance,

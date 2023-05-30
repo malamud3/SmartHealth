@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Map;
 
 
-public class superAppObjectBoundary {
+public class SuperAppObjectBoundary {
 
     private ObjectId objectId;
     private String type;
@@ -16,12 +16,12 @@ public class superAppObjectBoundary {
     private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
 
-	public superAppObjectBoundary(String superapp, String internalObjectId) {
+	public SuperAppObjectBoundary(String superapp, String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);
 
 	}
 
-	public superAppObjectBoundary() {
+	public SuperAppObjectBoundary() {
 
 	}
 
@@ -95,7 +95,7 @@ public class superAppObjectBoundary {
 
 	@Override
 	public boolean equals(Object obj) {
-		superAppObjectBoundary other = (superAppObjectBoundary) obj;
+		SuperAppObjectBoundary other = (SuperAppObjectBoundary) obj;
 		return objectId.equals(other.objectId);
 	}
 }

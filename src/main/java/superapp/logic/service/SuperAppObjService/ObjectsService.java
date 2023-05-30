@@ -4,21 +4,21 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import superapp.Boundary.superAppObjectBoundary;
+import superapp.Boundary.SuperAppObjectBoundary;
 
         @Service
         public interface ObjectsService {
-                 superAppObjectBoundary createObject(superAppObjectBoundary obj) throws RuntimeException;
+                 SuperAppObjectBoundary createObject(SuperAppObjectBoundary obj) throws RuntimeException;
 
 
                 @Deprecated
-                 superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update) throws RuntimeException;
+                 SuperAppObjectBoundary updateObject(String obj, String internal_obj_id, SuperAppObjectBoundary update) throws RuntimeException;
 
                 @Deprecated
-                 Optional<superAppObjectBoundary> getSpecificObject(String obj, String internal_obj_id) throws RuntimeException;
+                 Optional<SuperAppObjectBoundary> getSpecificObject(String obj, String internal_obj_id) throws RuntimeException;
 
                 @Deprecated
-                 List<superAppObjectBoundary> getAllObjects() throws RuntimeException;
+                 List<SuperAppObjectBoundary> getAllObjects() throws RuntimeException;
 
                 @Deprecated
                  void deleteAllObjects() throws RuntimeException;
