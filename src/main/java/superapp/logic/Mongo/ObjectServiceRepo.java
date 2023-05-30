@@ -337,7 +337,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
             PageRequest pageRequest = PageRequest.of(page, size, sort);
 
             // Query to get parent objects with pagination
-            List<SuperAppObjectEntity> parentObjects = objectRepository.findByChildObjectId(child.getObjectId(), pageRequest);
+            List<SuperAppObjectEntity> parentObjects = objectRepository.findByChildObjects(child.getObjectId(), pageRequest);
 
             return parentObjects.stream()
                     .map(this::entityToBoundary)

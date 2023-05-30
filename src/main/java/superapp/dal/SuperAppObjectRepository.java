@@ -16,5 +16,5 @@ public interface  SuperAppObjectRepository
     Page<SuperAppObjectEntity> findByAlias(String alias, Pageable pageable);
     Page<SuperAppObjectEntity> searchByType(String type, Pageable pageable);
 
-    List<SuperAppObjectEntity> findByChildObjectId(ObjectId childObjectId, Pageable pageable);
+    List<SuperAppObjectEntity> findByChildObjects(ObjectId childObjectId, Pageable pageable);
 }
