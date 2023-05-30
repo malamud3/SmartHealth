@@ -16,6 +16,6 @@ public interface ObjectsServiceWithAdminPermission extends ObjectsService, Objec
 	public Optional<superAppObjectBoundary> getSpecificObject(String superapp, String internalObjectId, String userSuperApp, String userEmail);
 
 
-	public superAppObjectBoundary updateObject(String obj, String internal_obj_id, superAppObjectBoundary update , String userSuperApp , String userEmail) throws RuntimeException;
+	public superAppObjectBoundary updateObject(String superapp, String internal_obj_id, superAppObjectBoundary update , String userSuperApp , String userEmail) throws RuntimeException;
 
 }
