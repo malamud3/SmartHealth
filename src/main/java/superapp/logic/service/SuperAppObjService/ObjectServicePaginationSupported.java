@@ -8,7 +8,6 @@ import java.util.Optional;
 public interface ObjectServicePaginationSupported extends ObjectsService {
     public SuperAppObjectBoundary getSpecificObject(String superapp, String internalObjectId, String userSuperApp, String userEmail) throws RuntimeException;
 
-    public List<SuperAppObjectBoundary> getAllObjects(int size, int page);
 
     public List<SuperAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page);
 
