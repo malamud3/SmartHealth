@@ -16,10 +16,10 @@ public class UsersRelatedAPIController {
 
 
 	// this method injects a configuration value of spring
-    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
-    public void setSpringApplicationName(String springApplicationName) {
-        this.springAppName = springApplicationName;
-    }
+	@Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
+	public void setSpringApplicationName(String springApplicationName) {
+		this.springAppName = springApplicationName;
+	}
 
 	@Autowired
 	public UsersRelatedAPIController(UsersService usersService) {
@@ -35,11 +35,7 @@ public class UsersRelatedAPIController {
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
 	public UserBoundary createUser(@RequestBody NewUserBoundary user) throws RuntimeException {
-		try {
-			return this.usersService.createUser(user);
-		} catch (RuntimeException e) {
-			throw new RuntimeException("Failed to create user: " + e.getMessage());
-		}
+		return this.usersService.createUser(user);
 	}
 
 	//GET: User Login And Retrieve User Details
@@ -49,32 +45,27 @@ public class UsersRelatedAPIController {
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
 	public UserBoundary validUser(@PathVariable("superapp") String superapp,
-								  @PathVariable("email") String email) {
-		try {
-			return this.usersService.login(superapp, email).orElseThrow();
-		}catch (RuntimeException e){
-			throw new RuntimeException("can't login: "+ e.getMessage());
-		}
+			@PathVariable("email") String email) {
+
+		return this.usersService.login(superapp, email);
 	}
 
-		//PUT: Update User
-		@RequestMapping(
-				path = {"/superapp/users/{superapp}/{userEmail}"},
-				method = {RequestMethod.PUT},
-				consumes = {MediaType.APPLICATION_JSON_VALUE})
-            /*produces = {MediaType.APPLICATION_JSON_VALUE} in the REST API 'update user' has no output
+	//PUT: Update User
+	@RequestMapping(
+			path = {"/superapp/users/{superapp}/{userEmail}"},
+			method = {RequestMethod.PUT},
+			consumes = {MediaType.APPLICATION_JSON_VALUE})
+	/*produces = {MediaType.APPLICATION_JSON_VALUE} in the REST API 'update user' has no output
 			but the userService's method 'updatedUser' returns user boundary, so to avoid troubles this method doesn't return User
 			Boundary as a JSON*/
 
-		public UserBoundary updateUser(
-				@PathVariable("superapp") String superapp,
-				@PathVariable("userEmail") String email,
-				@RequestBody UserBoundary updatedUser) throws RuntimeException{
-			try {
-				return this.usersService.updateUser(superapp, email, updatedUser);
-			}catch (RuntimeException e){
-				throw new RuntimeException("Failed to update user: " + e.getMessage());
-			}
-		}
+	public UserBoundary updateUser(
+			@PathVariable("superapp") String superapp,
+			@PathVariable("userEmail") String email,
+			@RequestBody UserBoundary updatedUser) throws RuntimeException{
+
+		return this.usersService.updateUser(superapp, email, updatedUser);
+
+	}
 
 }

@@ -14,9 +14,20 @@ public interface  SuperAppObjectRepository
         extends MongoRepository<SuperAppObjectEntity, ObjectId> {
 
 	Optional<SuperAppObjectEntity> findByObjectId(ObjectId objectId);
-    List<SuperAppObjectEntity> findByActiveTrue();
+    
+	List<SuperAppObjectEntity> findByActiveIsTrue();
+	
     Page<SuperAppObjectEntity> findByAlias(String alias, Pageable pageable);
+    
     Page<SuperAppObjectEntity> searchByType(String type, Pageable pageable);
+    
+    List<SuperAppObjectEntity> findByParentObjects_ObjectIdAndActiveIsTrue(ObjectId parentId, Pageable pageable);
+    
+    List<SuperAppObjectEntity> findByParentObjects_ObjectId(ObjectId parentId, Pageable pageable);
+    
+    List<SuperAppObjectEntity> findByChildObjects_ObjectId(ObjectId childObjectId, Pageable pageable);
+    
+    List<SuperAppObjectEntity> findByChildObjects_ObjectIdAndActiveIsTrue(ObjectId childObjectId, Pageable pageable);
 
-    List<SuperAppObjectEntity> findByChildObjects(ObjectId childObjectId, Pageable pageable);
+
 }

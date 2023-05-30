@@ -84,7 +84,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     }
 
     @Override
-    public Optional<UserBoundary> login(String userSuperApp, String userEmail) throws RuntimeException {
+    public UserBoundary login(String userSuperApp, String userEmail) throws RuntimeException {
         UserId userId = new UserId(userSuperApp, userEmail);
         UserEntity entity = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
@@ -95,7 +95,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         String message = "User logged in: " + boundary.getUserId();
         jmsTemplate.convertAndSend("userLoginQueue", message);
 
-        return Optional.of(boundary);
+        return boundary;
     }
 
 
@@ -103,36 +103,36 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     @Override
     public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException {
         UserId userId = new UserId(userSuperApp, userEmail);
-        Optional<UserEntity> optionalUser = userRepository.findByUserId(userId);
-        UserEntity existing = optionalUser.orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity userEntity = userRepository.findByUserId(userId)
+        		.orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
 
         //check the need of dirtyflag here
         boolean dirtyFlag = false;
 
         if (update.getRole() != null) {
-            existing.setRole(UserRole.valueOf(update.getRole()));
+            userEntity.setRole(UserRole.valueOf(update.getRole()));
             dirtyFlag = true;
         }
 
         if (update.getUsername() != null) {
-            existing.setUsername(update.getUsername());
+        	userEntity.setUsername(update.getUsername());
             dirtyFlag = true;
         }
 
         if (update.getAvatar() != null) {
-            existing.setAvatar(update.getAvatar());
+        	userEntity.setAvatar(update.getAvatar());
             dirtyFlag = true;
         }
 
         if (dirtyFlag) {
-            existing = userRepository.save(existing);
+        	userEntity = userRepository.save(userEntity);
 
             // Sending JMS message
-            String message = "User updated: " + existing.getUserId();
+            String message = "User updated: " + userEntity.getUserId();
             jmsTemplate.convertAndSend("userUpdateQueue", message);
         }
 
-        return entityToBoundary(existing);
+        return entityToBoundary(userEntity);
     }
 
     @Deprecated

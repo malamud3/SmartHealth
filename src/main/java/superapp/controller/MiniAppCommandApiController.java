@@ -45,19 +45,10 @@ public class MiniAppCommandApiController
     		@PathVariable("miniAppName") String miniAppName,
              @RequestParam(value = "async", defaultValue = "false") boolean asyncFlag,
              @RequestBody MiniAppCommandBoundary miniAppCommand) throws RuntimeException {
-    	CommandId commandId = new CommandId();
-    	commandId.setMiniapp(miniAppName);
-    	commandId.setSuperapp(superappName);
-    	commandId.setInternalCommandId(UUID.randomUUID().toString());
-        miniAppCommand.setCommandId(commandId);
-        try {
-
+        miniAppCommand.setCommandId(new CommandId(superappName,miniAppName, UUID.randomUUID().toString()));
            if (!asyncFlag)
                return miniAppCommandService.invokeCommand(miniAppCommand);
            else
                return miniAppCommandService.asyncHandle(miniAppCommandService.invokeCommand(miniAppCommand));
-       }catch (RuntimeException e){
-           throw new RuntimeException("can't invoke mini app: "+e.getMessage());
-       }
     }
 }
