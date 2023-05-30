@@ -1,6 +1,8 @@
 package superapp.data;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -16,7 +18,11 @@ public class SuperAppObjectEntity {
     private String alias;
     private Boolean active;
     private Date creationTimestamp;
-    private Location location;
+    //private Location location;
+    
+    @GeoSpatialIndexed
+    private Point location;//for distance calculations
+    
     private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
 
@@ -34,7 +40,7 @@ public class SuperAppObjectEntity {
     public SuperAppObjectEntity() {
 
     }
-
+    
     public ObjectId getObjectId() {
         return objectId;
     }
@@ -65,10 +71,10 @@ public class SuperAppObjectEntity {
     public void setCreationTimestamp(Date creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
     }
-    public Location getLocation() {
+    public Point getLocation() {
         return location;
     }
-    public void setLocation(Location location) {
+    public void setLocation(Point location) {
         this.location = location;
     }
     public CreatedBy getCreatedBy() {
