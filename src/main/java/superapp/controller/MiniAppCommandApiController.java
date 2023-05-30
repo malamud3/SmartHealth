@@ -1,9 +1,13 @@
 package superapp.controller;
 
+import superapp.Boundary.CommandId;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAsyncSupport;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +16,14 @@ import org.springframework.web.bind.annotation.*;
 
 public class MiniAppCommandApiController
 {
+	private String superappName;
+
+
+	// this method injects a configuration value of spring
+    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
+    public void setSpringApplicationName(String springApplicationName) {
+        this.superappName = springApplicationName;
+    }
 
     private final MiniAppCommandServiceWithAsyncSupport miniAppCommandService;
 
@@ -33,7 +45,11 @@ public class MiniAppCommandApiController
     		@PathVariable("miniAppName") String miniAppName,
              @RequestParam(value = "async", defaultValue = "false") boolean asyncFlag,
              @RequestBody MiniAppCommandBoundary miniAppCommand) throws RuntimeException {
-        miniAppCommand.getCommandId().setMiniapp(miniAppName);
+    	CommandId commandId = new CommandId();
+    	commandId.setMiniapp(miniAppName);
+    	commandId.setSuperapp(superappName);
+    	commandId.setInternalCommandId(UUID.randomUUID().toString());
+        miniAppCommand.setCommandId(commandId);
         try {
 
            if (!asyncFlag)
