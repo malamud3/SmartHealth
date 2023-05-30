@@ -213,12 +213,6 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 
 	@Override
-	@Deprecated
-	public void bindParentAndChild(String parentId, String childId) throws RuntimeException{
-		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
-	}
-
-	@Override
 	public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) throws RuntimeException {
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
 				.orElseThrow(()->new UserNotFoundException("inserted id: "

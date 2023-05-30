@@ -23,6 +23,4 @@ import superapp.Boundary.superAppObjectBoundary;
                 @Deprecated
                  void deleteAllObjects() throws RuntimeException;
 
-                @Deprecated
-                void bindParentAndChild(String parentId, String childId) throws RuntimeException;
         }
