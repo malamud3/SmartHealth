@@ -158,6 +158,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		throw new PermissionDeniedException("User do not have permission to getSpecificObject");
 	}
 	
+	
 
 	@Override
 	public List<SuperAppObjectBoundary> getAllObjects(int size, int page) {

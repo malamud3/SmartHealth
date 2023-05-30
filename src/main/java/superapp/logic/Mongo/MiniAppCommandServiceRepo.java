@@ -213,9 +213,6 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "_id");
         Page<MiniAppCommandEntity> commandPage = repository.findAll(pageRequest);
 
-        if (commandPage.isEmpty()) {
-            throw new RuntimeException("There aren't any commands");
-        }
 
         UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
                 .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
@@ -233,7 +230,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
     @Override
     public List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException {
-        UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
+        UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
                 .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
 
         if (!userEntity.getRole().equals(UserRole.ADMIN)) {
@@ -260,6 +257,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
         throw new DepreacatedOpterationException();
     }
 
+    
 
 
     public MiniAppCommandBoundary entityToBoundary(MiniAppCommandEntity entity) {

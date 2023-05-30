@@ -79,11 +79,8 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name="userSuperapp") String userSuperApp,
             @RequestParam(name="userEmail") String userEmail) throws RuntimeException {
 
-    	try {
         return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail);
-    	}catch(RuntimeException e) {
-    		throw e;
-    	}
+    	
     }
 
     // GET: Get All Objects

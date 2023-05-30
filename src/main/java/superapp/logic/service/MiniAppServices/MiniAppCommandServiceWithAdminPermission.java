@@ -11,6 +11,4 @@ public interface MiniAppCommandServiceWithAdminPermission extends MiniAppCommand
 	public void deleteAllCommands(UserId userId);
 
 	public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page ) throws PermissionDeniedException;
-
-	List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException;
 }
