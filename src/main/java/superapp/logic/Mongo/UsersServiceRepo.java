@@ -106,6 +106,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         Optional<UserEntity> optionalUser = userRepository.findByUserId(userId);
         UserEntity existing = optionalUser.orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
 
+        //check the need of dirtyflag here
         boolean dirtyFlag = false;
 
         if (update.getRole() != null) {
@@ -147,7 +148,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         UserEntity userEntity = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
 
-        if (userEntity.getRole() != UserRole.ADMIN) {
+        if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to get all users");
         }
 
@@ -182,7 +183,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         UserEntity userEntity = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
 
-        if (userEntity.getRole() != UserRole.ADMIN) {
+        if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to delete all users");
         }
         this.userRepository.deleteAll();

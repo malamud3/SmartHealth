@@ -153,7 +153,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
         UserEntity userEntity = this.userRepository.findByUserId(miniAppCommandBoundary.getInvokedBy().getUserId())
                 .orElseThrow();
-        if(userEntity.getRole() != UserRole.MINIAPP_USER && isObjectActive (miniAppCommandBoundary.getTargetObject().getObjectId())) {
+        if(!userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
             CommandId commandId = miniAppCommandBoundary.getCommandId();
             if (commandId.getInternalCommandId() == null || commandId.getInternalCommandId().isEmpty()) {
                 commandId = new CommandId(springApplicationName, miniAppCommandBoundary.getCommandId().getMiniapp(), UUID.randomUUID().toString());
@@ -215,7 +215,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 				.orElseThrow(()->new UserNotFoundException("inserted id: "
     	+ userId + " does not exist"));
 
-    	if (userEntity.getRole() != UserRole.ADMIN) {
+    	if (!userEntity.getRole().equals(UserRole.ADMIN)) {
     		throw new PermissionDeniedException("You do not have permission to delete all commands");
     	}
     	this.repository.deleteAll();
@@ -233,7 +233,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
         UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
                 .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
 
-        if (userEntity.getRole() != UserRole.ADMIN) {
+        if (!userEntity.getRole().equals(UserRole.ADMIN)) {
             throw new PermissionDeniedException("User doesn't have permission to export all commands");
         }
 
@@ -249,7 +249,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
         UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
                 .orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
 
-        if (userEntity.getRole() != UserRole.ADMIN) {
+        if (!userEntity.getRole().equals(UserRole.ADMIN)) {
             throw new PermissionDeniedException("User doesn't have permission to access all commands");
         }
 

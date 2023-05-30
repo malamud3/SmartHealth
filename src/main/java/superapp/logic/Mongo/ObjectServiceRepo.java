@@ -60,7 +60,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 			throw new RuntimeException(e.getMessage());
 		}
 
-		if (userEntity.getRole() != UserRole.SUPERAPP_USER)
+		if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER) )
 			throw new PermissionDeniedException("User do not have permission to createObject");
 
 		obj.setObjectId(new ObjectId(springAppName, UUID.randomUUID().toString()));
@@ -101,8 +101,8 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 		if (optionalEntity.isEmpty())
 			throw new NullPointerException("internal id not exist");
-		if (userEntity.getRole() != UserRole.SUPERAPP_USER)
-			throw new PermissionDeniedException("User do not have permission to createObject");
+		if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
+			throw new PermissionDeniedException("User do not have permission to updateObject");
 
 		SuperAppObjectEntity entity = optionalEntity.get();
 		if (update.getType() != null) {
@@ -205,7 +205,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 				.orElseThrow(()->new UserNotFoundException("inserted id: "
 						+ userId + " does not exist"));
 
-		if (userEntity.getRole() != UserRole.ADMIN) {
+		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
 			throw new PermissionDeniedException("You do not have permission to delete all users");
 		}
 		this.objectRepository.deleteAll();
@@ -226,7 +226,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		if (childId.equals(parentId)){
 			throw new RuntimeException("can't bind the same object");
 		}
-		if(userEntity.getRole() != UserRole.SUPERAPP_USER)
+		if(!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
 			throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
 
 		SuperAppObjectEntity parent  = objectRepository.findById(new ObjectId(springAppName, parentId)).orElseThrow(()
