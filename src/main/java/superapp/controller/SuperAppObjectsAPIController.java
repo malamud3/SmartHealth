@@ -108,6 +108,7 @@ public class SuperAppObjectsAPIController {
     ) throws RuntimeException {
 
             superAppObjectRelationshipService.bindParentAndChild(internalObjectId, objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
+
     }
 
 

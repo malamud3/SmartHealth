@@ -204,6 +204,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
 			throw new PermissionDeniedException("You do not have permission to delete all objects");
 		}
+
 		this.objectRepository.deleteAll();
 	}
 
