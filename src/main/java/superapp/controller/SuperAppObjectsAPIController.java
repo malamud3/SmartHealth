@@ -21,7 +21,6 @@ public class SuperAppObjectsAPIController {
 
     private final ObjectServicePaginationSupported objectsService;
     private final SuperAppObjectRelationshipService superAppObjectRelationshipService;
-
     private final ObjectsServiceWithAdminPermission objectsServiceWithAdminPermission;
 
 
@@ -30,7 +29,6 @@ public class SuperAppObjectsAPIController {
                                         SuperAppObjectRelationshipService superAppObjectRelationshipService, ObjectsServiceWithAdminPermission objectsServiceWithAdminPermission) {
         this.objectsService = objectsService;
         this.superAppObjectRelationshipService = superAppObjectRelationshipService;
-
         this.objectsServiceWithAdminPermission = objectsServiceWithAdminPermission;
     }
 
@@ -58,10 +56,9 @@ public class SuperAppObjectsAPIController {
             @RequestParam("userSuperapp") String userSuperApp,
             @RequestParam("userEmail") String userEmail,
             @RequestBody SuperAppObjectBoundary superAppObjectBoundary){
-        
 
             objectsServiceWithAdminPermission.updateObject(superapp, internalObjectId, superAppObjectBoundary , userSuperApp , userEmail);
-        
+
     }
 
     // GET: Get specific Object
@@ -76,7 +73,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name="userEmail") String userEmail) throws RuntimeException {
 
         return objectsService.getSpecificObject(superapp, internalObjectId, userSuperApp, userEmail);
-    	
+
     }
 
     // GET: Get All Objects
@@ -89,10 +86,10 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "userEmail") String userEmail,
             @RequestParam(name ="size" , required = false , defaultValue = "12") int size,
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page) {
-           
+
     		// Call the service method to retrieve all objects with the specified size and page
             return objectsService.getAllObjects(userSuperapp,userEmail,size,page);
-        
+
     }
 
 
@@ -109,7 +106,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name="userEmail") String userEmail,
             @RequestBody ObjectId objectIdBoundary
     ) throws RuntimeException {
-        
+
             //SuperAppObjectBoundary objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
             superAppObjectRelationshipService.bindParentAndChild(internalObjectId, objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
     }
@@ -129,8 +126,8 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
         {
             return superAppObjectRelationshipService.getAllChildren(internalObjectId,userSuperapp,userEmail, size, page);
-                 
-        
+
+
     }
 
 
@@ -148,7 +145,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "page" , required = false ,defaultValue = "0") int page)
             throws RuntimeException {
             return superAppObjectRelationshipService.getAllParents(internalObjectId,userSuperapp,userEmail,size,page);
-       
+
 
     }
 
@@ -196,7 +193,7 @@ public class SuperAppObjectsAPIController {
             @RequestParam(name = "userEmail") String email,
             @RequestParam(name = "size" , defaultValue = "12") int size,
             @RequestParam(name = "page" , defaultValue = "1") int page) {
-    	
+
         return objectsService.searchByLocation(latitude, longitude, distance, distanceUnits, superapp, email, size, page);
     }
 

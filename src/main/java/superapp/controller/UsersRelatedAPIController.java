@@ -55,9 +55,6 @@ public class UsersRelatedAPIController {
 			path = {"/superapp/users/{superapp}/{userEmail}"},
 			method = {RequestMethod.PUT},
 			consumes = {MediaType.APPLICATION_JSON_VALUE})
-	/*produces = {MediaType.APPLICATION_JSON_VALUE} in the REST API 'update user' has no output
-			but the userService's method 'updatedUser' returns user boundary, so to avoid troubles this method doesn't return User
-			Boundary as a JSON*/
 
 	public UserBoundary updateUser(
 			@PathVariable("superapp") String superapp,
