@@ -258,15 +258,16 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userEmail + userSuperApp + " does not exist"));
 
-		SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
-				.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
 
 
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
 
-			return this.objectRepository
-					.findByParentObjects_ObjectId(parent.getObjectId(), PageRequest.of(page, size, Sort
-							.Direction.ASC , "creationTimestamp", "_id"))
+			SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
+					.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+			
+			return  this.objectRepository
+					.findByParentObjectsContaining(parent, PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp"))
 					.stream()
 					.map(this::entityToBoundary)
 					.toList();
@@ -275,39 +276,44 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		}
 		else if (userEntity.getRole().equals(UserRole.MINIAPP_USER))
 		{
-			return this.objectRepository
-					.findByParentObjects_ObjectIdAndActiveIsTrue(parent.getObjectId(),PageRequest.of(page, size, Sort
-							.Direction.ASC , "creationTimestamp", "_id"))
+			SuperAppObjectEntity parent = objectRepository.findByObjectIdAndActiveIsTrue(new ObjectId(springAppName, internalObjectId))
+					.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+			
+			return  this.objectRepository
+					.findByParentObjectsContainingAndActiveIsTrue(parent, PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp"))
 					.stream()
 					.map(this::entityToBoundary)
 					.toList();
-
 		}
 		throw new PermissionDeniedException("User do not have permission to get all children");
 	}
 
 	@Override
 	public List<SuperAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
-		SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
-				.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
 		
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("inserted id: "
 						+ userEmail + userSuperapp + " does not exist"));
 	
-
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
+			SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
+					.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+			
 			return this.objectRepository
-					.findByChildObjects_ObjectId(child.getObjectId(), PageRequest.of(page, size, Sort
-							.Direction.ASC , "creationTimestamp", "_id"))
+					.findByChildObjectsContaining(child, PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp"))
 					.stream()
 					.map(this::entityToBoundary)
 					.toList();
 			
 		} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
+			SuperAppObjectEntity child = objectRepository.findByObjectIdAndActiveIsTrue(new ObjectId(springAppName, internalObjectId))
+					.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+			
 			return this.objectRepository
-					.findByChildObjects_ObjectIdAndActiveIsTrue(child.getObjectId(), PageRequest.of(page, size, Sort
-							.Direction.ASC , "creationTimestamp", "_id"))
+					.findByChildObjectsContainingAndActiveIsTrue(child, PageRequest.of(page, size, Sort
+							.Direction.ASC , "creationTimestamp"))
 					.stream()
 					.map(this::entityToBoundary)
 					.toList();

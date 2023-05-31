@@ -12,7 +12,8 @@ import java.util.*;
 
 @Document(collection = "SUPER_APP_OBJECTS")
 public class SuperAppObjectEntity {
-    @Id
+    
+	@Id
     private ObjectId objectId;
     private String type; //todo- define types
     private String alias;

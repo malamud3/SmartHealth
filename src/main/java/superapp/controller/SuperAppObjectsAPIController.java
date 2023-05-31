@@ -110,8 +110,8 @@ public class SuperAppObjectsAPIController {
             @RequestBody ObjectId objectIdBoundary
     ) throws RuntimeException {
         
-            SuperAppObjectBoundary objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
-            superAppObjectRelationshipService.bindParentAndChild(objectBoundaryParent.getObjectId().getInternalObjectId(), objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
+            //SuperAppObjectBoundary objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
+            superAppObjectRelationshipService.bindParentAndChild(internalObjectId, objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
     }
 
 
