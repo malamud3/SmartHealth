@@ -137,7 +137,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp,userEmail))
 				.orElseThrow(()->new UserNotFoundException("inserted id: "
 						+userEmail + userSuperApp + " does not exist"));
-		
+
 		SuperAppObjectEntity objectEntity = objectRepository.
 				findByObjectId(new ObjectId(superAppId, internal_obj_id))
 				.orElseThrow(() -> new ObjectNotFoundException("Could not find object with id: " + superAppId + "_" + internal_obj_id) );
@@ -204,9 +204,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 	@Override
 	public void deleteAllObjects(UserId userId) {
-		UserEntity userEntity = this.userRepository.findById(userId)
-				.orElseThrow(()->new UserNotFoundException("inserted id: "
-						+ userId + " does not exist"));
+		UserEntity userEntity = checkUserExist(userId);
 
 		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
 			throw new PermissionDeniedException("You do not have permission to delete all objects");
@@ -217,9 +215,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 	@Override
 	public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) throws RuntimeException {
-		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp,userEmail))
-				.orElseThrow(()->new UserNotFoundException("inserted id: "
-						+ userEmail + userSuperApp + " does not exist"));
+		UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 		if (childId.equals(parentId)){
 			throw new RuntimeException("can't bind the same object");
 		}
@@ -244,6 +240,11 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		}
 	}
 
+	private UserEntity checkUserExist(UserId userId){
+		return this.userRepository.findByUserId(userId)
+				.orElseThrow(()->new UserNotFoundException("inserted id: "
+						+ userId.getEmail() + userId.getSuperapp() + " does not exist"));
+	}
 
 
 
@@ -255,11 +256,7 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	@Override
 	public List<SuperAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
 
-		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
-				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userEmail + userSuperApp + " does not exist"));
-
-
-
+		UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
 
 			SuperAppObjectEntity parent = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
@@ -291,11 +288,11 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 
 	@Override
 	public List<SuperAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
-		
+
 		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperapp, userEmail))
 				.orElseThrow(() -> new UserNotFoundException("inserted id: "
 						+ userEmail + userSuperapp + " does not exist"));
-	
+
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
 			SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
 					.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
@@ -322,10 +319,8 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 
-	public List<SuperAppObjectBoundary> searchByAlias(String alias, String userSuperapp, String userEmail, int size, int page) {
-		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
-				.orElseThrow(() -> new UserNotFoundException("inserted id: "
-						+ userEmail + userSuperapp + " does not exist"));
+	public List<SuperAppObjectBoundary> searchByAlias(String alias, String userSuperApp, String userEmail, int size, int page) {
+		UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
 		PageRequest pageRequest = PageRequest.of(page, size , Sort.Direction.ASC,"_id");
 
@@ -346,11 +341,9 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 		}
 	}
 
-	public List<SuperAppObjectBoundary> searchByType(String type, String userSuperapp, String userEmail, int size, int page) {
-		
-		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
-				.orElseThrow(() -> new UserNotFoundException("inserted id: "
-						+ userEmail + userSuperapp + " does not exist"));
+	public List<SuperAppObjectBoundary> searchByType(String type, String userSuperApp, String userEmail, int size, int page) {
+
+		UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
 		PageRequest pageRequest = PageRequest.of(page, size , Sort.Direction.ASC,"_id");
 
@@ -372,11 +365,9 @@ public  class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Su
 	}
 
 	public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude,
-			double distance, String distanceUnits, String userSuperapp, String userEmail, int size, int page) {
-		
-		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperapp, userEmail))
-				.orElseThrow(() -> new UserNotFoundException("inserted id: "
-						+ userEmail + userSuperapp + " does not exist"));
+			double distance, String distanceUnits, String userSuperApp, String userEmail, int size, int page) {
+
+		UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 		
 		GeneralUtility generalUtility = new GeneralUtility();
 		if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
