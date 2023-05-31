@@ -106,31 +106,24 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException {
         UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
-        //check the need of dirtyflag here
-        boolean dirtyFlag = false;
 
         if (update.getRole() != null) {
             userEntity.setRole(UserRole.valueOf(update.getRole()));
-            dirtyFlag = true;
         }
 
         if (update.getUsername() != null) {
         	userEntity.setUsername(update.getUsername());
-            dirtyFlag = true;
         }
 
         if (update.getAvatar() != null) {
         	userEntity.setAvatar(update.getAvatar());
-            dirtyFlag = true;
         }
 
-        if (dirtyFlag) {
-        	userEntity = userRepository.save(userEntity);
+        userEntity = userRepository.save(userEntity);
 
             // Sending JMS message
             String message = "User updated: " + userEntity.getUserId();
             jmsTemplate.convertAndSend("userUpdateQueue", message);
-        }
 
         return entityToBoundary(userEntity);
     }

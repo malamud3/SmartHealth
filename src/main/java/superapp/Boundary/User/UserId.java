@@ -43,4 +43,12 @@ public class UserId {
 		UserId other = (UserId) obj;
 		return this.email.equals(other.email) && this.superapp.equals(other.superapp);
 	}
+
+	@Override
+	public String toString() {
+		return "UserId{" +
+				"superapp='" + superapp + '\'' +
+				", email='" + email + '\'' +
+				'}';
+	}
 }

@@ -72,4 +72,14 @@ public class UserEntity {
 	public int hashCode() {
 		return Objects.hash(userId, role, username, avatar);
 	}
+
+	@Override
+	public String toString() {
+		return "UserEntity{" +
+				"userId=" + userId +
+				", role=" + role +
+				", username='" + username + '\'' +
+				", avatar='" + avatar + '\'' +
+				'}';
+	}
 }

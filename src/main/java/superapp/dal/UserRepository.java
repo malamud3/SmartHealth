@@ -12,5 +12,6 @@ public interface UserRepository
 
         Optional<UserEntity> findByUserId(UserId userId);
 
+
 }
 
