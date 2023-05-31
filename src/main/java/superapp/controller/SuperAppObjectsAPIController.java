@@ -96,7 +96,7 @@ public class SuperAppObjectsAPIController {
 
     //PUT: Bind an existing object to an existing child object
     @PutMapping(
-            path = "/superapp/objects/{superapp}/{internalObjectId}/children",
+                path = "/superapp/objects/{superapp}/{internalObjectId}/children",
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public void bindObjectToChild(
@@ -107,7 +107,6 @@ public class SuperAppObjectsAPIController {
             @RequestBody ObjectId objectIdBoundary
     ) throws RuntimeException {
 
-            //SuperAppObjectBoundary objectBoundaryParent = objectsService.getSpecificObject(superapp, internalObjectId , userSuperApp , userEmail);
             superAppObjectRelationshipService.bindParentAndChild(internalObjectId, objectIdBoundary.getInternalObjectId(),userSuperApp,userEmail);
     }
 

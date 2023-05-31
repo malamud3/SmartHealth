@@ -61,6 +61,12 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         }
     }
 
+    private UserEntity checkUserExist(UserId userId){
+        return this.userRepository.findByUserId(userId)
+                .orElseThrow(()->new UserNotFoundException("inserted id: "
+                        + userId.getEmail() + userId.getSuperapp() + " does not exist"));
+    }
+
     @Async
     @Override
     public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
@@ -83,11 +89,9 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public UserBoundary login(String userSuperApp, String userEmail) throws RuntimeException {
-        UserId userId = new UserId(userSuperApp, userEmail);
-        UserEntity entity = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
-        UserBoundary boundary = entityToBoundary(entity);
+        UserBoundary boundary = entityToBoundary(userEntity);
 
         // Sending JMS message
         String message = "User logged in: " + boundary.getUserId();
@@ -100,9 +104,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException {
-        UserId userId = new UserId(userSuperApp, userEmail);
-        UserEntity userEntity = userRepository.findByUserId(userId)
-        		.orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
         //check the need of dirtyflag here
         boolean dirtyFlag = false;
@@ -142,9 +144,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     
     @Override
     public List<UserBoundary> exportAllUsers(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
-        UserId userId = new UserId(userSuperApp, userEmail);
-        UserEntity userEntity = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
         if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to get all users");
@@ -177,9 +177,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public void deleteAllUsers(String userSuperApp, String userEmail) throws RuntimeException {
-        UserId userId = new UserId(userSuperApp, userEmail);
-        UserEntity userEntity = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException("Could not find user with id: " + userSuperApp + "_" + userEmail));
+        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
         if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to delete all users");

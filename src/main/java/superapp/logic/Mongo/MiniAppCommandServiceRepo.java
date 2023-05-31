@@ -144,10 +144,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	@Override
 	public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
 		validatMiniappCommand(miniAppCommandBoundary);
+		UserEntity userEntity = checkUserExist(miniAppCommandBoundary.getInvokedBy().getUserId());
 
-
-		UserEntity userEntity = this.userRepository.findByUserId(miniAppCommandBoundary.getInvokedBy().getUserId())
-				.orElseThrow();
 		if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
 			miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
 			miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
@@ -194,9 +192,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 	@Override
 	public void deleteAllCommands(UserId userId) {
-		UserEntity userEntity = this.userRepository.findById(userId)
-				.orElseThrow(()->new UserNotFoundException("inserted id: "
-						+ userId + " does not exist"));
+		UserEntity userEntity = checkUserExist(userId);
 
 		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
 			throw new PermissionDeniedException("You do not have permission to delete all commands");
@@ -204,11 +200,18 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 		this.commandRepository.deleteAll();
 	}
 
+	private UserEntity checkUserExist(UserId userId){
+		return this.userRepository.findByUserId(userId)
+				.orElseThrow(()->new UserNotFoundException("inserted id: "
+						+ userId.getEmail() + userId.getSuperapp() + " does not exist"));
+	}
+
+
+
 	@Override
 	public List<MiniAppCommandBoundary> exportAllCommands(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
 
-		UserEntity userEntity = this.userRepository.findById(new UserId(userSuperApp, userEmail))
-				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
+		UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
 
 		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
 			throw new PermissionDeniedException("User doesn't have permission to export all commands");
@@ -223,8 +226,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 	@Override
 	public List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException {
-		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail))
-				.orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
+		UserEntity userEntity = this.userRepository.findByUserId(new UserId(userSuperApp, userEmail)).orElseThrow(() -> new UserNotFoundException("Inserted ID: " + userSuperApp + userEmail + " does not exist"));
 
 		if (!userEntity.getRole().equals(UserRole.ADMIN)) {
 			throw new PermissionDeniedException("User doesn't have permission to access all commands");
