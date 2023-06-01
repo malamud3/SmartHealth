@@ -2,7 +2,9 @@ package superapp.data;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -19,10 +21,12 @@ public class SuperAppObjectEntity {
     private String alias;
     private Boolean active;
     private Date creationTimestamp;
+    
+    
     //private Location location;
     
-    @GeoSpatialIndexed
-    private Point location;//for distance calculations
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+    private Point location;//using Point for distance calculations
     
     private CreatedBy createdBy;
     private Map<String, Object> objectDetails;

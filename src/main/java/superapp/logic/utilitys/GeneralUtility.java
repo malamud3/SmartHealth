@@ -9,13 +9,11 @@ public class GeneralUtility {
 
 
 
-	public Metrics parseDistanceUnit(String distanceUnitString) {
+	public double calculateRadiusInRadiansUsingDistanceUnit(String distanceUnitString, double distance) {
 		if (distanceUnitString.equalsIgnoreCase("kilometers") || distanceUnitString.equalsIgnoreCase("km")) {
-			return Metrics.KILOMETERS;
+			return distance / 6378.1;
 		} else if (distanceUnitString.equalsIgnoreCase("miles") || distanceUnitString.equalsIgnoreCase("mi")) {
-			return Metrics.MILES;
-		} else if (distanceUnitString.equalsIgnoreCase("NEUTRAL")) {
-			return Metrics.NEUTRAL;
+			return distance / 3963.2;
 		}else {
 			throw new IllegalArgumentException("Invalid distance unit: " + distanceUnitString);
 		}

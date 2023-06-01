@@ -3,9 +3,7 @@ package superapp.logic.Mongo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
-
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.Boundary.Location;
@@ -18,8 +16,6 @@ import superapp.data.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
-import superapp.logic.Exceptions.UserNotFoundException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupported;
@@ -60,7 +56,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
         System.err.println(userId.toString());
         UserEntity userEntity = userUtility.checkUserExist(userId);
         try {
-            superAppObjectUtility.validateObject(obj);
+        	superAppObjectUtility.validateObject(obj);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -74,6 +70,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
         entity = objectRepository.save(entity);
         return entityToBoundary(entity);
     }
+
 
     @Override
     @Deprecated
@@ -323,33 +320,31 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     }
 
     public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude,
-                                                         double distance, String distanceUnits, String userSuperApp, String userEmail, int size, int page) {
+    		double distance, String distanceUnits, String userSuperApp, String userEmail, int size, int page) {
 
-        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
+    	UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
 
-        GeneralUtility generalUtility = new GeneralUtility();
-        if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
+    	GeneralUtility generalUtility = new GeneralUtility();
+    	double distanceInRadians = generalUtility.calculateRadiusInRadiansUsingDistanceUnit(distanceUnits, distance);
+    	if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
+    		return this.objectRepository
+    				.findWithinCircle(latitude,
+    						longitude, distanceInRadians, 
+    						PageRequest.of(page, size, Sort.Direction.ASC, "_id"))
+    				.stream()
+    				.map(this::entityToBoundary)
+    				.toList();
 
-            return this.objectRepository
-                    .findByLocationWithinRadius(latitude, longitude,
-                            new Distance(distance, generalUtility.parseDistanceUnit(distanceUnits)),
-                            PageRequest.of(page, size, Sort
-                                    .Direction.ASC, "creationTimestamp", "objectId"))
-                    .stream()
-                    .map(this::entityToBoundary)
-                    .toList();
-
-        } else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
-            return this.objectRepository
-                    .findByLocationNearAndActiveIsTrue(new Point(latitude, longitude),
-                            new Distance(distance, generalUtility.parseDistanceUnit(distanceUnits)),
-                            PageRequest.of(page, size, Sort
-                                    .Direction.ASC, "creationTimestamp", "_id"))
-                    .stream()
-                    .map(this::entityToBoundary)
-                    .toList();
-        }
-        throw new PermissionDeniedException("User do not have permission to search by location");
+    	} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
+    		return this.objectRepository
+    				.findWithinCircleAndActiveIsTrue(latitude,
+    						longitude, distanceInRadians, 
+    						PageRequest.of(page, size, Sort.Direction.ASC, "_id"))
+    				.stream()
+    				.map(this::entityToBoundary)
+    				.toList();
+    	}
+    	throw new PermissionDeniedException("User do not have permission to search by location");
 
 
     }
@@ -366,7 +361,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
         obj.setObjectDetails(entity.getObjectDetails());
         obj.setCreationTimestamp(entity.getCreationTimestamp());
         obj.setType(entity.getType());
-        obj.setLocation(new Location(entity.getLocation().getX(), entity.getLocation().getY()));
+        obj.setLocation(new Location(entity.getLocation().getY(), entity.getLocation().getX()));
         return obj;
     }
 
@@ -376,7 +371,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
         rv.setObjectId(obj.getObjectId());
         rv.setActive(obj.getActive());
-        rv.setLocation(new Point(obj.getLocation().getLat(), obj.getLocation().getLng()));
+        rv.setLocation(new Point(obj.getLocation().getLng(), obj.getLocation().getLat()));
         rv.setType(obj.getType());
         rv.setObjectDetails(obj.getObjectDetails());
         rv.setAlias(obj.getAlias());
