@@ -32,6 +32,7 @@ import superapp.logic.utilitys.UserUtility;
 public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
+    private final UserUtility userUtility;
     private  JmsTemplate jmsTemplate ;
     private String springAppName;
 
@@ -40,12 +41,13 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     public UsersServiceRepo(UserRepository userRepository, MongoTemplate mongoTemplate) {
         this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
+        this.userUtility = new UserUtility(userRepository);
     }
 
     @Autowired
     public void setJmsTemplate(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
-        this.jmsTemplate.setDeliveryDelay(5000L);
+        this.jmsTemplate.setDeliveryDelay(3000L);
     }
 
     // this method injects a configuration value of spring
@@ -61,17 +63,15 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         }
     }
 
-    private UserEntity checkUserExist(UserId userId){
-        return this.userRepository.findByUserId(userId)
-                .orElseThrow(()->new UserNotFoundException("inserted id: "
-                        + userId.getEmail() + userId.getSuperapp() + " does not exist"));
-    }
+
+
+
 
     @Async
     @Override
     public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
         try {
-            validateUser(newUser);
+            userUtility.validateUser(newUser,springAppName);
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -89,7 +89,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public UserBoundary login(String userSuperApp, String userEmail) throws RuntimeException {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp,userEmail));
 
         UserBoundary boundary = entityToBoundary(userEntity);
 
@@ -104,7 +104,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public UserBoundary updateUser(String userSuperApp, String userEmail, UserBoundary update) throws RuntimeException {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp,userEmail));
 
 
         if (update.getRole() != null) {
@@ -137,7 +137,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     
     @Override
     public List<UserBoundary> exportAllUsers(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp,userEmail));
 
         if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to get all users");
@@ -170,7 +170,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Override
     public void deleteAllUsers(String userSuperApp, String userEmail) throws RuntimeException {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp,userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp,userEmail));
 
         if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to delete all users");
@@ -239,42 +239,4 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     }
 
-    /**
-     * Validates the given NewUserBoundary object.
-     *
-     * @param newUser the NewUserBoundary object to validate
-     * @throws IllegalArgumentException if the email address is invalid, role is invalid, username is null or empty, or avatar is null or empty
-     * @throws RuntimeException         if a user with the same email address already exists in the database
-     */
-    private void validateUser(NewUserBoundary newUser) throws RuntimeException {
-        UserUtility userUtility = new UserUtility(userRepository);
-        GeneralUtility generalUtility = new GeneralUtility();
-
-        // Check if email is valid
-        if (!superapp.logic.utilitys.UserUtility.isValidEmail(newUser.getEmail())) {
-            throw new IllegalArgumentException("Invalid email address: " + newUser.getEmail());
-        }
-
-        // Check if role is valid
-        if (!userUtility.isUserRoleValid(newUser.getRole())) {
-            throw new IllegalArgumentException("Invalid role: " + newUser.getRole());
-        }
-
-        // Check if the user already exists
-        // Check if the user already exists
-        UserId userId = new UserId(newUser.getEmail(), this.springAppName);
-        if (userRepository.findByUserId(userId).isPresent()) {
-            throw new RuntimeException("User with email " + newUser.getEmail() + " already exists");
-        }
-
-        //check if userName is not empty or null
-        if (generalUtility.isStringEmptyOrNull(newUser.getUsername())) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
-        }
-        //check if avatar is not empty or null
-        if (generalUtility.isStringEmptyOrNull(newUser.getAvatar())) {
-            throw new IllegalArgumentException("Avatar cannot be null or empty");
-        }
-
-    }
 }

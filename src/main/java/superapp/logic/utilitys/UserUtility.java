@@ -1,7 +1,9 @@
 package superapp.logic.utilitys;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.dal.SuperAppObjectRepository;
 import superapp.dal.UserRepository;
@@ -48,6 +50,43 @@ public class UserUtility {
     }
 
 
+    /**
+     * Validates the given NewUserBoundary object.
+     *
+     * @param newUser the NewUserBoundary object to validate
+     * @throws IllegalArgumentException if the email address is invalid, role is invalid, username is null or empty, or avatar is null or empty
+     * @throws RuntimeException         if a user with the same email address already exists in the database
+     */
+    public void validateUser(NewUserBoundary newUser,String springAppName) throws RuntimeException {
+        GeneralUtility generalUtility = new GeneralUtility();
+        System.err.println(springAppName);
+
+        // Check if email is valid
+        if (!superapp.logic.utilitys.UserUtility.isValidEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("Invalid email address: " + newUser.getEmail());
+        }
+
+        // Check if role is valid
+        if (!isUserRoleValid(newUser.getRole())) {
+            throw new IllegalArgumentException("Invalid role: " + newUser.getRole());
+        }
+
+        // Check if the user already exists
+        UserId userId = new UserId(springAppName,newUser.getEmail());
+        if (userRepository.findByUserId(userId).isPresent()) {
+            throw new RuntimeException("User with email " + newUser.getEmail() + " already exists");
+        }
+
+        //check if userName is not empty or null
+        if (generalUtility.isStringEmptyOrNull(newUser.getUsername())) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        //check if avatar is not empty or null
+        if (generalUtility.isStringEmptyOrNull(newUser.getAvatar())) {
+            throw new IllegalArgumentException("Avatar cannot be null or empty");
+        }
+
+    }
 
 
 
