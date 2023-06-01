@@ -44,7 +44,8 @@ public class UsersRelatedAPIController {
 			method = {RequestMethod.GET},
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
-	public UserBoundary validUser(@PathVariable("superapp") String superapp,
+	public UserBoundary validUser(
+			@PathVariable("superapp") String superapp,
 			@PathVariable("email") String email) {
 
 		return this.usersService.login(superapp, email);
