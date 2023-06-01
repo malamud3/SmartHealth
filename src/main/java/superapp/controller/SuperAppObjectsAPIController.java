@@ -189,11 +189,11 @@ public class SuperAppObjectsAPIController {
             @PathVariable("lat") double latitude,
             @PathVariable("lng") double longitude,
             @PathVariable("distance") double distance,
-            @RequestParam(value = "units", defaultValue = "NEUTRAL") String distanceUnits,
+            @RequestParam(value = "units", defaultValue = "km") String distanceUnits,
             @RequestParam(name = "userSuperapp") String superapp,
             @RequestParam(name = "userEmail") String email,
             @RequestParam(name = "size" , defaultValue = "12") int size,
-            @RequestParam(name = "page" , defaultValue = "1") int page) {
+            @RequestParam(name = "page" , defaultValue = "0") int page) {
 
         return objectsService.searchByLocation(latitude, longitude, distance, distanceUnits, superapp, email, size, page);
     }
