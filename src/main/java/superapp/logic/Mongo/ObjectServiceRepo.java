@@ -75,23 +75,6 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
         return entityToBoundary(entity);
     }
 
-//    private void validateObject(SuperAppObjectBoundary obj) {
-//        GeneralUtility generalUtility = new GeneralUtility();
-//        // Check if alias is valid
-//        if (generalUtility.isStringEmptyOrNull(obj.getAlias())) {
-//            throw new RuntimeException("alias is empty");
-//        }
-//        // Check if type is valid
-//        if (generalUtility.isStringEmptyOrNull(obj.getType())) {
-//            throw new RuntimeException("alias is empty");
-//            // Check if created by is valid
-//        }
-//        if (generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getUserId().getEmail()) ||
-//                generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getUserId().getSuperapp())) {
-//            throw new RuntimeException("created by is empty");
-//        }
-//    }
-
     @Override
     @Deprecated
     public SuperAppObjectBoundary updateObject(String superAppId, String internal_obj_id, SuperAppObjectBoundary update) {
