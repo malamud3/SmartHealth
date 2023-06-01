@@ -3,6 +3,8 @@ package superapp.Boundary.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 
+import java.util.Objects;
+
 
 public class UserId {
 		private String superapp;
@@ -39,9 +41,20 @@ public class UserId {
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(superapp, email);
+	}
+
+	@Override
 	public boolean equals(Object obj){
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		UserId other = (UserId) obj;
-		return this.email.equals(other.email) && this.superapp.equals(other.superapp);
+		return email.equals(other.email) && superapp.equals(other.superapp) ;
 	}
 
 	@Override

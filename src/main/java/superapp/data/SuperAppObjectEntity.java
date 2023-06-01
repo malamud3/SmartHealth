@@ -86,12 +86,6 @@ public class SuperAppObjectEntity {
     }
 
 
-    @Override
-    public boolean equals(Object obj) {
-        SuperAppObjectEntity other = (SuperAppObjectEntity) obj;
-        return objectId.equals(other.getObjectId());
-    }
-
 	public Map<String, Object> getObjectDetails() {
 		return objectDetails;
 	}
@@ -140,8 +134,21 @@ public class SuperAppObjectEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectId, type, alias, active, creationTimestamp, location, createdBy, objectDetails, parentObjects, childObjects);
+        return Objects.hash(objectId);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SuperAppObjectEntity other = (SuperAppObjectEntity) obj;
+        return objectId.equals(other.getObjectId());
+    }
+
 
     public void removeParentObject(SuperAppObjectEntity parentObject) {
         if (parentObjects != null) {

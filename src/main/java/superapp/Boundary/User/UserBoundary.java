@@ -67,12 +67,18 @@ public class UserBoundary {
 
 	@Override
 	public boolean equals(Object obj){
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		UserBoundary other = (UserBoundary) obj;
-		return this.userId.equals(other.userId);
+		return userId.equals(other.userId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(userId, role, username, avatar);
+		return Objects.hash(userId);
 	}
 }

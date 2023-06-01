@@ -46,15 +46,20 @@ public class MiniAppCommandEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MiniAppCommandEntity that)) return false;
-        return Objects.equals(commandId, that.commandId) && Objects.equals(command, that.command) && Objects.equals(targetObject, that.targetObject) && Objects.equals(invocationTimestamp, that.invocationTimestamp) && Objects.equals(invokedBy, that.invokedBy) && Objects.equals(commandAttributes, that.commandAttributes);
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MiniAppCommandEntity other = (MiniAppCommandEntity) obj;
+        return this.commandId.equals(other.getCommandId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(commandId, command, targetObject, invocationTimestamp, invokedBy, commandAttributes);
+        return Objects.hash(commandId);
     }
 
     public String getCommand() {

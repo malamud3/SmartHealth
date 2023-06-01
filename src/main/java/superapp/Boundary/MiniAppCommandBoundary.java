@@ -1,10 +1,10 @@
 package superapp.Boundary;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-import superapp.Boundary.User.UserId;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+
 public class MiniAppCommandBoundary
 {
     private CommandId commandId;
@@ -86,4 +86,20 @@ public class MiniAppCommandBoundary
         this.commandAttributes = commandAttributes;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MiniAppCommandBoundary other = (MiniAppCommandBoundary) obj;
+        return commandId.equals(other.commandId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(commandId);
+    }
 }

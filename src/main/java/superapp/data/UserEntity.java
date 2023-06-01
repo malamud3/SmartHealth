@@ -4,6 +4,7 @@ package superapp.data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.scheduling.annotation.EnableAsync;
+import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 
 import java.util.Objects;
@@ -62,15 +63,20 @@ public class UserEntity {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof UserEntity that)) return false;
-		return Objects.equals(userId, that.userId) && role == that.role && Objects.equals(username, that.username) && Objects.equals(avatar, that.avatar);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserEntity other = (UserEntity) obj;
+		return Objects.equals(userId, other.userId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(userId, role, username, avatar);
+		return Objects.hash(userId);
 	}
 
 	@Override
