@@ -32,6 +32,7 @@ public class SuperAppObjectUtility {
         // Check if alias is valid
         if (generalUtility.isStringEmptyOrNull(obj.getAlias())) {
             throw new RuntimeException("alias is empty");
+
         }
         // Check if type is valid
         if (generalUtility.isStringEmptyOrNull(obj.getType())) {
