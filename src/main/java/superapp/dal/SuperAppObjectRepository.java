@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import superapp.Boundary.Location;
 import superapp.Boundary.ObjectId;
 import superapp.data.SuperAppObjectEntity;
 
@@ -24,10 +23,13 @@ extends MongoRepository<SuperAppObjectEntity, ObjectId> {
 
 	List<SuperAppObjectEntity> findByActiveIsTrue(Pageable pageable);
 
-	//List<SuperAppObjectEntity> findByLocationNear(Point location, Distance distance, Pageable pageable);
 
-	@Query(value = "{'location': {$geoWithin: {$centerSphere: [ [ ?0, ?1 ], ?2 ]}}}")
-	List<SuperAppObjectEntity> findByLocationWithinRadius(double latitude, double longitude, Distance radius, Pageable pageable);
+	@Query("{ 'location' : { $geoWithin : { $centerSphere : [ [ ?1, ?0 ], ?2 ] } } }")
+	List<SuperAppObjectEntity> findWithinCircle(double centerLat, double centerLng, double radius,Pageable pageable);
+
+	@Query("{ $and: [ { 'location': { $geoWithin: { $centerSphere: [ [ ?1, ?0 ], ?2 ] } } }, { 'active': true } ] }")
+	List<SuperAppObjectEntity> findWithinCircleAndActiveIsTrue(double centerLat, double centerLng, double radius,Pageable pageable);
+
 
 	List<SuperAppObjectEntity> findByLocationNearAndActiveIsTrue(Point location, Distance distance, Pageable pageable);
 
