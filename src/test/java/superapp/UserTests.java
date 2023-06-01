@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
@@ -14,7 +15,7 @@ import superapp.Boundary.User.UserId;
 import superapp.controller.UsersRelatedAPIController;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserTests {
 
@@ -48,8 +49,8 @@ public class UserTests {
         // GIVEN the database is up
         NewUserBoundary newUserBoundary = new NewUserBoundary();
         newUserBoundary.setAvatar("example_avatar");
-        newUserBoundary.setRole("MINIAPP_USER");
-        newUserBoundary.setEmail("example545@example.com");
+        newUserBoundary.setRole("SUPERAPP_USER");
+        newUserBoundary.setEmail("example55545@example.com");
         newUserBoundary.setUsername("example_userName");
 
         // WHEN a POST request is sent to create a new user

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import superapp.Boundary.CreatedBy;
 import superapp.Boundary.Location;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class superAppObjectTests {
 
     @Autowired
@@ -48,21 +50,21 @@ public class superAppObjectTests {
     @DisplayName("Test create Object")
     public void testCreateObject() {
         // GIVEN an object boundary
-        SuperAppObjectBoundary superAppObjectBoundary = new SuperAppObjectBoundary("superapp", "123");
+        SuperAppObjectBoundary superAppObjectBoundary = new SuperAppObjectBoundary();
         superAppObjectBoundary.setType("exampleType");
         superAppObjectBoundary.setAlias("exampleAlias");
         superAppObjectBoundary.setActive(true);
         Date now = new Date();
         superAppObjectBoundary.setCreationTimestamp(now);
         superAppObjectBoundary.setLocation(new Location(1.0, 2.0));
-        superAppObjectBoundary.setCreatedBy(new CreatedBy((new UserId("superapp", "example545@example.com"))));
+        superAppObjectBoundary.setCreatedBy(new CreatedBy((new UserId("2023b.gil.azani", "example545@example.com"))));
         superAppObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
 
         // WHEN a POST request is sent to create the object
-        superapp.Boundary.SuperAppObjectBoundary response = this.restTemplate.postForObject(
+        SuperAppObjectBoundary response = this.restTemplate.postForObject(
                 this.baseUrl + "/superapp/objects",
                 superAppObjectBoundary,
-                superapp.Boundary.SuperAppObjectBoundary.class
+                SuperAppObjectBoundary.class
         );
 
         // THEN verify the response is not null and has the same fields as the input
