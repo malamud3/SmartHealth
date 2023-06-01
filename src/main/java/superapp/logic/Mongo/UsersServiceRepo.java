@@ -247,7 +247,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
      * @throws RuntimeException         if a user with the same email address already exists in the database
      */
     private void validateUser(NewUserBoundary newUser) throws RuntimeException {
-        UserUtility userUtility = new UserUtility();
+        UserUtility userUtility = new UserUtility(userRepository);
         GeneralUtility generalUtility = new GeneralUtility();
 
         // Check if email is valid

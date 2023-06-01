@@ -27,6 +27,7 @@ import superapp.logic.service.SuperAppObjService.ObjectsService;
 import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
+import superapp.logic.utilitys.UserUtility;
 
 import java.util.*;
 
@@ -37,13 +38,14 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     private final SuperAppObjectRepository objectRepository;
     private final UserRepository userRepository;//for permission checks
     private String springAppName;
-
+    private final UserUtility userUtility;
 
     @Autowired
     public ObjectServiceRepo(SuperAppObjectRepository objectRepository, UserRepository userRepository) {
 
         this.objectRepository = objectRepository;
         this.userRepository = userRepository;
+        this.userUtility = new UserUtility(userRepository);
     }
 
     @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
@@ -55,7 +57,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     public SuperAppObjectBoundary createObject(SuperAppObjectBoundary obj) throws RuntimeException {
         UserId userId = new UserId(obj.getCreatedBy().getUserId().getSuperapp(), obj.getCreatedBy().getUserId().getEmail());
         System.err.println(userId.toString());
-        UserEntity userEntity = checkUserExist(userId);
+        UserEntity userEntity = userUtility.checkUserExist(userId);
         try {
             validateObject(obj);
         } catch (IllegalArgumentException e) {
@@ -98,8 +100,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     @Override
     public SuperAppObjectBoundary updateObject(String superapp, String internal_obj_id, SuperAppObjectBoundary update, String userSuperApp, String userEmail) throws RuntimeException {
         SuperAppObjectEntity objectEntity = checkSuperAppObjectEntityExist(new ObjectId(superapp, internal_obj_id));
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
-
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
         if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
             throw new PermissionDeniedException("User do not have permission to updateObject");
 
@@ -132,7 +133,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public SuperAppObjectBoundary getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) throws RuntimeException {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
 
         SuperAppObjectEntity objectEntity = checkSuperAppObjectEntityExist(new ObjectId(springAppName, internal_obj_id));
 
@@ -163,9 +164,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public List<SuperAppObjectBoundary> getAllObjects(String userSuperApp, String userEmail, int size, int page) {
-        UserId userId = new UserId(userSuperApp, userEmail);
-        System.err.println(userId.toString());
-        UserEntity userEntity = checkUserExist(userId);
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
         if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
             return this.objectRepository
                     .findAll(PageRequest.of(page, size, Sort
@@ -194,7 +193,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public void deleteAllObjects(UserId userId) {
-        UserEntity userEntity = checkUserExist(userId);
+        UserEntity userEntity = userUtility.checkUserExist(userId);
 
         if (!userEntity.getRole().equals(UserRole.ADMIN)) {
             throw new PermissionDeniedException("You do not have permission to delete all objects");
@@ -206,7 +205,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) throws RuntimeException {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
         if (childId.equals(parentId)) {
             throw new RuntimeException("can't bind the same object");
         }
@@ -247,9 +246,8 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     @Override
     public List<SuperAppObjectBoundary> getAllChildren(String internalObjectId, String userSuperApp, String userEmail, int size, int page) {
 
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
         if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
-            SuperAppObjectEntity objectEntity = checkSuperAppObjectEntityExist(new ObjectId(springAppName, internalObjectId));
 
             SuperAppObjectEntity parent = checkSuperAppObjectEntityExist(new ObjectId(springAppName, internalObjectId));
 
@@ -277,7 +275,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public List<SuperAppObjectBoundary> getAllParents(String internalObjectId, String userSuperapp, String userEmail, int size, int page) {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperapp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperapp, userEmail));
 
         if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
             SuperAppObjectEntity child = objectRepository.findById(new ObjectId(springAppName, internalObjectId))
@@ -306,7 +304,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
 
     public List<SuperAppObjectBoundary> searchByAlias(String alias, String userSuperApp, String userEmail, int size, int page) {
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "_id");
 
@@ -329,7 +327,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     public List<SuperAppObjectBoundary> searchByType(String type, String userSuperApp, String userEmail, int size, int page) {
 
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "_id");
 
@@ -353,7 +351,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     public List<SuperAppObjectBoundary> searchByLocation(double latitude, double longitude,
                                                          double distance, String distanceUnits, String userSuperApp, String userEmail, int size, int page) {
 
-        UserEntity userEntity = checkUserExist(new UserId(userSuperApp, userEmail));
+        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
 
         GeneralUtility generalUtility = new GeneralUtility();
         if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
