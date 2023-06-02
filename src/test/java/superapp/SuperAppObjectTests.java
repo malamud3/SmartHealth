@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-test.properties")
-public class superAppObjectTests {
+public class SuperAppObjectTests {
 
 	private String baseUrl;
 	private RestTemplate restTemplate;

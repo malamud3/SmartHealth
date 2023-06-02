@@ -99,7 +99,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
             objectEntity.setActive(update.getActive());
         }
         if (update.getLocation() != null) {
-            objectEntity.setLocation(new Point(update.getLocation().getLat(), update.getLocation().getLng()));
+            objectEntity.setLocation(new Point(update.getLocation().getLng(), update.getLocation().getLat()));//Point object LNG is first (x)
         }
         if (update.getObjectDetails() != null) {
             objectEntity.setObjectDetails(update.getObjectDetails());
