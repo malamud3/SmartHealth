@@ -3,7 +3,9 @@ package superapp.logic.Mongo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
+
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.Boundary.Location;
@@ -16,6 +18,8 @@ import superapp.data.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
+import superapp.logic.Exceptions.UserNotFoundException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupported;
@@ -329,7 +333,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     	if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
     		return this.objectRepository
     				.findWithinCircle(latitude,
-    						longitude, distanceInRadians, 
+    						longitude, distanceInRadians,
     						PageRequest.of(page, size, Sort.Direction.ASC, "_id"))
     				.stream()
     				.map(this::entityToBoundary)
@@ -338,7 +342,7 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
     	} else if (userEntity.getRole().equals(UserRole.MINIAPP_USER)) {
     		return this.objectRepository
     				.findWithinCircleAndActiveIsTrue(latitude,
-    						longitude, distanceInRadians, 
+    						longitude, distanceInRadians,
     						PageRequest.of(page, size, Sort.Direction.ASC, "_id"))
     				.stream()
     				.map(this::entityToBoundary)

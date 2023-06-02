@@ -14,20 +14,20 @@ import java.util.*;
 
 @Document(collection = "SUPER_APP_OBJECTS")
 public class SuperAppObjectEntity {
-    
+
 	@Id
     private ObjectId objectId;
     private String type; //todo- define types
     private String alias;
     private Boolean active;
     private Date creationTimestamp;
-    
-    
+
+
     //private Location location;
-    
+
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private Point location;//using Point for distance calculations
-    
+
     private CreatedBy createdBy;
     private Map<String, Object> objectDetails;
 
@@ -45,7 +45,7 @@ public class SuperAppObjectEntity {
     public SuperAppObjectEntity() {
 
     }
-    
+
     public ObjectId getObjectId() {
         return objectId;
     }
@@ -138,7 +138,7 @@ public class SuperAppObjectEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectId);
+        return Objects.hash(objectId, type, alias, active, creationTimestamp, location, createdBy, objectDetails, parentObjects, childObjects);
     }
 
     @Override

@@ -1,16 +1,14 @@
 package superapp.Boundary;
 
 public class Location {
-	
+
 	private Double lat;
 	private Double lng;
-	
-	
+
 	public Location() {
-		
+
 	}
-	
-	
+
 	public Location(Double lat, Double lng) {
 		this.lat = lat;
 		this.lng = lng;
@@ -55,8 +53,8 @@ public class Location {
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
-	
-	
+
+
 
 
 }
