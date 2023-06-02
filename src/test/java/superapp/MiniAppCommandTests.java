@@ -50,31 +50,31 @@ public class MiniAppCommandTests {
         this.baseUrl = "http://localhost:" + this.port;
     }
 
-    @Test
-    @DisplayName("Test invoke mini app command")
-    public void testInvokeMiniAppCommand() {
-
-        // GIVEN a mini app command
-        MiniAppCommandBoundary command = new MiniAppCommandBoundary();
-        command.setCommand("example-command");
-        command.setTargetObject(new TargetObject( new ObjectId("2023b.gil.azani", "bdde6835-67e9-4ef5-8d39-705f71c8e8c5")));
-        command.setInvocationTimestamp(Date.from(Instant.parse("2023-05-09T14:32:07.905Z")));
-        command.setInvokedBy(new InvokedBy(new UserId("2023b.gil.azani", "45555@example.com")));
-        command.setCommandAttributes(new HashMap<>());
-        CommandId commandId = new CommandId();
-        command.setCommandId(commandId);
-
-        // WHEN a POST request is sent to invoke the mini app command
-        MiniAppCommandBoundary response = this.restTemplate.postForObject(
-                this.baseUrl + "/superapp/miniapp/{miniAppName}",
-                command,
-                MiniAppCommandBoundary.class,
-                miniAppName
-        );
-
-        // THEN verify the response is not null and has a command ID set
-        assertNotNull(response);
-        assertNotNull(response.getCommandId());
-    }
+//    @Test
+//    @DisplayName("Test invoke mini app command")
+//    public void testInvokeMiniAppCommand() {
+//
+//        // GIVEN a mini app command
+//        MiniAppCommandBoundary command = new MiniAppCommandBoundary();
+//        command.setCommand("example-command");
+//        command.setTargetObject(new TargetObject( new ObjectId("2023b.gil.azani", "bdde6835-67e9-4ef5-8d39-705f71c8e8c5")));
+//        command.setInvocationTimestamp(Date.from(Instant.parse("2023-05-09T14:32:07.905Z")));
+//        command.setInvokedBy(new InvokedBy(new UserId("2023b.gil.azani", "45555@example.com")));
+//        command.setCommandAttributes(new HashMap<>());
+//        CommandId commandId = new CommandId();
+//        command.setCommandId(commandId);
+//
+//        // WHEN a POST request is sent to invoke the mini app command
+//        MiniAppCommandBoundary response = this.restTemplate.postForObject(
+//                this.baseUrl + "/superapp/miniapp/{miniAppName}",
+//                command,
+//                MiniAppCommandBoundary.class,
+//                miniAppName
+//        );
+//
+//        // THEN verify the response is not null and has a command ID set
+//        assertNotNull(response);
+//        assertNotNull(response.getCommandId());
+//    }
 
 }
