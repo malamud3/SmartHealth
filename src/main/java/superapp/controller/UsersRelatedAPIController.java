@@ -65,5 +65,4 @@ public class UsersRelatedAPIController {
 		return this.usersService.updateUser(superapp, email, updatedUser);
 
 	}
-
 }
