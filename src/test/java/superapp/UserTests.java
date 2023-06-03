@@ -25,12 +25,6 @@ public class UserTests {
     private RestTemplate restTemplate;
     private String baseUrl;
     private int port;
-    //private String springAppName;
-
-//    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
-//    public void setSpringApplicationName(String springApplicationName) {
-//        this.springAppName = springApplicationName;
-//    }
 
     @LocalServerPort
     public void setPort(int port) {
@@ -71,18 +65,8 @@ public class UserTests {
 		// AND the database is empty
 		
 		// WHEN I POST /superapp/useres with new example user
-    	 NewUserBoundary newUserBoundary = new NewUserBoundary();
-         newUserBoundary.setAvatar("example_avatar");
-         newUserBoundary.setRole("ADMIN");//set to admin to get all users
-         newUserBoundary.setEmail("example55545@example.com");
-         newUserBoundary.setUsername("example_userName");
-		
-		
-         UserBoundary expectedUserBoundary = this.restTemplate.postForObject(
-                 this.baseUrl + "/superapp/users",
-                 newUserBoundary,
-                 UserBoundary.class
-         );
+
+         UserBoundary expectedUserBoundary = createExampleUser("ADMIN"); 
 		
 		// THEN the database contains a single userBoundary with the same content
 		assertThat(this.restTemplate
@@ -99,18 +83,8 @@ public class UserTests {
     public void testGetUserByUserId() {
     	// GIVEN the server is up
     	// AND there is one user in the DB
-    	
-    	NewUserBoundary newUserBoundary = new NewUserBoundary();
-    	newUserBoundary.setAvatar("example_avatar");
-        newUserBoundary.setRole("SUPERAPP_USER");
-        newUserBoundary.setEmail("example55545@example.com");
-        newUserBoundary.setUsername("example_userName");
         
-        UserBoundary expectedUserBoundary = this.restTemplate.postForObject(
-                this.baseUrl + "/superapp/users",
-                newUserBoundary,
-                UserBoundary.class
-        );
+        UserBoundary expectedUserBoundary = createExampleUser("SUPERAPP_USER");
     			
     	// WHEN I GET /superapp/users/login/{superapp}/{email} of the user by userId
         UserBoundary actualUserBoundary = this.restTemplate
@@ -131,18 +105,8 @@ public class UserTests {
     public void testUpdateUser() {
     	// GIVEN the server is up
     	// AND there is one user in the DB
-    	
-    	NewUserBoundary newUserBoundary = new NewUserBoundary();
-    	newUserBoundary.setAvatar("example_avatar");
-        newUserBoundary.setRole("SUPERAPP_USER");
-        newUserBoundary.setEmail("example55545@example.com");
-        newUserBoundary.setUsername("example_userName");
-        
-        UserBoundary userBoundaryToUpdate = this.restTemplate.postForObject(
-                this.baseUrl + "/superapp/users",
-                newUserBoundary,
-                UserBoundary.class
-        );
+       
+        UserBoundary userBoundaryToUpdate = createExampleUser("SUPERAPP_USER");
 
         // WHEN I PUT /superapp/users/{superapp}/{userEmail} an updated userBoundaryToUpdate 
         //AND I GET /superapp/users/login/{superapp}/{email} the actualUpdatedUserBoundary
@@ -170,17 +134,8 @@ public class UserTests {
     	// GIVEN the server is up
     	// AND there is one user in the DB with MINIAPP_USER role
     	
-    	NewUserBoundary newUserBoundary = new NewUserBoundary();
-    	newUserBoundary.setAvatar("example_avatar");
-        newUserBoundary.setRole("MINIAPP_USER");
-        newUserBoundary.setEmail("example55545@example.com");
-        newUserBoundary.setUsername("example_userName");
         
-        UserBoundary miniappUserBoundary = this.restTemplate.postForObject(
-                this.baseUrl + "/superapp/users",
-                newUserBoundary,
-                UserBoundary.class
-        );
+        UserBoundary miniappUserBoundary = createExampleUser("MINIAPP_USER");
 
         // WHEN I GET /superapp/admin/users?userSuperapp={userSuperapp}&userEmail={userEmail} by miniappUserBoundary's UserId 
         HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () -> {
@@ -199,18 +154,8 @@ public class UserTests {
     	// GIVEN the server is up
     	// AND there is one user in the DB with SUPERAPP_USER role
     	
-    	NewUserBoundary newUserBoundary = new NewUserBoundary();
-    	newUserBoundary.setAvatar("example_avatar");
-        newUserBoundary.setRole("SUPERAPP_USER");
-        newUserBoundary.setEmail("example55545@example.com");
-        newUserBoundary.setUsername("example_userName");
-        
-        UserBoundary superappUserBoundary = this.restTemplate.postForObject(
-                this.baseUrl + "/superapp/users",
-                newUserBoundary,
-                UserBoundary.class
-        );
-
+        UserBoundary superappUserBoundary = createExampleUser("SUPERAPP_USER");
+           
         // WHEN I GET /superapp/admin/users?userSuperapp={userSuperapp}&userEmail={userEmail} by superappUserBoundary's UserId 
         HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () -> {
             restTemplate.getForObject(this.baseUrl + "/superapp/admin/users?userSuperapp={userSuperapp}&userEmail={userEmail}",
@@ -222,6 +167,18 @@ public class UserTests {
         assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
     
+    private UserBoundary createExampleUser(String role) {
+		NewUserBoundary newSuperappBoundary = new NewUserBoundary();
+		newSuperappBoundary.setAvatar(role + "_avatar");
+		newSuperappBoundary.setRole(role);
+		newSuperappBoundary.setEmail(role + "@example.com");
+		newSuperappBoundary.setUsername(role + "_userName");
+
+		return this.restTemplate.postForObject(
+				this.baseUrl + "/superapp/users",
+				newSuperappBoundary,
+				UserBoundary.class);
+	}
     
 
 }

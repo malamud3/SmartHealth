@@ -3,7 +3,6 @@ package superapp.logic.Mongo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
 
 import superapp.Boundary.SuperAppObjectBoundary;
@@ -18,8 +17,6 @@ import superapp.data.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
-import superapp.logic.Exceptions.UserNotFoundException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupported;
@@ -190,27 +187,22 @@ public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, Sup
 
     @Override
     public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) throws RuntimeException {
-        UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
-        if (childId.equals(parentId)) {
-            throw new RuntimeException("can't bind the same object");
-        }
-        if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
-            throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
+    	UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
+    	if (childId.equals(parentId)) {
+    		throw new RuntimeException("can't bind the same object");
+    	}
+    	if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
+    		throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
 
-        SuperAppObjectEntity parent = superAppObjectUtility.checkSuperAppObjectEntityExist(new ObjectId(springAppName, parentId));
-        SuperAppObjectEntity child = superAppObjectUtility.checkSuperAppObjectEntityExist(new ObjectId(springAppName, parentId));
+    	SuperAppObjectEntity parent = superAppObjectUtility.checkSuperAppObjectEntityExist(new ObjectId(springAppName, parentId));
+    	SuperAppObjectEntity child = superAppObjectUtility.checkSuperAppObjectEntityExist(new ObjectId(springAppName, childId));
 
-        boolean isChildAlreadyAssociated = parent.getChildObjects().stream()
-                .anyMatch(existingChild -> existingChild.equals(child));
-
-        if (!isChildAlreadyAssociated) {
-            parent.getChildObjects().add(child);
-            child.getParentObjects().add(parent);
-            objectRepository.save(child);
-            objectRepository.save(parent);
-        } else {
-            throw new RuntimeException("child and parent already bind");
-        }
+    	parent.getChildObjects().add(child);
+    	child.getParentObjects().add(parent);
+    	
+    	objectRepository.save(child);
+    	objectRepository.save(parent);
+        
     }
 
     @Deprecated

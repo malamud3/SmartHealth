@@ -69,7 +69,7 @@ public class SuperAppObjectTests {
 		.delete(this.baseUrl + "/superapp/admin/objects?userSuperapp={userSuperapp}&userEmail={userEmail}",
 				adminUserId.getSuperapp(), adminUserId.getEmail()); 
 
-		//clean the usersOObjects DB
+		//clean the usersObjects DB
 		this.restTemplate
 		.delete(this.baseUrl + "/superapp/admin/users?userSuperapp={userSuperapp}&userEmail={userEmail}",
 				adminUserId.getSuperapp(), adminUserId.getEmail());
