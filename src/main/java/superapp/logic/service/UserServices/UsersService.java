@@ -7,7 +7,8 @@ import superapp.Boundary.User.UserBoundary;
 
 public interface UsersService {
 
-	public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException;
+	@Deprecated
+	public UserBoundary createUser(UserBoundary newUser) throws RuntimeException;
 
 	public UserBoundary login(String userSuperApp, String userEmail) throws RuntimeException;
 
