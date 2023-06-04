@@ -2,6 +2,7 @@ package superapp.Boundary;
 
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,6 +20,17 @@ public class SuperAppObjectBoundary {
 
 	public SuperAppObjectBoundary(String superapp, String internalObjectId) {
 		objectId = new ObjectId(superapp, internalObjectId);
+
+	}
+	public SuperAppObjectBoundary(SuperAppObjectBoundary other) {
+		this.objectId = other.objectId;
+		this.type = other.type;
+		this.alias = other.alias;
+		this.active = other.active;
+		this.creationTimestamp = other.creationTimestamp;
+		this.location = other.location;
+		this.createdBy = other.createdBy;
+		this.objectDetails = other.objectDetails;
 
 	}
 
@@ -89,8 +101,15 @@ public class SuperAppObjectBoundary {
 		return objectDetails;
 	}
 
+
 	public void setObjectDetails(Map<String, Object> objectDetails) {
 		this.objectDetails = objectDetails;
+	}
+	public void insertToObjectDetails(Object obj) {
+		if (objectDetails.isEmpty()){
+			objectDetails = new HashMap<>();
+		}
+		objectDetails.put(obj.toString(),obj);
 	}
 
 	@Override
