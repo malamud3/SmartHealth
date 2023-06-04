@@ -36,7 +36,7 @@ public class SuperAppObjectUtility {
         }
         // Check if type is valid
         if (generalUtility.isStringEmptyOrNull(obj.getType())) {
-            throw new RuntimeException("alias is empty");
+            throw new RuntimeException("type is empty");
             // Check if created by is valid
         }
         if (generalUtility.isStringEmptyOrNull(obj.getCreatedBy().getUserId().getEmail()) ||
