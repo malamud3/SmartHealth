@@ -1,8 +1,9 @@
 package superapp.miniapps.commands;
 
+import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
 
 public interface Command {
-    public SuperAppObjectBoundary execute();
+    public void execute(MiniAppCommandBoundary miniAppCommandBoundary);
 }
 
