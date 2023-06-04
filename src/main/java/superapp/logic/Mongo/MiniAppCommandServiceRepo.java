@@ -152,9 +152,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 		if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
 			miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
 			miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
-			if (miniAppCommandBoundary.getInvocationTimestamp() == null) {
-				miniAppCommandBoundary.setInvocationTimestamp(new Date());
-			}
+			miniAppCommandBoundary.setInvocationTimestamp(new Date());
 			if (miniAppCommandBoundary.getCommandAttributes() == null) {
 				miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
 			}

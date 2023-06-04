@@ -42,7 +42,7 @@ public class createRecipeCommand {
         IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
 
         dietitian.insertToObjectDetails(ingredient);
-        //SuperAppObjectBoundary
+
         objectRelationshipService.updateObject(superapp,dietitian.getObjectId().getInternalObjectId(),dietitian,superapp,email);
 
         return dietitian;
