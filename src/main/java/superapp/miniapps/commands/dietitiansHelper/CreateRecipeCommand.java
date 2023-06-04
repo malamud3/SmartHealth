@@ -1,22 +1,17 @@
 package superapp.miniapps.commands.dietitiansHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.dal.UserCrud;
 import superapp.data.IngredientEntity;
-import superapp.data.UserEntity;
-import superapp.logic.Mongo.ObjectServiceRepo;
 import superapp.logic.service.SpoonaculerService;
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
-import superapp.logic.utilitys.UserUtility;
 
 @Component("createRecipe")
-public class createRecipeCommand {
-
+public class CreateRecipeCommand {
     private SpoonaculerService spoonaculerService;
     private SuperAppObjectCrud superAppObjectCrud;
     private UserCrud userCrud;
@@ -30,7 +25,7 @@ public class createRecipeCommand {
         this.objectRelationshipService = objectRelationshipService;
     }
 
-    public SuperAppObjectBoundary createRecipe(MiniAppCommandBoundary commandBoundary) {
+    public SuperAppObjectBoundary execute(MiniAppCommandBoundary commandBoundary) {
         // 1. find the dietitian object
         // 2. add new recipe to the dietitian object
         String superapp = commandBoundary.getCommandId().getSuperapp();
@@ -42,10 +37,9 @@ public class createRecipeCommand {
         IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
 
         dietitian.insertToObjectDetails(ingredient);
-        //SuperAppObjectBoundary
+
         objectRelationshipService.updateObject(superapp,dietitian.getObjectId().getInternalObjectId(),dietitian,superapp,email);
 
         return dietitian;
     }
-
 }
