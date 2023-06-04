@@ -7,7 +7,7 @@ import superapp.data.MiniAppCommandEntity;
 
 import java.util.List;
 
-public interface MiniAppCommandRepository
+public interface MiniAppCommandCrud
         extends MongoRepository<MiniAppCommandEntity, CommandId> {
 	
 	List<MiniAppCommandEntity> findAllByCommandIdMiniapp(String miniapp, Pageable pageable);

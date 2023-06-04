@@ -9,8 +9,8 @@ import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.Boundary.User.UserId;
 import superapp.Boundary.Location;
 import superapp.Boundary.ObjectId;
-import superapp.dal.SuperAppObjectRepository;
-import superapp.dal.UserRepository;
+import superapp.dal.SuperAppObjectCrud;
+import superapp.dal.UserCrud;
 import superapp.data.UserRole;
 import superapp.data.SuperAppObjectEntity;
 import superapp.data.UserEntity;
@@ -33,16 +33,16 @@ import java.util.*;
 @Service
 public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService, ObjectServicePaginationSupported, ObjectsService {
 
-    private final SuperAppObjectRepository objectRepository;
+    private final SuperAppObjectCrud objectRepository;
     private String springAppName;
     private final UserUtility userUtility;
     private final SuperAppObjectUtility superAppObjectUtility;
 
     @Autowired
-    public ObjectServiceRepo(SuperAppObjectRepository objectRepository, UserRepository userRepository) {
+    public ObjectServiceRepo(SuperAppObjectCrud objectRepository, UserCrud userCrud) {
 
         this.objectRepository = objectRepository;
-        this.userUtility = new UserUtility(userRepository);
+        this.userUtility = new UserUtility(userCrud);
         this.superAppObjectUtility = new SuperAppObjectUtility(objectRepository);
     }
 

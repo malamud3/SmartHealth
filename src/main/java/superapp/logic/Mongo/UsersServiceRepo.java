@@ -17,20 +17,19 @@ import superapp.logic.Exceptions.PermissionDeniedException;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.dal.UserRepository;
+import superapp.dal.UserCrud;
 import superapp.data.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
 import superapp.data.UserEntity;
 import jakarta.annotation.PostConstruct;
 import superapp.logic.service.UserServices.UsersServiceWithAdminPermission;
-import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 
 
 @Service
 
 public class UsersServiceRepo implements UsersServiceWithAdminPermission {
-    private final UserRepository userRepository;
+    private final UserCrud userCrud;
     private final MongoTemplate mongoTemplate;
     private final UserUtility userUtility;
     private  JmsTemplate jmsTemplate ;
@@ -38,10 +37,10 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
 
     @Autowired
-    public UsersServiceRepo(UserRepository userRepository, MongoTemplate mongoTemplate) {
-        this.userRepository = userRepository;
+    public UsersServiceRepo(UserCrud userCrud, MongoTemplate mongoTemplate) {
+        this.userCrud = userCrud;
         this.mongoTemplate = mongoTemplate;
-        this.userUtility = new UserUtility(userRepository);
+        this.userUtility = new UserUtility(userCrud);
     }
 
     @Autowired
@@ -76,7 +75,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
          UserBoundary user = new UserBoundary(newUser, springAppName);
          UserEntity userEntity = boundaryToEntity(user);
-         userEntity = userRepository.save(userEntity);
+         userEntity = userCrud.save(userEntity);
 
          // Sending JMS message
          String message = "New user created: " + user.getUserId();
@@ -123,7 +122,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         	userEntity.setAvatar(update.getAvatar());
         }
 
-        userEntity = userRepository.save(userEntity);
+        userEntity = userCrud.save(userEntity);
 
             // Sending JMS message
             String message = "User updated: " + userEntity.getUserId();
@@ -147,7 +146,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
             throw new PermissionDeniedException("You do not have permission to get all users");
         }
 
-        Page<UserEntity> userPage = userRepository.findAll(PageRequest.of(page,size, Sort.Direction.ASC , "id"));
+        Page<UserEntity> userPage = userCrud.findAll(PageRequest.of(page,size, Sort.Direction.ASC , "id"));
 
         return userPage.getContent().stream()
                 .map(this::entityToBoundary)
@@ -179,7 +178,7 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         if (!userEntity.getRole().equals(UserRole.ADMIN) ) {
             throw new PermissionDeniedException("You do not have permission to delete all users");
         }
-        this.userRepository.deleteAll();
+        this.userCrud.deleteAll();
     }
 
 

@@ -1,28 +1,26 @@
 package superapp.logic.utilitys;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.dal.SuperAppObjectRepository;
-import superapp.dal.UserRepository;
+import superapp.dal.UserCrud;
 import superapp.data.UserEntity;
 import superapp.data.UserRole;
 import superapp.logic.Exceptions.UserNotFoundException;
-import superapp.logic.Mongo.ObjectServiceRepo;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 public class UserUtility {
-    private UserRepository userRepository;
+    private UserCrud userCrud;
+
 
     @Autowired
-    public UserUtility( UserRepository userRepository) {
+    public UserUtility( UserCrud userCrud) {
 
-        this.userRepository = userRepository;
+        this.userCrud = userCrud;
     }
 
 
@@ -44,7 +42,7 @@ public class UserUtility {
     }
 
     public UserEntity checkUserExist(UserId userId){
-        return userRepository.findByUserId(userId)
+        return userCrud.findByUserId(userId)
                 .orElseThrow(()->new UserNotFoundException("inserted id: "
                         + userId.getEmail() + userId.getSuperapp() + " does not exist"));
     }
@@ -73,7 +71,7 @@ public class UserUtility {
 
         // Check if the user already exists
         UserId userId = new UserId(springAppName,newUser.getEmail());
-        if (userRepository.findByUserId(userId).isPresent()) {
+        if (userCrud.findByUserId(userId).isPresent()) {
             throw new RuntimeException("User with email " + newUser.getEmail() + " already exists");
         }
 

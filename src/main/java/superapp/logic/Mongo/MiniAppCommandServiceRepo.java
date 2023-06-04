@@ -10,9 +10,9 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
-import superapp.dal.MiniAppCommandRepository;
-import superapp.dal.SuperAppObjectRepository;
-import superapp.dal.UserRepository;
+import superapp.dal.MiniAppCommandCrud;
+import superapp.dal.SuperAppObjectCrud;
+import superapp.dal.UserCrud;
 import superapp.data.UserRole;
 import superapp.data.MiniAppCommandEntity;
 import superapp.data.SuperAppObjectEntity;
@@ -32,12 +32,12 @@ import java.util.*;
 public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdminPermission {
 
 	private  String springApplicationName;
-	private final MiniAppCommandRepository commandRepository;
-	private final UserRepository userRepository;//for permission checks
+	private final MiniAppCommandCrud commandRepository;
+	private final UserCrud userCrud;//for permission checks
 	private final MongoTemplate mongoTemplate;
 	private final UserUtility userUtility;
 
-	private final SuperAppObjectRepository objectRepository;
+	private final SuperAppObjectCrud objectRepository;
 
 	private JmsTemplate jmsTemplate;
 
@@ -123,13 +123,13 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 	@Autowired
 	public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-			MiniAppCommandRepository repository, ObjectMapper jackson, UserRepository userRepository, SuperAppObjectRepository objectRepository) {
+									 MiniAppCommandCrud repository, ObjectMapper jackson, UserCrud userCrud, SuperAppObjectCrud objectRepository) {
 
 		this.commandRepository = repository;
-		this.userRepository = userRepository;
+		this.userCrud = userCrud;
 		this.mongoTemplate = mongoTemplate;
 		this.jackson = jackson;
-		this.userUtility = new UserUtility(userRepository);
+		this.userUtility = new UserUtility(userCrud);
 		this.objectRepository = objectRepository;
 	}
 

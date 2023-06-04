@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.ObjectId;
 import superapp.Boundary.SuperAppObjectBoundary;
-import superapp.dal.SuperAppObjectRepository;
-import superapp.dal.UserRepository;
+import superapp.dal.SuperAppObjectCrud;
 import superapp.data.SuperAppObjectEntity;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 
@@ -13,16 +12,16 @@ import superapp.logic.Exceptions.ObjectNotFoundException;
 public class SuperAppObjectUtility {
 
 
-    private final SuperAppObjectRepository superAppObjectRepository;
+    private final SuperAppObjectCrud superAppObjectCrud;
 
     @Autowired
-    public SuperAppObjectUtility( SuperAppObjectRepository superAppObjectRepository) {
+    public SuperAppObjectUtility( SuperAppObjectCrud superAppObjectCrud) {
 
-        this.superAppObjectRepository = superAppObjectRepository;
+        this.superAppObjectCrud = superAppObjectCrud;
     }
 
     public SuperAppObjectEntity checkSuperAppObjectEntityExist(ObjectId objectId) {
-        return superAppObjectRepository.findById(objectId)
+        return superAppObjectCrud.findById(objectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Object "+objectId.getInternalObjectId() +" not found"));
     }
 

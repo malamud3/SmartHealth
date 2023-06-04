@@ -7,7 +7,7 @@ import superapp.data.UserEntity;
 import java.util.Optional;
 
 
-public interface UserRepository
+public interface UserCrud
         extends MongoRepository<UserEntity, UserId> {
 
         Optional<UserEntity> findByUserId(UserId userId);
