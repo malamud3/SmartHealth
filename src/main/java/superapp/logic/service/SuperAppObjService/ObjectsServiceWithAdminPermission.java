@@ -6,7 +6,7 @@ import superapp.Boundary.SuperAppObjectBoundary;
 import java.util.List;
 import java.util.Optional;
 
-public interface ObjectsServiceWithAdminPermission extends ObjectsService, ObjectServicePaginationSupported {
+public interface ObjectsServiceWithAdminPermission extends ObjectServicePaginationSupported {
 
 	//pagination Support
 

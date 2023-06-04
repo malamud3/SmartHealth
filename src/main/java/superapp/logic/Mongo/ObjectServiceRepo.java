@@ -31,7 +31,7 @@ import java.util.*;
 
 
 @Service
-public class ObjectServiceRepo implements ObjectsServiceWithAdminPermission, SuperAppObjectRelationshipService, ObjectServicePaginationSupported, ObjectsService {
+public class ObjectServiceRepo implements SuperAppObjectRelationshipService {
 
     private final SuperAppObjectRepository objectRepository;
     private String springAppName;
