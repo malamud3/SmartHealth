@@ -57,10 +57,7 @@ public class createRecipeCommand implements Command {
         SuperAppObjectBoundary dietitian = (SuperAppObjectBoundary)miniAppCommandBoundary.getCommandAttributes().get("userObj");
         IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
         dietitian.insertToObjectDetails(ingredient);
-<<<<<<< HEAD
 
-=======
->>>>>>> master3
         objectRelationshipService.updateObject(superapp,dietitian.getObjectId().getInternalObjectId(),dietitian,superapp,email);
     }
 }
