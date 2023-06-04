@@ -19,9 +19,6 @@ import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import superapp.logic.service.SuperAppObjService.ObjectServicePaginationSupported;
-import superapp.logic.service.SuperAppObjService.ObjectsService;
-import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.SuperAppObjectUtility;
@@ -117,7 +114,7 @@ public class ObjectServiceRepo implements SuperAppObjectRelationshipService {
     public SuperAppObjectBoundary getSpecificObject(String superAppId, String internal_obj_id, String userSuperApp, String userEmail) throws RuntimeException {
         UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
 
-        SuperAppObjectEntity objectEntity = superAppObjectUtility.checkSuperAppObjectEntityExist(new ObjectId(springAppName, internal_obj_id));
+        superAppObjectUtility.checkSuperAppObjectEntityExist(new ObjectId(springAppName, internal_obj_id));
 
         if (userEntity.getRole().equals(UserRole.SUPERAPP_USER)) {
             SuperAppObjectEntity entity = objectRepository
