@@ -5,7 +5,7 @@ import superapp.logic.service.UserServices.UsersService;
 
 import java.util.List;
 
-public interface UsersServiceWithAdminPermission extends UsersService {
+public interface UsersServiceWithAdminPermission extends UsersServiceWithNewUser {
 
 	public void deleteAllUsers(String userSuperApp, String userEmail) throws RuntimeException;
 

@@ -1,42 +1,37 @@
 package superapp;
 
 import jakarta.annotation.PostConstruct;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import superapp.Boundary.CreatedBy;
 import superapp.Boundary.Location;
-import superapp.Boundary.ObjectId;
 import superapp.Boundary.SuperAppObjectBoundary;
+import superapp.Boundary.User.NewUserBoundary;
+import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
-import superapp.data.SuperAppObjectEntity;
-import superapp.logic.Mongo.ObjectServiceRepo;
-
 import java.util.Date;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class RelationshipTests {
 
     private RestTemplate restTemplate;
-    private ObjectServiceRepo objectServiceRepo;
     private String baseUrl;
     private int port;
-    private String springAppName;
+    private UserId adminUserId;
 
-    @Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
-    public void setSpringApplicationName(String springApplicationName) {
-        this.springAppName = springApplicationName;
-    }
 
     @LocalServerPort
     public void setPort(int port) {
@@ -48,75 +43,174 @@ public class RelationshipTests {
     public void setup() {
         this.restTemplate = new RestTemplate();
         this.restTemplate = new RestTemplate();
-        this.baseUrl = "http://localhost:" + this.port+"/superapp";
+        this.baseUrl = "http://localhost:" + this.port;
     }
+    
+    @BeforeEach
+	private void createAdminUser() {
+		NewUserBoundary newAdminBoundary = new NewUserBoundary();
+		newAdminBoundary.setAvatar("admin_avatar");
+		newAdminBoundary.setRole("ADMIN");
+		newAdminBoundary.setEmail("admin@example.com");
+		newAdminBoundary.setUsername("admin_userName");
 
-    @AfterEach
-//	@BeforeEach
-    public void tearDown () {
-        this.restTemplate
-                .delete(this.baseUrl);
-    }
+		adminUserId = this.restTemplate.postForObject(
+				this.baseUrl + "/superapp/users",
+				newAdminBoundary,
+				UserBoundary.class
+				).getUserId();
 
-    @Test
-    @DisplayName("test relationship many to many")
-    public void testRelationshipSettingBetweenMessages() throws Exception{
-        // GIVEN the database already contains 2 messages
-
-        SuperAppObjectBoundary boundaryParent = new SuperAppObjectBoundary("superapp", "123");
-        boundaryParent.setType("exampleType");
-        boundaryParent.setAlias("exampleAlias");
-        boundaryParent.setActive(true);
-        Date now = new Date();
-        boundaryParent.setCreationTimestamp(now);
-        boundaryParent.setLocation(new Location(1.0, 2.0));
-        boundaryParent.setCreatedBy(new CreatedBy((new UserId("2023b.gil.azani", "gil2@gmail.com"))));
-        boundaryParent.setObjectDetails(Map.of("exampleKey", "exampleValue"));
-
-        // WHEN a POST request is sent to create the object
-        SuperAppObjectBoundary parent = this.restTemplate.postForObject(
-                this.baseUrl+"/objects",
-                boundaryParent,
-                SuperAppObjectBoundary.class
-        );
-
-        SuperAppObjectBoundary boundaryChild = new SuperAppObjectBoundary("superapp", "1234");
-        boundaryChild.setType("exampleType");
-        boundaryChild.setAlias("exampleAlias");
-        boundaryChild.setActive(true);
-        now = new Date();
-        boundaryChild.setCreationTimestamp(now);
-        boundaryChild.setLocation(new Location(1.0, 2.0));
-        boundaryChild.setCreatedBy(new CreatedBy((new UserId("2023b.gil.azani", "gil2@gmail.com"))));
-        boundaryChild.setObjectDetails(Map.of("exampleKey", "exampleValue"));
-
-        // WHEN a POST request is sent to create the object
-        superapp.Boundary.SuperAppObjectBoundary child = this.restTemplate.postForObject(
-                this.baseUrl +"/objects" ,
-                boundaryChild,
-                superapp.Boundary.SuperAppObjectBoundary.class
-        );
+	}
 
 
-        // WHEN I PUT {superapp}/{internalObjectId}/children
-        assert child != null;
-        assert parent != null;
-        this.restTemplate
-                .put(this.baseUrl + "/objects/{superapp}/{internalObjectId}/children",
-                      boundaryChild.getObjectId(),springAppName, parent.getObjectId().getInternalObjectId());
+	@AfterEach
+	public void tearDown() {	
+		//clean the superappObjects collection
+		this.restTemplate
+		.delete(this.baseUrl + "/superapp/admin/objects?userSuperapp={userSuperapp}&userEmail={userEmail}",
+				adminUserId.getSuperapp(), adminUserId.getEmail()); 
 
-        // THEN a relationship will be created between objects
-        SuperAppObjectBoundary[] children =
-                this.restTemplate
-                        .getForObject(this.baseUrl + "/objects/{superapp}/{internalObjectId}/children", SuperAppObjectBoundary[].class,
-                                parent.getObjectId().getInternalObjectId());
+		//clean the usersObjects DB
+		this.restTemplate
+		.delete(this.baseUrl + "/superapp/admin/users?userSuperapp={userSuperapp}&userEmail={userEmail}",
+				adminUserId.getSuperapp(), adminUserId.getEmail());
+	}
+	
+	@Test
+	@DisplayName("test create relationship")
+	public void testCreateRelationship() {
+		//GIVEN the database is up
+		//AND there are 2 SuperappObjects in  the server
+		//AND a SUPERAPP_USER
+		
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER");
+		
+		UserId userId = superappUser.getUserId();
+		
+		SuperAppObjectBoundary parentObjectBoundary = createExampleSuperappObject("parentType", "parentAlias", true, userId);
+		
+		SuperAppObjectBoundary childObjectBoundary = createExampleSuperappObject("childType", "childAlias", true, userId);
+		
+		//WHEN I PUT /superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email} to bind parent and child
+		
+		this.restTemplate.put(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email}",
+				childObjectBoundary.getObjectId(), parentObjectBoundary.getObjectId().getSuperapp(), parentObjectBoundary.getObjectId().getInternalObjectId(),
+				userId.getSuperapp(), userId.getEmail());
+		
+		//THEN GET All children of parentObject should contain only the child object
+		//AND GET ALL parents of childObject should contain only the parent object
+		
+		SuperAppObjectBoundary[] children = this.restTemplate.getForObject(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email}",
+				SuperAppObjectBoundary[].class, parentObjectBoundary.getObjectId().getSuperapp(), parentObjectBoundary.getObjectId().getInternalObjectId(),
+				userId.getSuperapp(), userId.getEmail());
+		
+		SuperAppObjectBoundary[] parents = this.restTemplate.getForObject(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}/parents?userSuperapp={userSuperapp}&userEmail={email}",
+				SuperAppObjectBoundary[].class, childObjectBoundary.getObjectId().getSuperapp(), childObjectBoundary.getObjectId().getInternalObjectId(),
+				userId.getSuperapp(), userId.getEmail());
+		
+		assertThat(children)
+		.hasSize(1)
+		.contains(childObjectBoundary);
+		
+		assertThat(parents)
+		.hasSize(1)
+		.contains(parentObjectBoundary);
+	}
+	
+	@Test
+	@DisplayName("test miniappUser create relationship")
+	public void testMiniappUserCreateRelationship() {
+		//GIVEN the database is up
+		//AND there are 2 SuperappObjects in  the server
+		//AND a MINIAPP_USER and a SUPERAPP_USER (to create the objects)
+		
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER");
+		
+		UserBoundary miniappUser = createExampleUser("MINIAPP_USER");
+		
+		UserId userId = miniappUser.getUserId();
+		
+		SuperAppObjectBoundary parentObjectBoundary = createExampleSuperappObject("parentType", "parentAlias",
+				true, superappUser.getUserId());
+		
+		SuperAppObjectBoundary childObjectBoundary = createExampleSuperappObject("childType", "childAlias",
+				true, superappUser.getUserId());
+		
+		//WHEN I PUT /superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email} to bind parent and child
+		
+		HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> {
+		    this.restTemplate.put(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email}",
+		        childObjectBoundary.getObjectId(), parentObjectBoundary.getObjectId().getSuperapp(), parentObjectBoundary.getObjectId().getInternalObjectId(),
+		        userId.getSuperapp(), userId.getEmail());
+		});
 
-        Assertions.assertThat(children)
-                .isNotNull()
-                .isNotEmpty()
-                .usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(child);
-    }
+		 //THEN an HTTP FORBIDDEN (403 error code) thrown
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+	
+	@Test
+	@DisplayName("test Admin create relationship")
+	public void testAdminUserCreateRelationship() {
+		//GIVEN the database is up
+		//AND there are 2 SuperappObjects in  the server
+		//AND a ADMIN and a SUPERAPP_USER (to create the objects)
+		
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER");
+		
+		UserBoundary adminUser = createExampleUser("ADMIN");
+		
+		UserId userId = adminUser.getUserId();
+		
+		SuperAppObjectBoundary parentObjectBoundary = createExampleSuperappObject("parentType", "parentAlias",
+				true, superappUser.getUserId());
+		
+		SuperAppObjectBoundary childObjectBoundary = createExampleSuperappObject("childType", "childAlias",
+				true, superappUser.getUserId());
+		
+		//WHEN I PUT /superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email} to bind parent and child
+		
+		HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> {
+		    this.restTemplate.put(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}/children?userSuperapp={userSuperapp}&userEmail={email}",
+		        childObjectBoundary.getObjectId(), parentObjectBoundary.getObjectId().getSuperapp(), parentObjectBoundary.getObjectId().getInternalObjectId(),
+		        userId.getSuperapp(), userId.getEmail());
+		});
 
+		 //THEN an HTTP FORBIDDEN (403 error code) thrown
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+	
+	
+	private SuperAppObjectBoundary createExampleSuperappObject(String type, String alias, boolean active, UserId creatorId) {
+		SuperAppObjectBoundary newParentObjectBoundary = new SuperAppObjectBoundary();
+		newParentObjectBoundary.setType(type);
+		newParentObjectBoundary.setAlias(alias);
+		newParentObjectBoundary.setActive(active);
+		newParentObjectBoundary.setCreationTimestamp(new Date());
+		newParentObjectBoundary.setLocation(new Location(1.0, 2.0));
+		newParentObjectBoundary.setCreatedBy(new CreatedBy((creatorId)));
+		newParentObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
+
+
+		return this.restTemplate.postForObject(
+				this.baseUrl + "/superapp/objects",
+				newParentObjectBoundary,
+				SuperAppObjectBoundary.class
+				);
+		
+		
+	}
+
+	private UserBoundary createExampleUser(String role) {
+		NewUserBoundary newSuperappBoundary = new NewUserBoundary();
+		newSuperappBoundary.setAvatar("example_avatar");
+		newSuperappBoundary.setRole(role);
+		newSuperappBoundary.setEmail(role + "@example.com");
+		newSuperappBoundary.setUsername("superapp_userName");
+
+		return this.restTemplate.postForObject(
+				this.baseUrl + "/superapp/users",
+				newSuperappBoundary,
+				UserBoundary.class);
+	}
 
 }

@@ -138,7 +138,7 @@ public class SuperAppObjectEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectId, type, alias, active, creationTimestamp, location, createdBy, objectDetails, parentObjects, childObjects);
+        return Objects.hash(objectId);
     }
 
     @Override

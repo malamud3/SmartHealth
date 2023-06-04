@@ -65,26 +65,30 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
 
 
-
-
     @Async
     @Override
-    public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
-        try {
-            userUtility.validateUser(newUser,springAppName);
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+	public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
+    	 try {
+             userUtility.validateUser(newUser,springAppName);
+         } catch (RuntimeException e) {
+             throw new IllegalArgumentException(e.getMessage());
+         }
 
-        UserBoundary user = new UserBoundary(newUser, springAppName);
-        UserEntity userEntity = boundaryToEntity(user);
-        userEntity = userRepository.save(userEntity);
+         UserBoundary user = new UserBoundary(newUser, springAppName);
+         UserEntity userEntity = boundaryToEntity(user);
+         userEntity = userRepository.save(userEntity);
 
-        // Sending JMS message
-        String message = "New user created: " + user.getUserId();
-        jmsTemplate.convertAndSend("userQueue", message);
+         // Sending JMS message
+         String message = "New user created: " + user.getUserId();
+         jmsTemplate.convertAndSend("userQueue", message);
 
-        return entityToBoundary(userEntity);
+         return entityToBoundary(userEntity);
+	}
+
+    @Deprecated
+    @Override
+    public UserBoundary createUser(UserBoundary newUser) throws RuntimeException {
+    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");  
     }
 
     @Override
@@ -238,5 +242,6 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         return rv;
 
     }
+
 
 }

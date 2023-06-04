@@ -3,6 +3,8 @@ package superapp.controller;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.logic.service.UserServices.UsersService;
+import superapp.logic.service.UserServices.UsersServiceWithNewUser;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UsersRelatedAPIController {
-	private final UsersService usersService;
+	private final UsersServiceWithNewUser usersService;
 	private String springAppName;
 
 
@@ -22,7 +24,7 @@ public class UsersRelatedAPIController {
 	}
 
 	@Autowired
-	public UsersRelatedAPIController(UsersService usersService) {
+	public UsersRelatedAPIController(UsersServiceWithNewUser usersService) {
 		super();
 		this.usersService = usersService;
 	}
@@ -35,6 +37,7 @@ public class UsersRelatedAPIController {
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 
 	public UserBoundary createUser(@RequestBody NewUserBoundary user) throws RuntimeException {
+		
 		return this.usersService.createUser(user);
 	}
 
