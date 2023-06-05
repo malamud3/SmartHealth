@@ -99,6 +99,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	public Object asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
 		miniAppCommandBoundary.setInvocationTimestamp(new Date());
 		validateMiniappCommand(miniAppCommandBoundary);
+		UserEntity userEntity = userUtility.checkUserExist(miniAppCommandBoundary.getInvokedBy().getUserId());
+
 		try {
 			String json = this.jackson
 					.writeValueAsString(miniAppCommandBoundary);
@@ -108,11 +110,19 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			this.jmsTemplate
 			.convertAndSend("InvocationMiniAppQueue", json);
 
-			return createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
 
+			if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
+
+				createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
+
+				MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
+				entity = this.commandRepository.save(entity);
+				return this.entityToBoundary(entity);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		throw new RuntimeException("Cant Invoke");
 	}
 
 
