@@ -1,30 +1,23 @@
 package superapp.miniapps.commands.dietitiansHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
-import superapp.dal.SuperAppObjectCrud;
-import superapp.dal.UserCrud;
 import superapp.data.IngredientEntity;
-import superapp.data.UserEntity;
 import superapp.logic.Mongo.ObjectServiceRepo;
 import superapp.logic.service.SpoonaculerService;
-import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
-import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.Command;
 
 @Component("createRecipe")
 public class createRecipeCommand implements Command {
-    private SpoonaculerService spoonaculerService;
-    private SuperAppObjectRelationshipService objectRelationshipService;
+    //private final  SpoonaculerService spoonaculerService;
+    private final  ObjectServiceRepo objectServiceRepo;
 
     @Autowired
-    public createRecipeCommand(SuperAppObjectRelationshipService objectRelationshipService, SpoonaculerService spoonaculerService) {
-        this.spoonaculerService = spoonaculerService;
-        this.objectRelationshipService = objectRelationshipService;
+    public createRecipeCommand(ObjectServiceRepo objectServiceRepo, SpoonaculerService spoonaculerService) {
+      //  this.spoonaculerService = spoonaculerService;
+        this.objectServiceRepo = objectServiceRepo;
     }
 
 
@@ -55,9 +48,10 @@ public class createRecipeCommand implements Command {
         String email = miniAppCommandBoundary.getInvokedBy().getUserId().getEmail();
 
         SuperAppObjectBoundary dietitian = (SuperAppObjectBoundary)miniAppCommandBoundary.getCommandAttributes().get("userObj");
-        IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
+        //IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
+        String ingredient = "asdfas";
         dietitian.insertToObjectDetails(ingredient);
 
-        objectRelationshipService.updateObject(superapp,dietitian.getObjectId().getInternalObjectId(),dietitian,superapp,email);
+        objectServiceRepo.updateObject(superapp,dietitian.getObjectId().getInternalObjectId(),dietitian,superapp,email);
     }
 }

@@ -49,10 +49,6 @@ extends MongoRepository<SuperAppObjectEntity, ObjectId> {
 
 	List<SuperAppObjectEntity> findByChildObjectsContainingAndActiveIsTrue(SuperAppObjectEntity childObject, Pageable pageable);
 
-
-
-
-
 }
 
 
