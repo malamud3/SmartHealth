@@ -19,12 +19,14 @@ import superapp.data.SuperAppObjectEntity;
 import superapp.data.UserEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import superapp.logic.Exceptions.*;
 import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPermission;
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
+import superapp.miniapps.commands.Command;
 import superapp.miniapps.commands.CommandsEnum;
 import superapp.miniapps.commands.RecipesCommandFactory;
 
@@ -45,6 +47,13 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private JmsTemplate jmsTemplate;
 
 	private ObjectMapper jackson;
+	
+	private ApplicationContext applicationContext;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
 
 
@@ -163,7 +172,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			if (miniAppCommandBoundary.getCommandAttributes() == null) {
 				miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
 			}else {
-				recipesCommandFactory.createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()),miniAppCommandBoundary);
+				invoke(miniAppCommandBoundary.getCommand(), miniAppCommandBoundary);
+				//recipesCommandFactory.createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()),miniAppCommandBoundary);
 			}
 
 			MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
@@ -172,6 +182,25 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 		}
 		throw new ObjectBadRequest("Can't invoke");
 	}
+
+
+
+	private Object invoke(String command, MiniAppCommandBoundary miniAppCommandBoundary) {
+		Command commandBean = null;
+		
+		try {
+			commandBean = this.applicationContext
+					.getBean(command.toString(), Command.class);
+		}catch (Exception e) {
+			//command = this.default;
+			System.out.println("Unknown command");
+		}
+
+        return commandBean.execute(miniAppCommandBoundary);
+
+    }
+		
+	
 
 
 
