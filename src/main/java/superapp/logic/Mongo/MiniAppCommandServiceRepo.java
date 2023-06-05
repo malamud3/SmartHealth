@@ -27,8 +27,7 @@ import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPerm
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.Command;
-import superapp.miniapps.commands.CommandsEnum;
-import superapp.miniapps.commands.RecipesCommandFactory;
+import superapp.miniapps.commands.dietitiansHelper.RecipesCommandFactory;
 
 import java.util.*;
 
@@ -47,7 +46,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private JmsTemplate jmsTemplate;
 
 	private ObjectMapper jackson;
-	
+
 	private ApplicationContext applicationContext;
 
     @Autowired
@@ -187,7 +186,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 	private Object invoke(String command, MiniAppCommandBoundary miniAppCommandBoundary) {
 		Command commandBean = null;
-		
+
 		try {
 			commandBean = this.applicationContext
 					.getBean(command.toString(), Command.class);
@@ -198,8 +197,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
         return commandBean.execute(miniAppCommandBoundary);
 
     }
-		
-	
+
+
 
 
 

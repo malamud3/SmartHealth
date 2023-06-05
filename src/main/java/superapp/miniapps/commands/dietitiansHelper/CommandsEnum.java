@@ -1,4 +1,4 @@
-package superapp.miniapps.commands;
+package superapp.miniapps.commands.dietitiansHelper;
 
 public enum CommandsEnum {
 
