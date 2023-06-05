@@ -9,7 +9,6 @@ import superapp.Boundary.User.UserId;
 import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPermission;
 import superapp.logic.service.SuperAppObjService.ObjectsServiceWithAdminPermission;
 import superapp.logic.service.UserServices.UsersServiceWithAdminPermission;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -73,7 +72,7 @@ public class AdminRelatedAPIController {
 	public List<UserBoundary> exportAllUsers(
 			@RequestParam(name = "userSuperapp",required = true) String userSuperApp,
 			@RequestParam(name ="userEmail",required = true) String email,
-			@RequestParam(name = "size" , required = false , defaultValue = "8") int size,
+			@RequestParam(name = "size" , required = false , defaultValue = "3") int size,
 			@RequestParam(name = "page" , required = false , defaultValue = "0") int page)
 			throws RuntimeException {
 		return userService.exportAllUsers(userSuperApp, email, size, page);
@@ -87,7 +86,7 @@ public class AdminRelatedAPIController {
 	public List<MiniAppCommandBoundary> exportAllMiniAppsHistory(
 			@RequestParam(name = "userSuperapp" , required = true ) String userSuperApp,
 			@RequestParam(name ="userEmail",required = true ) String userEmail,
-			@RequestParam(name="size" , defaultValue = "10" , required = false) int size ,
+			@RequestParam(name="size" , defaultValue = "3" , required = false) int size ,
 			@RequestParam(name = "page", defaultValue = "0" , required = false) int page){
 
 		return miniAppCommandService.exportAllCommands(userSuperApp,userEmail,size,page);
@@ -102,7 +101,7 @@ public class AdminRelatedAPIController {
 			@PathVariable("miniAppName") String miniapp ,
 			@RequestParam(name = "userSuperapp" , required = true ) String userSuperApp,
 			@RequestParam(name ="userEmail",required = true ) String userEmail,
-			@RequestParam(name="size" , defaultValue = "10" , required = false) int size ,
+			@RequestParam(name="size" , defaultValue = "1" , required = false) int size ,
 			@RequestParam(name = "page", defaultValue = "0" , required = false) int page)
 	{
 
