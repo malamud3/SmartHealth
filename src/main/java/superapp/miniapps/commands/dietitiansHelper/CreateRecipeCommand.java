@@ -4,24 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
+import superapp.dal.SuperAppObjectCrud;
+import superapp.dal.UserCrud;
 import superapp.logic.Mongo.ObjectServiceRepo;
-import superapp.logic.service.SpoonaculerService;
 import superapp.miniapps.commands.Command;
 
 @Component("createRecipe")
 public class CreateRecipeCommand implements Command {
     //private final  SpoonaculerService spoonaculerService;
     private ObjectServiceRepo objectServiceRepo;
+    private SuperAppObjectCrud objectRepository;
+    private UserCrud userCrud;
 
     @Autowired
-    public CreateRecipeCommand(ObjectServiceRepo objectServiceRepo) {
-      //  this.spoonaculerService = spoonaculerService;
-        this.objectServiceRepo = objectServiceRepo;
+    public CreateRecipeCommand(SuperAppObjectCrud objectRepository,UserCrud userCrud) {
+        this.objectRepository = objectRepository;
+        this.userCrud = userCrud;
+        //  this.spoonaculerService = spoonaculerService;
+        this.objectServiceRepo = new ObjectServiceRepo(this.objectRepository,userCrud);
     }
 
 
 
-    public CreateRecipeCommand() {
+    public CreateRecipeCommand(UserCrud userCrud) {
+
     }
 //    public SuperAppObjectBoundary createRecipe(MiniAppCommandBoundary commandBoundary) {
 //        // 1. find the dietitian object
