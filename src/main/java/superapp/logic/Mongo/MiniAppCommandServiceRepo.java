@@ -48,7 +48,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private ObjectMapper jackson;
 
 	private ApplicationContext applicationContext;
-	
+
 
     @Autowired
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -342,8 +342,4 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 		return entity;
 	}
-
-
-
-
 }
