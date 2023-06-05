@@ -7,7 +7,7 @@ import superapp.Boundary.MiniAppCommandBoundary;
 public interface MiniAppCommandService {
 
 
-        public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) throws RuntimeException;
+        public Object invokeCommand(MiniAppCommandBoundary MiniAppCommandBoundary) throws RuntimeException;
 
 
         @Deprecated

@@ -29,7 +29,7 @@ public class GetAllRecipeCommand implements Command {
         // 2. add new recipe to the dietitian object
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        dietitian.getObjectDetails().get(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
+        dietitian.getObjectDetails().values();
         objectRepository.save(dietitian);
 
         //entity to boundary

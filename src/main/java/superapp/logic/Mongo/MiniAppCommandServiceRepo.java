@@ -50,10 +50,10 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private ApplicationContext applicationContext;
 
 
-    @Autowired
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+	@Autowired
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
 
 
@@ -65,7 +65,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 	@Autowired
 	public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-									 MiniAppCommandCrud repository, ObjectMapper jackson, UserCrud userCrud, SuperAppObjectCrud objectRepository) {
+			MiniAppCommandCrud repository, ObjectMapper jackson, UserCrud userCrud, SuperAppObjectCrud objectRepository) {
 
 		this.commandRepository = repository;
 		this.userCrud = userCrud;
@@ -96,16 +96,9 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 
 	@Override
-	public MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
-		miniAppCommandBoundary.setInvocationTimestamp(miniAppCommandBoundary.getInvocationTimestamp());
-		if (miniAppCommandBoundary.getCommandAttributes() == null) {
-			miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-		}
-		miniAppCommandBoundary.getCommandAttributes().put("status", "in-process...");
-		miniAppCommandBoundary.setCommand(miniAppCommandBoundary.getCommand());
-		miniAppCommandBoundary.setTargetObject(new TargetObject(miniAppCommandBoundary.getTargetObject().getObjectId()));
-		miniAppCommandBoundary.setInvokedBy(new InvokedBy(miniAppCommandBoundary.getInvokedBy().getUserId()));
-
+	public Object asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary) {
+		miniAppCommandBoundary.setInvocationTimestamp(new Date());
+		validateMiniappCommand(miniAppCommandBoundary);
 		try {
 			String json = this.jackson
 					.writeValueAsString(miniAppCommandBoundary);
@@ -114,7 +107,9 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			System.err.println("*** sending: " + json);
 			this.jmsTemplate
 			.convertAndSend("InvocationMiniAppQueue", json);
-			return miniAppCommandBoundary;
+
+			return createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -122,30 +117,30 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 
 	@JmsListener(destination = "InvocationMiniAppQueue")
-	public void handleInvokeMiniApp(String json) {
+	public void handleInvokeMiniApp(String json) { 
 		try {
+
 			System.err.println(
 					this.entityToBoundary(
 							this.mongoTemplate
 							.save(
 									this.boundaryToEntity(
-											this.setStatus(
-													this.jackson
-													.readValue(json, MiniAppCommandBoundary.class),
-													"accepted..AsyncDone")))));
+											this.jackson
+											.readValue(json, MiniAppCommandBoundary.class)
+											))));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private MiniAppCommandBoundary setStatus(MiniAppCommandBoundary miniAppCommandBoundary, String status) {
-		if (miniAppCommandBoundary.getCommandAttributes() == null) {
-			miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-		}
-		miniAppCommandBoundary.getCommandAttributes().put("status", status);
-
-		return miniAppCommandBoundary;
-	}
+	//	private MiniAppCommandBoundary setStatus(MiniAppCommandBoundary miniAppCommandBoundary, String status) {
+	//		if (miniAppCommandBoundary.getCommandAttributes() == null) {
+	//			miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
+	//		}
+	//		miniAppCommandBoundary.getCommandAttributes().put("status", status);
+	//
+	//		return miniAppCommandBoundary;
+	//	}
 
 
 
@@ -160,19 +155,15 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	}
 
 	@Override
-	public MiniAppCommandBoundary invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
+	public Object invokeCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
 		validateMiniappCommand(miniAppCommandBoundary);
+		miniAppCommandBoundary.setInvocationTimestamp(new Date());
 		UserEntity userEntity = userUtility.checkUserExist(miniAppCommandBoundary.getInvokedBy().getUserId());
 
 		if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
-			miniAppCommandBoundary.setInvokedBy(new InvokedBy(new UserId(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp(), miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())));
-			miniAppCommandBoundary.setTargetObject(new TargetObject(new ObjectId(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp(), miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId())));
-			miniAppCommandBoundary.setInvocationTimestamp(new Date());
-			if (miniAppCommandBoundary.getCommandAttributes() == null) {
-				miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
-			}else {
-				createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
-			}
+
+			createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
+
 			MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
 			entity = this.commandRepository.save(entity);
 			return this.entityToBoundary(entity);
@@ -192,9 +183,9 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			throw new CommandNotFoundException("could not find command: " + commandBoundary.getCommand());
 		}
 
-        return commandBean.execute(commandBoundary);
+		return commandBean.execute(commandBoundary);
 
-    }
+	}
 
 
 
@@ -233,7 +224,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			throw new PermissionDeniedException("You do not have permission to delete all commands");
 		}
 		this.commandRepository.deleteAll();
-		}
+	}
 
 
 	@Override
@@ -246,7 +237,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 		}
 
 		return this.commandRepository
-				.findAll(PageRequest.of(page, size, Sort.Direction.ASC,"invocationTimestamp‏"))
+				.findAll(PageRequest.of(page, size, Sort.Direction.DESC,"invocationTimestamp‏"))
 				.stream() // Stream<CommandEntity>
 				.map(this::entityToBoundary) // Stream<CommandBoundary>
 				.toList(); // List<CommandBoundary>

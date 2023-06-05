@@ -7,7 +7,7 @@ import superapp.logic.Exceptions.PermissionDeniedException;
 
 public interface MiniAppCommandServiceWithAsyncSupport extends MiniAppCommandService {
 
-    public MiniAppCommandBoundary asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary);
+    public Object asyncHandle(MiniAppCommandBoundary miniAppCommandBoundary);
     
     List<MiniAppCommandBoundary> exportSpecificCommands(String miniAppName, String userSuperApp, String userEmail, int size, int page) throws PermissionDeniedException;
 
