@@ -1,8 +1,9 @@
-package superapp.miniapps.commands.dietitiansHelper;
+package superapp.miniapps.commands;
 
 import superapp.Boundary.MiniAppCommandBoundary;
+import superapp.miniapps.commands.dietitiansHelper.CommandsEnum;
 
-public interface RecipesCommandInterface {
+public interface CommandInterface {
     public Object createCommand(CommandsEnum commandsEnum, MiniAppCommandBoundary commandBoundary);
 
 

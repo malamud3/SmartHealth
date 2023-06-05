@@ -1,16 +1,14 @@
-package superapp.miniapps.commands.dietitiansHelper;
+package superapp.miniapps.commands;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.miniapps.commands.Command;
 import superapp.miniapps.commands.dietitiansHelper.CommandsEnum;
-import superapp.miniapps.commands.dietitiansHelper.RecipesCommandInterface;
 
 @Service
-public class RecipesCommandFactory implements RecipesCommandInterface {
+public class CommandFactory implements CommandInterface {
 
     private ApplicationContext applicationContext;
 
