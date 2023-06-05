@@ -27,7 +27,6 @@ import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.CommandsEnum;
 import superapp.miniapps.commands.RecipesCommandFactory;
-import superapp.miniapps.commands.dietitiansHelper.createRecipeCommand;
 
 import java.util.*;
 
@@ -39,7 +38,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private final UserCrud userCrud;//for permission checks
 	private final MongoTemplate mongoTemplate;
 	private final UserUtility userUtility;
-	private RecipesCommandFactory recipesCommandFactory;
+	private RecipesCommandFactory recipesCommandFactory = new RecipesCommandFactory();
 
 	private final SuperAppObjectCrud objectRepository;
 
@@ -160,7 +159,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			if (miniAppCommandBoundary.getCommandAttributes() == null) {
 				miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
 			}else {
-				recipesCommandFactory.createCommand(CommandsEnum.valueOf((String)miniAppCommandBoundary.getCommandAttributes().get("command")),miniAppCommandBoundary);
+				recipesCommandFactory.createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()),miniAppCommandBoundary);
 			}
 
 			MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);

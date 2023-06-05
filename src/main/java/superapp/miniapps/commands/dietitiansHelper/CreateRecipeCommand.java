@@ -1,34 +1,27 @@
 package superapp.miniapps.commands.dietitiansHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
-import superapp.dal.SuperAppObjectCrud;
-import superapp.dal.UserCrud;
 import superapp.data.IngredientEntity;
-import superapp.data.UserEntity;
-import superapp.logic.Mongo.ObjectServiceRepo;
 import superapp.logic.service.SpoonaculerService;
 import superapp.logic.service.SuperAppObjService.SuperAppObjectRelationshipService;
-import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.Command;
 
 @Component("createRecipe")
-public class createRecipeCommand implements Command {
+public class CreateRecipeCommand implements Command {
     private SpoonaculerService spoonaculerService;
     private SuperAppObjectRelationshipService objectRelationshipService;
 
     @Autowired
-    public createRecipeCommand(SuperAppObjectRelationshipService objectRelationshipService, SpoonaculerService spoonaculerService) {
+    public CreateRecipeCommand(SuperAppObjectRelationshipService objectRelationshipService, SpoonaculerService spoonaculerService) {
         this.spoonaculerService = spoonaculerService;
         this.objectRelationshipService = objectRelationshipService;
     }
 
-
-
+    public CreateRecipeCommand() {
+    }
 //    public SuperAppObjectBoundary createRecipe(MiniAppCommandBoundary commandBoundary) {
 //        // 1. find the dietitian object
 //        // 2. add new recipe to the dietitian object
@@ -53,8 +46,11 @@ public class createRecipeCommand implements Command {
         // 2. add new recipe to the dietitian object
         String superapp = miniAppCommandBoundary.getCommandId().getSuperapp();
         String email = miniAppCommandBoundary.getInvokedBy().getUserId().getEmail();
+        String id = miniAppCommandBoundary.getCommandId().getInternalCommandId();
 
-        SuperAppObjectBoundary dietitian = (SuperAppObjectBoundary)miniAppCommandBoundary.getCommandAttributes().get("userObj");
+        SuperAppObjectBoundary dietitian = objectRelationshipService.getSpecificObject(superapp,id,superapp,email);
+
+      //  (SuperAppObjectBoundary)miniAppCommandBoundary.getCommandAttributes().get("userObj");
         IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
         dietitian.insertToObjectDetails(ingredient);
 
