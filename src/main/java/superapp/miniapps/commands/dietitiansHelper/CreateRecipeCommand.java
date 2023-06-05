@@ -49,7 +49,8 @@ public class CreateRecipeCommand implements Command {
         String email = miniAppCommandBoundary.getInvokedBy().getUserId().getEmail();
         String id = miniAppCommandBoundary.getCommandId().getInternalCommandId();
 
-        SuperAppObjectBoundary dietitian = (SuperAppObjectBoundary)miniAppCommandBoundary.getCommandAttributes().get("userObj");
+
+        SuperAppObjectBoundary dietitian = objectServiceRepo.getSpecificObject(superapp,id,superapp,email);
         //IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
         String ingredient = "asdfas";
         dietitian.insertToObjectDetails(ingredient);
