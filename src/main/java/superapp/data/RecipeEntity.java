@@ -1,34 +1,82 @@
 package superapp.data;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class RecipeEntity {
-    int id;
-    String title;
-    String imageURL;
-    int servings;
-    int readyIn;
-    List< IngredientEntity > ingredients;
-    public List<String> cuisines;
-    public List<String> dishTypes;
-    public List<String> diets;
+    private int id;
+    private String title;
+    private String summary;
+    private String imageURL;
+    private int servings;
+    private int readyIn;
+    private String fat;
+    private String carbs;
+    private String protein;
+    private int calories;
 
-    public RecipeEntity(  ) {
+    private ArrayList< IngredientEntity > ingredients;
 
-    }
-    public RecipeEntity( int id, String title, String imageURL ) {
+
+    public RecipeEntity() {}
+
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
 
-    public RecipeEntity( int id, String title, String imageURL, int servings, int readyIn, List< IngredientEntity > ingredients ) {
-        this.id = id;
-        this.title = title;
-        this.imageURL = imageURL;
+    public void setServings(int servings) {
         this.servings = servings;
+    }
+
+    public void setReadyIn(int readyIn) {
         this.readyIn = readyIn;
-        this.ingredients = ingredients;
+    }
+
+    public String getFat() {
+        return fat;
+    }
+
+    public void setFat(String fat) {
+        this.fat = fat;
+    }
+
+    public String getCarbs() {
+        return carbs;
+    }
+
+    public void setCarbs(String carbs) {
+        this.carbs = carbs;
+    }
+
+    public String getProtein() {
+        return protein;
+    }
+
+    public void setProtein(String protein) {
+        this.protein = protein;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
     }
 
     public int getId() {
@@ -51,8 +99,11 @@ public class RecipeEntity {
         return readyIn;
     }
 
-
-    public List<IngredientEntity> getIngredients() {
+    public ArrayList<IngredientEntity> getIngredients() {
         return ingredients;
+    }
+
+    public void setIngredients(ArrayList<IngredientEntity> ingredients) {
+        this.ingredients = ingredients;
     }
 }
