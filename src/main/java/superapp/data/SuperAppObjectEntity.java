@@ -152,11 +152,19 @@ public class SuperAppObjectEntity {
         SuperAppObjectEntity other = (SuperAppObjectEntity) obj;
         return objectId.equals(other.getObjectId());
     }
-    public void insertToObjectDetails(Object obj) {
+    
+    public void insertToObjectDetails(String key, Object obj) {
         if (objectDetails.isEmpty()){
             objectDetails = new HashMap<>();
         }
-        objectDetails.put(obj.toString(),obj);
+        objectDetails.put(key, obj);
+    }
+    
+    public void deleteFromObjectDetails(String key) {
+    	if (objectDetails.isEmpty()){
+            objectDetails = new HashMap<>();
+        }
+    	objectDetails.remove(key);;
     }
 
     public void removeParentObject(SuperAppObjectEntity parentObject) {

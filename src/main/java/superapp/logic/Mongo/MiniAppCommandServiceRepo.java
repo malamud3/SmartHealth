@@ -192,8 +192,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			commandBean = this.applicationContext
 					.getBean(command.toString(), Command.class);
 		}catch (Exception e) {
-			//command = this.default;
-			System.out.println("Unknown command");
+			throw new CommandNotFoundException("could not find command: " + miniAppCommandBoundary.getCommand());
 		}
 
         return commandBean.execute(miniAppCommandBoundary);
