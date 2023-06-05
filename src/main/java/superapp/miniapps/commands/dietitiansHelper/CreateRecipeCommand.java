@@ -13,15 +13,13 @@ import superapp.miniapps.commands.Command;
 public class CreateRecipeCommand implements Command {
     //private final  SpoonaculerService spoonaculerService;
     private ObjectServiceRepo objectServiceRepo;
-    private SuperAppObjectCrud objectRepository;
-    private UserCrud userCrud;
+
 
     @Autowired
     public CreateRecipeCommand(SuperAppObjectCrud objectRepository,UserCrud userCrud) {
-        this.objectRepository = objectRepository;
-        this.userCrud = userCrud;
+
         //  this.spoonaculerService = spoonaculerService;
-        this.objectServiceRepo = new ObjectServiceRepo(this.objectRepository,userCrud);
+        this.objectServiceRepo = new ObjectServiceRepo(objectRepository,userCrud);
     }
 
 
@@ -49,7 +47,7 @@ public class CreateRecipeCommand implements Command {
 
     @Override
     public void execute(MiniAppCommandBoundary miniAppCommandBoundary) {
-         // 1. find the dietitian object
+        // 1. find the dietitian object
         // 2. add new recipe to the dietitian object
         String superapp = miniAppCommandBoundary.getCommandId().getSuperapp();
         String email = miniAppCommandBoundary.getInvokedBy().getUserId().getEmail();

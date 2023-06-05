@@ -1,15 +1,32 @@
 package superapp.miniapps.commands;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import superapp.Boundary.MiniAppCommandBoundary;
+import superapp.dal.SuperAppObjectCrud;
+import superapp.dal.UserCrud;
+import superapp.logic.utilitys.SuperAppObjectUtility;
+import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.dietitiansHelper.RecipesCommandInterface;
 import superapp.miniapps.commands.dietitiansHelper.CreateRecipeCommand;
 
+@Service
 public class RecipesCommandFactory implements RecipesCommandInterface {
-    private CreateRecipeCommand createRecipeCommand = new CreateRecipeCommand(userCrud);
+    private SuperAppObjectCrud objectRepository;
+    private UserCrud userCrud;
+    private CreateRecipeCommand createRecipeCommand;
 
     public RecipesCommandFactory() {
-
     }
+
+    @Autowired
+    public RecipesCommandFactory(SuperAppObjectCrud objectRepository, UserCrud userCrud) {
+
+        this.objectRepository = objectRepository;
+        this.userCrud = userCrud;
+        this.createRecipeCommand = new CreateRecipeCommand(objectRepository,userCrud);
+    }
+
 
     @Override
     public void createCommand(CommandsEnum commandsEnum, MiniAppCommandBoundary commandBoundary) {
