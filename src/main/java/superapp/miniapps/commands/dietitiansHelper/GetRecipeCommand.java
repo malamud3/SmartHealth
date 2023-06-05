@@ -37,9 +37,9 @@ public class GetRecipeCommand implements Command {
 
         List<RecipeResponse> recipes = RecipeApiClient.fetchRecipesWithParams(1);
         Map<String, Object> map = new HashMap<>();
-        map.put("recipes", recipes.get(0));
+        map.put("recipes", recipes.toArray());
         miniAppCommandBoundary.setCommandAttributes(map);
         //entity to boundary
-        return recipes.get(0);
+        return recipes;
     }
 }

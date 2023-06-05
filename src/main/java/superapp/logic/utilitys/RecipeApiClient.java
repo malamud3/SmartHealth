@@ -15,7 +15,7 @@ import superapp.data.RecipeResponse;
 
 public class RecipeApiClient {
 
-    private static final String API_KEY = "84eb8e78605740d1b536934fa885e448";
+    private static final String API_KEY = "837f9584e1af42d2a8255fca1f40e6c9";
     private static final String FETCH_RECIPES_URL = "https://api.spoonacular.com/recipes/random";
 
     private static final ObjectMapper objectMapper = new ObjectMapper()
@@ -77,7 +77,7 @@ public class RecipeApiClient {
 
                 for (Map<String, Object> nutrientJson : nutrientsJsonList) {
                     String nutrientName = (String) nutrientJson.get("name");
-                    double nutrientAmount = (double) nutrientJson.get("amount");
+                    double nutrientAmount = ((Number) nutrientJson.get("amount")).doubleValue();
                     String nutrientUnit = (String) nutrientJson.get("unit");
 
                     switch (nutrientName) {
@@ -97,6 +97,7 @@ public class RecipeApiClient {
                             break;
                     }
                 }
+
 
                 _recipes.add(recipe);
             }

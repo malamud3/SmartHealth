@@ -8,5 +8,4 @@ public enum CommandsEnum {
     DELETE_ALL_RECIPES,
     GET_RECIPE,
     GET_ALL_RECIPES
-
 }

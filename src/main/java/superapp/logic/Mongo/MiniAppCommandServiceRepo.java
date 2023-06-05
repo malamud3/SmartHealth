@@ -91,7 +91,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	@Autowired
 	public void setJmsTemplate(JmsTemplate jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
-		this.jmsTemplate.setDeliveryDelay(3000L);
+		this.jmsTemplate.setDeliveryDelay(5000L);
 	}
 
 
