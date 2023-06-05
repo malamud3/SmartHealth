@@ -27,11 +27,13 @@ import superapp.logic.service.MiniAppServices.MiniAppCommandServiceWithAdminPerm
 import superapp.logic.utilitys.GeneralUtility;
 import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.Command;
+import superapp.miniapps.commands.CommandInterface;
+import superapp.miniapps.commands.CommandsEnum;
 
 import java.util.*;
 
 @Service
-public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdminPermission {
+public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdminPermission, CommandInterface {
 
 	private  String springApplicationName;
 	private final MiniAppCommandCrud commandRepository;
@@ -46,6 +48,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private ObjectMapper jackson;
 
 	private ApplicationContext applicationContext;
+	
 
     @Autowired
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -168,10 +171,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			if (miniAppCommandBoundary.getCommandAttributes() == null) {
 				miniAppCommandBoundary.setCommandAttributes(new HashMap<>());
 			}else {
-				invoke(miniAppCommandBoundary.getCommand(), miniAppCommandBoundary);
-				//recipesCommandFactory.createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()),miniAppCommandBoundary);
+				createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
 			}
-
 			MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
 			entity = this.commandRepository.save(entity);
 			return this.entityToBoundary(entity);
@@ -180,18 +181,18 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	}
 
 
-
-	private Object invoke(String command, MiniAppCommandBoundary miniAppCommandBoundary) {
+	@Override
+	public Object createCommand(CommandsEnum commandsEnum, MiniAppCommandBoundary commandBoundary){
 		Command commandBean = null;
 
 		try {
 			commandBean = this.applicationContext
-					.getBean(command.toString(), Command.class);
+					.getBean(commandsEnum.toString(), Command.class);
 		}catch (Exception e) {
-			throw new CommandNotFoundException("could not find command: " + miniAppCommandBoundary.getCommand());
+			throw new CommandNotFoundException("could not find command: " + commandBoundary.getCommand());
 		}
 
-        return commandBean.execute(miniAppCommandBoundary);
+        return commandBean.execute(commandBoundary);
 
     }
 
@@ -245,7 +246,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 		}
 
 		return this.commandRepository
-				.findAll(PageRequest.of(page, size, Sort.Direction.ASC,"commandId"))
+				.findAll(PageRequest.of(page, size, Sort.Direction.ASC,"invocationTimestamp‏"))
 				.stream() // Stream<CommandEntity>
 				.map(this::entityToBoundary) // Stream<CommandBoundary>
 				.toList(); // List<CommandBoundary>
@@ -341,4 +342,8 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 		return entity;
 	}
+
+
+
+
 }
