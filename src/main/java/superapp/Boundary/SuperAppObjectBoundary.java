@@ -105,12 +105,6 @@ public class SuperAppObjectBoundary {
 	public void setObjectDetails(Map<String, Object> objectDetails) {
 		this.objectDetails = objectDetails;
 	}
-	public void insertToObjectDetails(Object obj) {
-		if (objectDetails.isEmpty()){
-			objectDetails = new HashMap<>();
-		}
-		objectDetails.put(obj.toString(),obj);
-	}
 
 	@Override
 	public int hashCode() {

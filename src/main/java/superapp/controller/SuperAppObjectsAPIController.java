@@ -66,7 +66,7 @@ public class SuperAppObjectsAPIController {
             path = {"/superapp/objects/{superapp}/{internalObjectId}"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public SuperAppObjectBoundary retrieveObject(
+    public SuperAppObjectBoundary retrieveObject (
             @PathVariable("superapp") String superapp,
             @PathVariable("internalObjectId") String internalObjectId,
             @RequestParam(name="userSuperapp") String userSuperApp,

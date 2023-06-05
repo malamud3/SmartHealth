@@ -38,7 +38,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private final UserCrud userCrud;//for permission checks
 	private final MongoTemplate mongoTemplate;
 	private final UserUtility userUtility;
-	private RecipesCommandFactory recipesCommandFactory = new RecipesCommandFactory();
+	private RecipesCommandFactory recipesCommandFactory;
 
 	private final SuperAppObjectCrud objectRepository;
 
@@ -53,6 +53,21 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	public void setSpringApplicationName(String springApplicationName) {
 		this.springApplicationName = springApplicationName;
 	}
+
+	@Autowired
+	public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
+									 MiniAppCommandCrud repository, ObjectMapper jackson, UserCrud userCrud, SuperAppObjectCrud objectRepository) {
+
+		this.commandRepository = repository;
+		this.userCrud = userCrud;
+		this.mongoTemplate = mongoTemplate;
+		this.jackson = jackson;
+		this.userUtility = new UserUtility(userCrud);
+		this.objectRepository = objectRepository;
+		this.recipesCommandFactory = new RecipesCommandFactory(objectRepository,userCrud);
+	}
+
+
 
 	@PostConstruct
 	public void init() {
@@ -124,17 +139,6 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 		return miniAppCommandBoundary;
 	}
 
-	@Autowired
-	public MiniAppCommandServiceRepo(MongoTemplate mongoTemplate,
-									 MiniAppCommandCrud repository, ObjectMapper jackson, UserCrud userCrud, SuperAppObjectCrud objectRepository) {
-
-		this.commandRepository = repository;
-		this.userCrud = userCrud;
-		this.mongoTemplate = mongoTemplate;
-		this.jackson = jackson;
-		this.userUtility = new UserUtility(userCrud);
-		this.objectRepository = objectRepository;
-	}
 
 
 	public boolean isObjectActive(ObjectId objectId) {

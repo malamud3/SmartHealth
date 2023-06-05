@@ -16,8 +16,8 @@ public class RecipesCommandFactory implements RecipesCommandInterface {
     private UserCrud userCrud;
     private CreateRecipeCommand createRecipeCommand;
 
-    public RecipesCommandFactory() {
-    }
+//    public RecipesCommandFactory() {
+//    }
 
     @Autowired
     public RecipesCommandFactory(SuperAppObjectCrud objectRepository, UserCrud userCrud) {

@@ -42,9 +42,11 @@ public class UserUtility {
     }
 
     public UserEntity checkUserExist(UserId userId){
+        System.err.println(userId.toString());
         return userCrud.findByUserId(userId)
                 .orElseThrow(()->new UserNotFoundException("inserted id: "
                         + userId.getEmail() + userId.getSuperapp() + " does not exist"));
+
     }
 
 
