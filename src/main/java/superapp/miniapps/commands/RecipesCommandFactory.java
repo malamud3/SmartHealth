@@ -20,8 +20,8 @@ public class RecipesCommandFactory implements RecipesCommandInterface {
     private ApplicationContext applicationContext;
 
 //    public RecipesCommandFactory() {
+    
 //    }
-
     @Autowired
     public RecipesCommandFactory(SuperAppObjectCrud objectRepository, UserCrud userCrud) {
 
