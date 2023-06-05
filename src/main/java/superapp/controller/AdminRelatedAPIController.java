@@ -20,7 +20,7 @@ public class AdminRelatedAPIController {
 
 	@Autowired
 	public AdminRelatedAPIController(UsersServiceWithAdminPermission userService,
-			MiniAppCommandServiceWithAdminPermission miniAppCommandService, ObjectsServiceWithAdminPermission objectsService) {
+									 MiniAppCommandServiceWithAdminPermission miniAppCommandService, ObjectsServiceWithAdminPermission objectsService) {
 		this.userService = userService;
 		this.miniAppCommandService = miniAppCommandService;
 		this.objectsService = objectsService;
@@ -75,7 +75,7 @@ public class AdminRelatedAPIController {
 			@RequestParam(name ="userEmail",required = true) String email,
 			@RequestParam(name = "size" , required = false , defaultValue = "8") int size,
 			@RequestParam(name = "page" , required = false , defaultValue = "0") int page)
-					throws RuntimeException {
+			throws RuntimeException {
 		return userService.exportAllUsers(userSuperApp, email, size, page);
 	}
 

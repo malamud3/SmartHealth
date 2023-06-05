@@ -66,28 +66,28 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
 
     @Async
     @Override
-	public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
-    	 try {
-             userUtility.validateUser(newUser,springAppName);
-         } catch (RuntimeException e) {
-             throw new IllegalArgumentException(e.getMessage());
-         }
+    public UserBoundary createUser(NewUserBoundary newUser) throws RuntimeException {
+        try {
+            userUtility.validateUser(newUser,springAppName);
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
 
-         UserBoundary user = new UserBoundary(newUser, springAppName);
-         UserEntity userEntity = boundaryToEntity(user);
-         userEntity = userCrud.save(userEntity);
+        UserBoundary user = new UserBoundary(newUser, springAppName);
+        UserEntity userEntity = boundaryToEntity(user);
+        userEntity = userCrud.save(userEntity);
 
-         // Sending JMS message
-         String message = "New user created: " + user.getUserId();
-         jmsTemplate.convertAndSend("userQueue", message);
+        // Sending JMS message
+        String message = "New user created: " + user.getUserId();
+        jmsTemplate.convertAndSend("userQueue", message);
 
-         return entityToBoundary(userEntity);
-	}
+        return entityToBoundary(userEntity);
+    }
 
     @Deprecated
     @Override
     public UserBoundary createUser(UserBoundary newUser) throws RuntimeException {
-    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");  
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
 
     @Override
@@ -115,29 +115,29 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         }
 
         if (update.getUsername() != null) {
-        	userEntity.setUsername(update.getUsername());
+            userEntity.setUsername(update.getUsername());
         }
 
         if (update.getAvatar() != null) {
-        	userEntity.setAvatar(update.getAvatar());
+            userEntity.setAvatar(update.getAvatar());
         }
 
         userEntity = userCrud.save(userEntity);
 
-            // Sending JMS message
-            String message = "User updated: " + userEntity.getUserId();
-            jmsTemplate.convertAndSend("userUpdateQueue", message);
+        // Sending JMS message
+        String message = "User updated: " + userEntity.getUserId();
+        jmsTemplate.convertAndSend("userUpdateQueue", message);
 
         return entityToBoundary(userEntity);
     }
 
     @Deprecated
     @Override
-	public List<UserBoundary> getAllUsers() {
-		throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
-	}
-    
-    
+    public List<UserBoundary> getAllUsers() {
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+
+
     @Override
     public List<UserBoundary> exportAllUsers(String userSuperApp, String userEmail, int size, int page) throws RuntimeException {
         UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp,userEmail));
@@ -154,14 +154,14 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
     }
 
 
-    
-    
+
+
     @Override
     @Deprecated
-	public void deleteAllUsers() {
-    	throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
-	}
-    
+    public void deleteAllUsers() {
+        throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
+    }
+
     /**
      * delete all users
      *
@@ -241,6 +241,4 @@ public class UsersServiceRepo implements UsersServiceWithAdminPermission {
         return rv;
 
     }
-
-
 }
