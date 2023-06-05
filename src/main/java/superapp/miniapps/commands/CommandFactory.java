@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.miniapps.commands.dietitiansHelper.CommandsEnum;
 
 @Service
 public class CommandFactory implements CommandInterface {

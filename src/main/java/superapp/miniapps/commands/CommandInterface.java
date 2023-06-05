@@ -1,7 +1,6 @@
 package superapp.miniapps.commands;
 
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.miniapps.commands.dietitiansHelper.CommandsEnum;
 
 public interface CommandInterface {
     public Object createCommand(CommandsEnum commandsEnum, MiniAppCommandBoundary commandBoundary);
