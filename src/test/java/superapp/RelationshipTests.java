@@ -180,6 +180,30 @@ public class RelationshipTests {
 	}
 	
 	
+	@Test
+	@DisplayName("test create object to itslef relationship")
+	public void testCreateSameRelationship() {
+		// GIVEN there is 1 superappObject
+		// AND there is 1 superappUser
+		
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER");
+		SuperAppObjectBoundary relationshipObject =
+				createExampleSuperappObject("exampleType", "exampleAlias", false, superappUser.getUserId());
+		
+		
+		// WHEN I PUT /superapp/objects/{superapp}/{internalObjectId}/children to bind object to itself
+		HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () -> {
+			this.restTemplate.put(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}/children"
+					+ "?userSuperapp={userSuperapp}&userEmail={email}",
+					relationshipObject.getObjectId(), relationshipObject.getObjectId().getSuperapp(), relationshipObject.getObjectId().getInternalObjectId(),
+					superappUser.getUserId().getSuperapp(), superappUser.getUserId().getEmail());
+		});
+		
+		//THEN an HTTP BAD REQUEST (400 error code) thrown
+		assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		
+	}
+	
 	private SuperAppObjectBoundary createExampleSuperappObject(String type, String alias, boolean active, UserId creatorId) {
 		SuperAppObjectBoundary newParentObjectBoundary = new SuperAppObjectBoundary();
 		newParentObjectBoundary.setType(type);

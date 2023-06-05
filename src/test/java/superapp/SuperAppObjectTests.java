@@ -82,36 +82,12 @@ public class SuperAppObjectTests {
 		// AND the superappObject database is empty
 		//AND there is a SUPERAPP_USER user
 
-		NewUserBoundary newSuperappBoundary = new NewUserBoundary();
-		newSuperappBoundary.setAvatar("superapp_avatar");
-		newSuperappBoundary.setRole("SUPERAPP_USER");
-		newSuperappBoundary.setEmail("superapp@example.com");
-		newSuperappBoundary.setUsername("superapp_userName");
-
-		UserBoundary superappUser = this.restTemplate.postForObject(
-				this.baseUrl + "/superapp/users",
-				newSuperappBoundary,
-				UserBoundary.class);
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER"); 
 
 
 		// WHEN I POST /superapp/objects with newSuperappObjectBoundary
 		//AND I get /superapp/objects/{superapp}/{internalObjectId} the actualObjectBoundary
-		SuperAppObjectBoundary newSuperAppObjectBoundary = new SuperAppObjectBoundary();
-		newSuperAppObjectBoundary.setType("exampleType");
-		newSuperAppObjectBoundary.setAlias("exampleAlias");
-		newSuperAppObjectBoundary.setActive(true);
-		Date now = new Date();
-		newSuperAppObjectBoundary.setCreationTimestamp(now);
-		newSuperAppObjectBoundary.setLocation(new Location(1.0, 2.0));
-		newSuperAppObjectBoundary.setCreatedBy(new CreatedBy((superappUser.getUserId())));
-		newSuperAppObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
-
-
-		SuperAppObjectBoundary expectedObjectBoundary = this.restTemplate.postForObject(
-				this.baseUrl + "/superapp/objects",
-				newSuperAppObjectBoundary,
-				SuperAppObjectBoundary.class
-				);
+		SuperAppObjectBoundary expectedObjectBoundary = createExampleSuperappObject(true, superappUser.getUserId()); 
 
 		SuperAppObjectBoundary actualObjectBoundary = this.restTemplate
 				.getForObject(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}"
@@ -135,32 +111,12 @@ public class SuperAppObjectTests {
 		// AND the superappObject database is empty
 		//AND there is a MINIAPP_USER user
 
-		NewUserBoundary newMiniappBoundary = new NewUserBoundary();
-		newMiniappBoundary.setAvatar("miniapp_avatar");
-		newMiniappBoundary.setRole("MINIAPP_USER");
-		newMiniappBoundary.setEmail("miniapp@example.com");
-		newMiniappBoundary.setUsername("miniapp_userName");
-
-		UserBoundary miniappUser = this.restTemplate.postForObject(
-				this.baseUrl + "/superapp/users",
-				newMiniappBoundary,
-				UserBoundary.class);
-
-		// WHEN I POST /superapp/objects with newMiniappObjectBoundary
-		SuperAppObjectBoundary newMiniappObjectBoundary = new SuperAppObjectBoundary();
-		newMiniappObjectBoundary.setType("exampleType");
-		newMiniappObjectBoundary.setAlias("exampleAlias");
-		newMiniappObjectBoundary.setActive(true);
-		Date now = new Date();
-		newMiniappObjectBoundary.setCreationTimestamp(now);
-		newMiniappObjectBoundary.setLocation(new Location(1.0, 2.0));
-		newMiniappObjectBoundary.setCreatedBy(new CreatedBy((miniappUser.getUserId())));
-		newMiniappObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
-
-
+		UserBoundary miniappUser =  createExampleUser("MINIAPP_USER");
+		
+		// WHEN I POST /superapp/objects with miniappUser
+		
 		HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () -> {
-			restTemplate.postForObject(this.baseUrl + "/superapp/objects",
-					newMiniappObjectBoundary, SuperAppObjectBoundary.class);
+			createExampleSuperappObject(false, miniappUser.getUserId()); 
 		});
 
 		//THEN an HTTP FORBIDDEN (403 error code) thrown
@@ -176,20 +132,8 @@ public class SuperAppObjectTests {
 
 
 		// WHEN I POST /superapp/objects with newMiniappObjectBoundary
-		SuperAppObjectBoundary newAdminObjectBoundary = new SuperAppObjectBoundary();
-		newAdminObjectBoundary.setType("exampleType");
-		newAdminObjectBoundary.setAlias("exampleAlias");
-		newAdminObjectBoundary.setActive(true);
-		Date now = new Date();
-		newAdminObjectBoundary.setCreationTimestamp(now);
-		newAdminObjectBoundary.setLocation(new Location(1.0, 2.0));
-		newAdminObjectBoundary.setCreatedBy(new CreatedBy((adminUserId)));
-		newAdminObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
-
-
 		HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () -> {
-			restTemplate.postForObject(this.baseUrl + "/superapp/objects",
-					newAdminObjectBoundary, SuperAppObjectBoundary.class);
+			createExampleSuperappObject(true, adminUserId);
 		});
 
 		//THEN an HTTP FORBIDDEN (403 error code) thrown
@@ -203,60 +147,105 @@ public class SuperAppObjectTests {
 		// AND there is one SuperappObject on the server
 		// AND there is a SUPERAPP user
 
-		NewUserBoundary newSuperappBoundary = new NewUserBoundary();
-		newSuperappBoundary.setAvatar("superapp_avatar");
-		newSuperappBoundary.setRole("SUPERAPP_USER");
-		newSuperappBoundary.setEmail("superapp@example.com");
-		newSuperappBoundary.setUsername("superapp_userName");
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER"); new NewUserBoundary();
 
-		UserBoundary superappUser = this.restTemplate.postForObject(
-				this.baseUrl + "/superapp/users",
-				newSuperappBoundary,
-				UserBoundary.class);
-
-		SuperAppObjectBoundary newSuperAppObjectBoundary = new SuperAppObjectBoundary();
-		newSuperAppObjectBoundary.setType("exampleType");
-		newSuperAppObjectBoundary.setAlias("exampleAlias");
-		newSuperAppObjectBoundary.setActive(true);
-		Date now = new Date();
-		newSuperAppObjectBoundary.setCreationTimestamp(now);
-		newSuperAppObjectBoundary.setLocation(new Location(1.0, 2.0));
-		newSuperAppObjectBoundary.setCreatedBy(new CreatedBy((superappUser.getUserId())));
-		newSuperAppObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
-
-
-		SuperAppObjectBoundary existsObjectBoundary = this.restTemplate.postForObject(
-				this.baseUrl + "/superapp/objects",
-				newSuperAppObjectBoundary,
-				SuperAppObjectBoundary.class
-				);
+		SuperAppObjectBoundary existsSuperAppObjectBoundary = 
+				createExampleSuperappObject(true, superappUser.getUserId());
 
 		// WHEN I PUT /superapp/objects/{superapp}/{internalObjectId} updated object
 
-		existsObjectBoundary.setType("updatedType");
-		existsObjectBoundary.setAlias("updatedAlias");
-		existsObjectBoundary.setActive(false);
-		existsObjectBoundary.setLocation(new Location(2.0, 1.0));
-		existsObjectBoundary.setObjectDetails(Map.of("updatedkey", "updatedVlaue"));
+		existsSuperAppObjectBoundary.setType("updatedType");
+		existsSuperAppObjectBoundary.setAlias("updatedAlias");
+		existsSuperAppObjectBoundary.setActive(false);
+		existsSuperAppObjectBoundary.setLocation(new Location(2.0, 1.0));
+		existsSuperAppObjectBoundary.setObjectDetails(Map.of("updatedkey", "updatedVlaue"));
 
 		this.restTemplate.put(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}"
 				+ "?userSuperapp={userSuperapp}&userEmail={userEmail}",
-				existsObjectBoundary, existsObjectBoundary.getObjectId().getSuperapp(),
-				existsObjectBoundary.getObjectId().getInternalObjectId(),
+				existsSuperAppObjectBoundary, existsSuperAppObjectBoundary.getObjectId().getSuperapp(),
+				existsSuperAppObjectBoundary.getObjectId().getInternalObjectId(),
 				superappUser.getUserId().getSuperapp(), superappUser.getUserId().getEmail());
 
 		SuperAppObjectBoundary actualUpdatedObjectBoundary = this.restTemplate
 				.getForObject(this.baseUrl + "/superapp/objects/{superapp}/{internalObjectId}"
 						+ "?userSuperapp={userSuperapp}&userEmail={userEmail}", SuperAppObjectBoundary.class,
-						existsObjectBoundary.getObjectId().getSuperapp(), existsObjectBoundary.getObjectId().getInternalObjectId(),
+						existsSuperAppObjectBoundary.getObjectId().getSuperapp(), existsSuperAppObjectBoundary.getObjectId().getInternalObjectId(),
 						superappUser.getUserId().getSuperapp(), superappUser.getUserId().getEmail());
 
 		// THEN  the existsObjectBoundary should be the same as the actualUpdatedObjectBoundary 
 		assertThat(actualUpdatedObjectBoundary)
 		.isNotNull()
-		.usingRecursiveComparison().isEqualTo(existsObjectBoundary);
+		.usingRecursiveComparison().isEqualTo(existsSuperAppObjectBoundary);
 
 	}
+	
+	@Test
+	@DisplayName("test get not active object")
+	public void testGetNotActiveObject() {
+		// GIVEN the server is up
+		// AND there is a SuperappObject with active = flase
+		//AND there is a SUPERAPP_USER and a MINIAPP_USER
+		
+		UserBoundary superappUser = createExampleUser("SUPERAPP_USER");
+		UserBoundary miniappUser = createExampleUser("MINIAPP_USER");
+		SuperAppObjectBoundary object = createExampleSuperappObject(false, superappUser.getUserId());
 
+
+		// WHEN I GET /superapp/objects using both users
+		
+		SuperAppObjectBoundary[] superappUserGetResponse = this.restTemplate
+				.getForObject(this.baseUrl + "/superapp/objects?userSuperapp={userSuperapp}&userEmail={email}",
+						SuperAppObjectBoundary[].class, superappUser.getUserId().getSuperapp(), superappUser.getUserId().getEmail());
+
+		SuperAppObjectBoundary[] miniappUserGetResponse = this.restTemplate
+				.getForObject(this.baseUrl + "/superapp/objects?userSuperapp={userSuperapp}&userEmail={email}",
+						SuperAppObjectBoundary[].class, miniappUser.getUserId().getSuperapp(), miniappUser.getUserId().getEmail());
+		
+		// THEN superappUser get should return an array with exactly the sent object
+		// AND miniappUser GET should return an empty array
+		assertThat(superappUserGetResponse)
+		.isNotNull()
+		.hasSize(1)
+		.containsExactly(object);
+		
+		assertThat(miniappUserGetResponse)
+		.isNotNull()
+		.hasSize(0);
+		
+	}
+
+	
+	private SuperAppObjectBoundary createExampleSuperappObject(boolean active, UserId creatorId) {
+		SuperAppObjectBoundary newParentObjectBoundary = new SuperAppObjectBoundary();
+		newParentObjectBoundary.setType("exampleType");
+		newParentObjectBoundary.setAlias("exampleAlias");
+		newParentObjectBoundary.setActive(active);
+		newParentObjectBoundary.setCreationTimestamp(new Date());
+		newParentObjectBoundary.setLocation(new Location(1.0, 2.0));
+		newParentObjectBoundary.setCreatedBy(new CreatedBy((creatorId)));
+		newParentObjectBoundary.setObjectDetails(Map.of("exampleKey", "exampleValue"));
+
+
+		return this.restTemplate.postForObject(
+				this.baseUrl + "/superapp/objects",
+				newParentObjectBoundary,
+				SuperAppObjectBoundary.class
+				);
+		
+		
+	}
+
+	private UserBoundary createExampleUser(String role) {
+		NewUserBoundary newSuperappBoundary = new NewUserBoundary();
+		newSuperappBoundary.setAvatar("example_avatar");
+		newSuperappBoundary.setRole(role);
+		newSuperappBoundary.setEmail(role + "@example.com");
+		newSuperappBoundary.setUsername("superapp_userName");
+
+		return this.restTemplate.postForObject(
+				this.baseUrl + "/superapp/users",
+				newSuperappBoundary,
+				UserBoundary.class);
+	}
 
 }

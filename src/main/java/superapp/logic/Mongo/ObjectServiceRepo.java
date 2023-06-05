@@ -15,6 +15,7 @@ import superapp.data.UserRole;
 import superapp.data.SuperAppObjectEntity;
 import superapp.data.UserEntity;
 import superapp.logic.Exceptions.DepreacatedOpterationException;
+import superapp.logic.Exceptions.ObjectBadRequest;
 import superapp.logic.Exceptions.ObjectNotFoundException;
 import superapp.logic.Exceptions.PermissionDeniedException;
 import org.springframework.beans.factory.annotation.Value;
@@ -186,7 +187,7 @@ public class ObjectServiceRepo implements SuperAppObjectRelationshipService {
     public void bindParentAndChild(String parentId, String childId, String userSuperApp, String userEmail) throws RuntimeException {
     	UserEntity userEntity = userUtility.checkUserExist(new UserId(userSuperApp, userEmail));
     	if (childId.equals(parentId)) {
-    		throw new RuntimeException("can't bind the same object");
+    		throw new ObjectBadRequest("can't bind the same object");
     	}
     	if (!userEntity.getRole().equals(UserRole.SUPERAPP_USER))
     		throw new PermissionDeniedException("User do not have permission to bindParentAndChild Objects");
