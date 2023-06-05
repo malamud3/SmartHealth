@@ -1,8 +1,6 @@
 package superapp.data;
 
 public class IngredientEntity {
-
-
 	private int id;
 	private String aisle;
 	private float amount;

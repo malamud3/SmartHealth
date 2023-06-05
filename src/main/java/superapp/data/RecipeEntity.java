@@ -6,7 +6,7 @@ public class RecipeEntity {
     private int id;
     private String title;
     private String summary;
-    private String imageURL;
+    private String image;
     private int servings;
     private int readyIn;
     private String fat;
@@ -35,8 +35,8 @@ public class RecipeEntity {
         this.summary = summary;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setImage(String imageURL) {
+        this.image = imageURL;
     }
 
     public void setServings(int servings) {
@@ -87,8 +87,8 @@ public class RecipeEntity {
         return title;
     }
 
-    public String getImageURL() {
-        return imageURL;
+    public String getImage() {
+        return image;
     }
 
     public int getServings() {

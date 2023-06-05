@@ -5,9 +5,15 @@ import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectCrud;
+import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.utilitys.RecipeApiClient;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component("GET_RECIPE")
 public class GetRecipeCommand implements Command {
@@ -28,11 +34,12 @@ public class GetRecipeCommand implements Command {
         // 1. find the dietitian object
         // 2. add new recipe to the dietitian object
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
-        SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        dietitian.getObjectDetails().get(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
-        objectRepository.save(dietitian);
 
+        List<RecipeResponse> recipes = RecipeApiClient.fetchRecipesWithParams(1);
+        Map<String, Object> map = new HashMap<>();
+        map.put("recipes", recipes.get(0));
+        miniAppCommandBoundary.setCommandAttributes(map);
         //entity to boundary
-        return dietitian;
+        return recipes.get(0);
     }
 }
