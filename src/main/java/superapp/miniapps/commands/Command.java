@@ -5,6 +5,6 @@ import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
 
 public interface Command {
-    public void execute(MiniAppCommandBoundary miniAppCommandBoundary);
+    public Object execute(MiniAppCommandBoundary miniAppCommandBoundary);
 }
 

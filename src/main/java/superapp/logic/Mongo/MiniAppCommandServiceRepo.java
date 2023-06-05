@@ -208,9 +208,7 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 			throw new PermissionDeniedException("You do not have permission to delete all commands");
 		}
 		this.commandRepository.deleteAll();
-	}
-
-
+		}
 
 
 	@Override

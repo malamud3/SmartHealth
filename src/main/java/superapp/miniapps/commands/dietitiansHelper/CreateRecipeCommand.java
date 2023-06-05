@@ -44,7 +44,7 @@ public class CreateRecipeCommand implements Command {
     }
 
     @Override
-    public void execute(MiniAppCommandBoundary miniAppCommandBoundary) {
+    public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
         // 1. find the dietitian object
         // 2. add new recipe to the dietitian object
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
@@ -52,5 +52,8 @@ public class CreateRecipeCommand implements Command {
         String ingredient = "new";
         dietitian.insertToObjectDetails(ingredient);
         objectRepository.save(dietitian);
+        
+        //entity to boundary
+        return dietitian;
     }
 }
