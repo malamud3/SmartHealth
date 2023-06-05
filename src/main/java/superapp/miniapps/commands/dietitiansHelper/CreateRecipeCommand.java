@@ -20,8 +20,8 @@ public class createRecipeCommand implements Command {
         this.objectServiceRepo = objectServiceRepo;
     }
 
-
-
+    public CreateRecipeCommand() {
+    }
 //    public SuperAppObjectBoundary createRecipe(MiniAppCommandBoundary commandBoundary) {
 //        // 1. find the dietitian object
 //        // 2. add new recipe to the dietitian object
@@ -46,6 +46,7 @@ public class createRecipeCommand implements Command {
         // 2. add new recipe to the dietitian object
         String superapp = miniAppCommandBoundary.getCommandId().getSuperapp();
         String email = miniAppCommandBoundary.getInvokedBy().getUserId().getEmail();
+        String id = miniAppCommandBoundary.getCommandId().getInternalCommandId();
 
         SuperAppObjectBoundary dietitian = (SuperAppObjectBoundary)miniAppCommandBoundary.getCommandAttributes().get("userObj");
         //IngredientEntity ingredient = spoonaculerService.getIngredientDataByName("pasta",20);
