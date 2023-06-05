@@ -15,7 +15,7 @@ import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.logic.utilitys.UserUtility;
 import superapp.miniapps.commands.Command;
 
-@Component("createRecipe")
+@Component("CREATE_RECIPE")
 public class CreateRecipeCommand implements Command {
     //private final  SpoonaculerService spoonaculerService;
     private ObjectServicePaginationSupported servicePaginationSupported;

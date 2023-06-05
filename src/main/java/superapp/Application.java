@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public class Application {
 
     public static void main(String[] args) {
-        ApplicationContext context = SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args);
 
     }
 

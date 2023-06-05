@@ -30,7 +30,10 @@ public class RecipesCommandFactory implements RecipesCommandInterface {
         this.createRecipeCommand = new CreateRecipeCommand(objectRepository,userCrud);
     }
 
-
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
     @Override
     public Object createCommand(CommandsEnum commandsEnum, MiniAppCommandBoundary commandBoundary) {
 //        switch (commandsEnum) {
@@ -70,8 +73,9 @@ public class RecipesCommandFactory implements RecipesCommandInterface {
 			//command = this.default;
 			System.out.println("Unknown command");
 		}
-		
-		return command
+
+        assert command != null;
+        return command
 			.execute(commandBoundary);
 	
     	
