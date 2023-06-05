@@ -5,7 +5,7 @@ import superapp.miniapps.commands.dietitiansHelper.RecipesCommandInterface;
 import superapp.miniapps.commands.dietitiansHelper.CreateRecipeCommand;
 
 public class RecipesCommandFactory implements RecipesCommandInterface {
-    private CreateRecipeCommand createRecipeCommand = new CreateRecipeCommand();
+    private CreateRecipeCommand createRecipeCommand = new CreateRecipeCommand(userCrud);
 
     public RecipesCommandFactory() {
 
