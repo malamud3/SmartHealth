@@ -4,18 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.SuperAppObjectBoundary;
-import superapp.data.IngredientEntity;
 import superapp.logic.Mongo.ObjectServiceRepo;
 import superapp.logic.service.SpoonaculerService;
 import superapp.miniapps.commands.Command;
 
 @Component("createRecipe")
-public class createRecipeCommand implements Command {
+public class CreateRecipeCommand implements Command {
     //private final  SpoonaculerService spoonaculerService;
-    private final  ObjectServiceRepo objectServiceRepo;
+    private ObjectServiceRepo objectServiceRepo;
 
     @Autowired
-    public createRecipeCommand(ObjectServiceRepo objectServiceRepo, SpoonaculerService spoonaculerService) {
+    public CreateRecipeCommand(ObjectServiceRepo objectServiceRepo, SpoonaculerService spoonaculerService) {
       //  this.spoonaculerService = spoonaculerService;
         this.objectServiceRepo = objectServiceRepo;
     }

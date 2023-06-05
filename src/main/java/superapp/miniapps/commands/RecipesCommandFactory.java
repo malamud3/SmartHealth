@@ -1,12 +1,11 @@
 package superapp.miniapps.commands;
 
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.miniapps.commands.dietitiansHelper.RecipesCommandInterface;
-import superapp.miniapps.commands.dietitiansHelper.createRecipeCommand;
+import superapp.miniapps.commands.dietitiansHelper.CreateRecipeCommand;
 
 public class RecipesCommandFactory implements RecipesCommandInterface {
-    createRecipeCommand createRecipeCommand;
+    CreateRecipeCommand createRecipeCommand;
 
     public RecipesCommandFactory() {
 
