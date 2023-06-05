@@ -14,10 +14,12 @@ public class CreateRecipeCommand implements Command {
     private ObjectServiceRepo objectServiceRepo;
 
     @Autowired
-    public CreateRecipeCommand(ObjectServiceRepo objectServiceRepo, SpoonaculerService spoonaculerService) {
+    public CreateRecipeCommand(ObjectServiceRepo objectServiceRepo) {
       //  this.spoonaculerService = spoonaculerService;
         this.objectServiceRepo = objectServiceRepo;
     }
+
+
 
     public CreateRecipeCommand() {
     }
