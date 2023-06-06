@@ -13,11 +13,11 @@ import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
 
 @Component("REMOVE_INGREDIENT")
-public class RemoveIngredientFromRecipeCommand implements Command{
+public class RemoveIngredientFromRecipeCommand implements Command {
 	private SuperAppObjectUtility superAppObjectUtility;
 	private SuperAppObjectCrud objectRepository;
 	private SpoonacularService spoonacularService;
-	
+
 	@Autowired
 	public RemoveIngredientFromRecipeCommand(SuperAppObjectCrud objectRepository, SpoonacularService spoonacularService) {
 		this.objectRepository = objectRepository;
@@ -25,24 +25,23 @@ public class RemoveIngredientFromRecipeCommand implements Command{
 		this.spoonacularService = spoonacularService;
 	}
 
-	
-	
 	@Override
 	public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
-		
+		// 1. Find the dietitian object using the provided object ID
 		ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
-        SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        
-        String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
-        int ingredientId = (int) miniAppCommandBoundary.getCommandAttributes().get("ingredientId");
-        
-        //IngredientEntity ingredient = spoonacularService.getIngredientDataByName(ingredientName);
-        
-        RecipeResponse updatedRecipe = dietitian.removeIngredientFromRecipe(recipeId, ingredientId);
-        objectRepository.save(dietitian);
-        
-        //entity to boundary
-        return updatedRecipe;
-	}
+		SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
 
+		// 2. Retrieve the necessary attributes from the command attributes
+		String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
+		int ingredientId = (int) miniAppCommandBoundary.getCommandAttributes().get("ingredientId");
+
+		// 3. Remove the ingredient from the recipe in the dietitian's object details
+		RecipeResponse updatedRecipe = dietitian.removeIngredientFromRecipe(recipeId, ingredientId);
+
+		// 4. Save the updated dietitian object
+		objectRepository.save(dietitian);
+
+		// Return the updated recipe response
+		return updatedRecipe;
+	}
 }

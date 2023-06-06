@@ -3,25 +3,17 @@ package superapp.miniapps.commands.dietitiansHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
-import superapp.Boundary.ObjectId;
-import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
 import superapp.logic.service.SpoonacularService;
-import superapp.logic.utilitys.RecipeApiClient;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component("FIND_RECIPE")
 public class FindRecipeCommand implements Command {
     private SpoonacularService spoonacularService;
     private SuperAppObjectUtility superAppObjectUtility;
-
     private SuperAppObjectCrud objectRepository;
 
     @Autowired
@@ -34,29 +26,29 @@ public class FindRecipeCommand implements Command {
 
     @Override
     public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
-        // 1. find the dietitian object
-        // 2. add new recipe to the dietitian object
-        SuperAppObjectEntity dietitianObject =  superAppObjectUtility
-        		.checkSuperAppObjectEntityExist(miniAppCommandBoundary.getTargetObject().getObjectId());
-        
+        // 1. Find the dietitian object using the provided object ID
+        SuperAppObjectEntity dietitianObject = superAppObjectUtility.checkSuperAppObjectEntityExist(miniAppCommandBoundary.getTargetObject().getObjectId());
+
+        // 2. Initialize an empty RecipeResponse object
         RecipeResponse recipe = new RecipeResponse();
 
-        if(miniAppCommandBoundary.getCommandAttributes().get("diet") == null) {
-        	recipe = spoonacularService
-            		.getRecipeByName((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
-        }else {
-        	recipe = spoonacularService.getRecipeByNameAndDiet((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"),
-        			(String)miniAppCommandBoundary.getCommandAttributes().get("diet"));
-        }    
-        //List<RecipeResponse> recipe = RecipeApiClient.fetchRecipesWithParams(1);
-        
+        // 3. Check if the "diet" attribute is provided in the command attributes
+        if (miniAppCommandBoundary.getCommandAttributes().get("diet") == null) {
+            // If no "diet" attribute is provided, retrieve the recipe by name only
+            recipe = spoonacularService.getRecipeByName((String) miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
+        } else {
+            // If the "diet" attribute is provided, retrieve the recipe by name and diet
+            recipe = spoonacularService.getRecipeByNameAndDiet((String) miniAppCommandBoundary.getCommandAttributes().get("recipeName"),
+                    (String) miniAppCommandBoundary.getCommandAttributes().get("diet"));
+        }
+
+        // 4. Insert the new recipe into the dietitian's object details
         dietitianObject.insertNewRecipeToObjectDetails(recipe);
+
+        // 5. Save the updated dietitian object
         objectRepository.save(dietitianObject);
-        
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("recipes", recipes.toArray());
-//        miniAppCommandBoundary.setCommandAttributes(map);
-        //entity to boundary
+
+        // Return the recipe response
         return recipe;
     }
 }

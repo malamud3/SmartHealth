@@ -14,8 +14,8 @@ import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
 
 @Component("ADD_INGREDIENT")
-public class AddIngredientToRecipeCommand implements Command{
-	
+public class AddIngredientToRecipeCommand implements Command {
+
 	private SuperAppObjectUtility superAppObjectUtility;
 	private SuperAppObjectCrud objectRepository;
 	private SpoonacularService spoonacularService;
@@ -27,25 +27,28 @@ public class AddIngredientToRecipeCommand implements Command{
 		this.spoonacularService = spoonacularService;
 	}
 
-
 	@Override
 	public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
-		// 1. find the dietitian object
-        // 2. add new recipe to the dietitian object
-        ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
-        SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        
-        String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
-        double amount = (double) miniAppCommandBoundary.getCommandAttributes().get("amount");
-        String ingredientName = (String) miniAppCommandBoundary.getCommandAttributes().get("ingredientName");
-        
-        IngredientEntity ingredient = spoonacularService.getIngredientDataByNameAndAmount(ingredientName, amount);
-        
-        RecipeResponse updatedRecipe = dietitian.addIngredientToRecipe(recipeId, ingredient);
-        objectRepository.save(dietitian);
-        
-        //entity to boundary
-        return updatedRecipe;
-	}
+		// 1. Find the dietitian object using the provided object ID
+		ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
+		SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
 
+		// 2. Extract the required attributes from the command boundary
+		String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
+		double amount = (double) miniAppCommandBoundary.getCommandAttributes().get("amount");
+		String ingredientName = (String) miniAppCommandBoundary.getCommandAttributes().get("ingredientName");
+
+		// 3. Retrieve ingredient data from the Spoonacular service
+		IngredientEntity ingredient = spoonacularService.getIngredientDataByNameAndAmount(ingredientName, amount);
+
+		// 4. Add the ingredient to the recipe of the dietitian
+		RecipeResponse updatedRecipe = dietitian.addIngredientToRecipe(recipeId, ingredient);
+
+		// 5. Save the updated dietitian object
+		objectRepository.save(dietitian);
+
+		// 6. Convert the updated recipe response to a boundary object and return it
+		return updatedRecipe;
+	}
 }
+

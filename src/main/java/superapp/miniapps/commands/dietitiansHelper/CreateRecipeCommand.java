@@ -26,14 +26,17 @@ public class CreateRecipeCommand implements Command {
 
     @Override
     public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
-        // 1. find the dietitian object
-        // 2. add new recipe to the dietitian object
+        // 1. Find the dietitian object using the provided object ID
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
+
+        // 2. Create a new recipe using the recipe name from the command attributes
         RecipeResponse newRecipe = dietitian.createRecipe(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
+
+        // Save the updated dietitian object with the new recipe
         objectRepository.save(dietitian);
 
-        //entity to boundary
+        // Convert the recipe response to a boundary object and return it
         return newRecipe;
     }
 }

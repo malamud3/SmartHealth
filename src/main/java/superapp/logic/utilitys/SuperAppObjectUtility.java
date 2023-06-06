@@ -20,7 +20,7 @@ public class SuperAppObjectUtility {
         this.superAppObjectCrud = superAppObjectCrud;
     }
 
-    public SuperAppObjectEntity checkSuperAppObjectEntityExist(ObjectId objectId) {
+    public  SuperAppObjectEntity checkSuperAppObjectEntityExist(ObjectId objectId) {
         return superAppObjectCrud.findById(objectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Object "+objectId.getInternalObjectId() +" not found"));
     }

@@ -13,7 +13,6 @@ import superapp.miniapps.commands.Command;
 public class GetAllRecipeCommand implements Command {
     //private final  SpoonaculerService spoonaculerService;
     private SuperAppObjectUtility superAppObjectUtility;
-
     private SuperAppObjectCrud objectRepository;
 
     @Autowired
@@ -25,10 +24,11 @@ public class GetAllRecipeCommand implements Command {
 
     @Override
     public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
-        // 1. find the dietitian object
-        // 2. add new recipe to the dietitian object
+        // 1. Find the dietitian object using the provided object ID
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
+
+        // 2. Retrieve the recipes from the dietitian's object details
         return dietitian.getObjectDetails().get("recipes");
     }
 }
