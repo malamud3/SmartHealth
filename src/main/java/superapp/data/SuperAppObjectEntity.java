@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import superapp.Boundary.*;
+import superapp.Boundary.User.UserId;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -168,13 +169,13 @@ public class SuperAppObjectEntity {
 	@SuppressWarnings("unchecked")
 	public void deleteRecipeFromObjectDetails(String recipeName) {
 		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
-		 if (recipes == null) {
-		        recipes = new ArrayList<>();
-		    }
-		    recipes = recipes.stream()
-		            .filter(recipe -> !recipe.getRecipeName().equals(recipeName))
-		            .toList();
-		    objectDetails.put("recipes", recipes);
+		if (recipes == null) {
+			recipes = new ArrayList<>();
+		}
+		recipes = recipes.stream()
+				.filter(recipe -> !recipe.getRecipeName().equals(recipeName))
+				.toList();
+		objectDetails.put("recipes", recipes);
 	}
 
 	public void removeParentObject(SuperAppObjectEntity parentObject) {
@@ -195,5 +196,31 @@ public class SuperAppObjectEntity {
 		List<RecipeResponse> recipes =  new ArrayList<>();
 		objectDetails.put("recipes", recipes);		
 	}
+
+	@SuppressWarnings("unchecked")
+
+	public void addFollowerToObjectDetails(UserId userId) {
+		List<UserId> followers =  (List<UserId>) objectDetails.get("followers");
+		if (followers == null) {
+			followers = new ArrayList<>();
+		}
+		if (!followers.contains(userId)) {
+			followers.add(userId);
+		}
+		objectDetails.put("followers", followers);
+	}		
+
+	@SuppressWarnings("unchecked")
+	public void deleteFollowerFromObjectDetails(UserId userId) {
+		List<UserId> followers =  (List<UserId>) objectDetails.get("followers");
+		if (followers == null) {
+			followers = new ArrayList<>();
+		}
+		followers = followers.stream()
+				.filter(follower -> !follower.equals(userId))
+				.toList();
+		objectDetails.put("followers", followers);
+	}
+
 
 }

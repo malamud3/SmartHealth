@@ -8,7 +8,7 @@ import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
-import superapp.logic.service.SpoonaculerService;
+import superapp.logic.service.SpoonacularService;
 import superapp.logic.utilitys.RecipeApiClient;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
@@ -19,17 +19,17 @@ import java.util.Map;
 
 @Component("FIND_RECIPE")
 public class FindRecipeCommand implements Command {
-    private SpoonaculerService spoonaculerService;
+    private SpoonacularService spoonacularService;
     private SuperAppObjectUtility superAppObjectUtility;
 
     private SuperAppObjectCrud objectRepository;
 
     @Autowired
-    public FindRecipeCommand(SuperAppObjectCrud objectRepository, SpoonaculerService spoonaculerService) {
+    public FindRecipeCommand(SuperAppObjectCrud objectRepository, SpoonacularService spoonaculerService) {
         //  this.spoonaculerService = spoonaculerService;
         this.objectRepository = objectRepository;
         this.superAppObjectUtility = new SuperAppObjectUtility(objectRepository);
-        this.spoonaculerService = spoonaculerService;
+        this.spoonacularService = spoonaculerService;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class FindRecipeCommand implements Command {
         
         
 
-        RecipeResponse recipe = spoonaculerService
+        RecipeResponse recipe = spoonacularService
         		.getRecipeByName((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
         
         //List<RecipeResponse> recipe = RecipeApiClient.fetchRecipesWithParams(1);

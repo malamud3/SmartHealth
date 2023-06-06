@@ -14,10 +14,10 @@ import org.springframework.web.client.RestTemplate;
 
 import superapp.data.IngredientEntity;
 import superapp.data.RecipeResponse;
-import superapp.logic.service.SpoonaculerService;
+import superapp.logic.service.SpoonacularService;
 
 @Service
-public class SpoonaculerUtility implements SpoonaculerService{
+public class SpoonacularUtility implements SpoonacularService{
 
 	//private ObjectMapper jackson; //add if needed
 	private RestTemplate restTemplate;
@@ -26,7 +26,7 @@ public class SpoonaculerUtility implements SpoonaculerService{
 	private String API_KEY;
 	private String API_BASE_URL;
 
-	public SpoonaculerUtility() {
+	public SpoonacularUtility() {
 		//TODO - find a way to inject the API key
 		API_KEY = "4484a885c6ed4e6281e94718c241a20e";
 

@@ -3,7 +3,7 @@ package superapp.logic.service;
 import superapp.data.IngredientEntity;
 import superapp.data.RecipeResponse;
 
-public interface SpoonaculerService {
+public interface SpoonacularService {
 
 	public IngredientEntity getIngredientDataByName(String ingredientName);
 	
