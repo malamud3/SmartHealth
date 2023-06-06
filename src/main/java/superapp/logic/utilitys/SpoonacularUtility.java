@@ -1,6 +1,8 @@
 package superapp.logic.utilitys;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.activemq.artemis.commons.shaded.json.JsonObject;
@@ -51,7 +53,7 @@ public class SpoonacularUtility implements SpoonacularService{
 	public IngredientEntity getIngredientDataByNameAndAmount(String ingredientName, double amountInGrams) {
 		String resultJSON = this.restTemplate
 				.getForObject(API_BASE_URL + "/food/ingredients/search?query={query}&apiKey={apiKey}"
-					, String.class, ingredientName, API_KEY);
+						, String.class, ingredientName, API_KEY);
 
 		Integer id = getIdOfTheFirstResult(resultJSON);
 		System.err.println(resultJSON);
@@ -61,73 +63,95 @@ public class SpoonacularUtility implements SpoonacularService{
 
 	@Override
 	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, double amountInGrams) {
-		
+
 		return this.restTemplate
 				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information?apiKey={apiKey}&amount={amount}&unit=grams",
 						IngredientEntity.class,id, API_KEY, amountInGrams);
 	}
-	
+
 	@Override
 	public RecipeResponse getRecipeByName(String recipeName) {
-		
+
 		RecipeResponse response = new RecipeResponse();
 		response.setRecipeName(recipeName);
-			String recipeObjectString =  this.restTemplate
-		.getForObject(API_BASE_URL + "/recipes/complexSearch?apiKey={apiKey}&query={query}",
-				String.class,API_KEY, recipeName);
-			//System.err.println(recipeObjectString);
-			JSONObject recipeObject = new JSONObject(recipeObjectString); 
-			JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
-			response.setId(String.valueOf(firstResult.getInt("id")));
-			response.setImage(firstResult.getString("image"));
-			response.setTitle(firstResult.getString("title"));
-			return calculateRecipseDetails(response);
+		String recipeObjectString =  this.restTemplate
+				.getForObject(API_BASE_URL + "/recipes/complexSearch?apiKey={apiKey}&query={query}",
+						String.class,API_KEY, recipeName);
+		//System.err.println(recipeObjectString);
+		JSONObject recipeObject = new JSONObject(recipeObjectString); 
+		JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
+		response.setId(String.valueOf(firstResult.getInt("id")));
+		response.setImage(firstResult.getString("image"));
+		response.setTitle(firstResult.getString("title"));
+		return calculateRecipseDetails(response);
 	}
-	
+
 	@Override
 	public RecipeResponse getRecipeByNameAndDiet(String recipeName, String diet) {
 		RecipeResponse response = new RecipeResponse();
 		response.setRecipeName(recipeName);
-			String recipeObjectString =  this.restTemplate
-		.getForObject(API_BASE_URL + "/recipes/complexSearch?apiKey={apiKey}&query={query}&diet={diet}",
-				String.class,API_KEY, recipeName, diet);
-			System.err.println(recipeObjectString);
-			JSONObject recipeObject = new JSONObject(recipeObjectString); 
-			JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
-			response.setId(String.valueOf(firstResult.getInt("id")));
-			response.setImage(firstResult.getString("image"));
-			response.setTitle(firstResult.getString("title"));
-			return calculateRecipseDetails(response);
+		String recipeObjectString =  this.restTemplate
+				.getForObject(API_BASE_URL + "/recipes/complexSearch?apiKey={apiKey}&query={query}&diet={diet}",
+						String.class,API_KEY, recipeName, diet);
+		System.err.println(recipeObjectString);
+		JSONObject recipeObject = new JSONObject(recipeObjectString); 
+		JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
+		response.setId(String.valueOf(firstResult.getInt("id")));
+		response.setImage(firstResult.getString("image"));
+		response.setTitle(firstResult.getString("title"));
+		return calculateRecipseDetails(response);
 	}
-	
+
+	@Override
+	public List<RecipeResponse> getRandomRecipe(int number) {
+		String recipeListJSON = this.restTemplate.getForObject(API_BASE_URL + "/recipes/random?apiKey={apiKey}&number={number}",
+				String.class, API_KEY, number );
+		
+		JSONObject jsonObject = new JSONObject(recipeListJSON);
+        JSONArray recipesArray = jsonObject.getJSONArray("recipes");
+		List<RecipeResponse> recipeResponses = new ArrayList<>();
+		
+        for (int i = 0; i < recipesArray.length(); i++) {
+        	RecipeResponse response = new RecipeResponse();
+            JSONObject recipeObject = recipesArray.getJSONObject(i);
+            
+            response.setId(String.valueOf(recipeObject.getInt("id")));
+            response.setImage(recipeObject.getString("image"));
+            response.setTitle(recipeObject.getString("title"));
+            
+            recipeResponses.add(calculateRecipseDetails(response));
+        }
+        return recipeResponses;
+	}
+
 	private RecipeResponse calculateRecipseDetails(RecipeResponse recipeObject) {
 		String nutrientsString = this.restTemplate.
 				getForObject(API_BASE_URL + "/recipes/{id}/nutritionWidget.json/?apiKey={apiKey}", String.class, recipeObject.getId(),
 						API_KEY);
-		
-		JSONArray nutrients = new JSONObject(nutrientsString).getJSONArray("nutrients");
-		
-		for (int i = 0; i < nutrients.length(); i++) {
-            String nutrientName = nutrients.getJSONObject(i).getString("name");
-            double nutrientAmount = nutrients.getJSONObject(i).getDouble("amount");
-            String nutrientUnit =  nutrients.getJSONObject(i).getString("unit");
 
-            switch (nutrientName) {
-                case "Calories":
-                    recipeObject.setCalories(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
-                    break;
-                case "Fat":
-                    recipeObject.setFat(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
-                    break;
-                case "Net Carbohydrates":
-                    recipeObject.setCarbs(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
-                    break;
-                case "Protein":
-                    recipeObject.setProtein(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
-                    break;
-                default:
-                    break;
-            }
+		JSONArray nutrients = new JSONObject(nutrientsString).getJSONArray("nutrients");
+
+		for (int i = 0; i < nutrients.length(); i++) {
+			String nutrientName = nutrients.getJSONObject(i).getString("name");
+			double nutrientAmount = nutrients.getJSONObject(i).getDouble("amount");
+			String nutrientUnit =  nutrients.getJSONObject(i).getString("unit");
+
+			switch (nutrientName) {
+			case "Calories":
+				recipeObject.setCalories(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
+				break;
+			case "Fat":
+				recipeObject.setFat(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
+				break;
+			case "Net Carbohydrates":
+				recipeObject.setCarbs(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
+				break;
+			case "Protein":
+				recipeObject.setProtein(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
+				break;
+			default:
+				break;
+			}
 		}
 		return fetchIngredients(recipeObject);
 	}
