@@ -36,7 +36,7 @@ public class DeleteRecipeCommand implements Command{
         objectRepository.save(dietitian);
 
         //entity to boundary
-        return dietitian;
+        return dietitian.getObjectDetails().get("recipes");
     }
 
 }

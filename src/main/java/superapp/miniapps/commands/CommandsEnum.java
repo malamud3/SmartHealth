@@ -6,6 +6,6 @@ public enum CommandsEnum {
     MODIFY_RECIPE,
     DELETE_RECIPE,
     DELETE_ALL_RECIPES,
-    GET_RECIPE,
+    FIND_RECIPE,
     GET_ALL_RECIPES
 }

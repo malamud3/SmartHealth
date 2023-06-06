@@ -17,15 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component("GET_RECIPE")
-public class GetRecipeCommand implements Command {
+@Component("FIND_RECIPE")
+public class FindRecipeCommand implements Command {
     private SpoonaculerService spoonaculerService;
     private SuperAppObjectUtility superAppObjectUtility;
 
     private SuperAppObjectCrud objectRepository;
 
     @Autowired
-    public GetRecipeCommand(SuperAppObjectCrud objectRepository, SpoonaculerService spoonaculerService) {
+    public FindRecipeCommand(SuperAppObjectCrud objectRepository, SpoonaculerService spoonaculerService) {
         //  this.spoonaculerService = spoonaculerService;
         this.objectRepository = objectRepository;
         this.superAppObjectUtility = new SuperAppObjectUtility(objectRepository);

@@ -1,5 +1,7 @@
 package superapp.miniapps.commands.dietitiansHelper;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
@@ -35,8 +37,7 @@ public class DeleteAllRecipesCommand implements Command {
         dietitian.deleteAllRecipes();
         objectRepository.save(dietitian);
 
-        //entity to boundary
-        return dietitian;
+        return new ArrayList<>();
     }
 
 }
