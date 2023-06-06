@@ -1,6 +1,7 @@
 package superapp.data;
 
 import java.util.List;
+import java.util.Iterator;
 
 public class RecipeResponse {
 	private String id;
@@ -120,7 +121,7 @@ public class RecipeResponse {
 		String carbsUnit = "";
 		String proteinUnit = "";
 		for (int i = 0; i < this.extendedIngredients.size(); i++) {
-			for(int j = 0; i< extendedIngredients.get(i).getNutrition().getNutrients().size(); j++) {
+			for(int j = 0; j < extendedIngredients.get(i).getNutrition().getNutrients().size(); j++) {
 				String nutrientName = extendedIngredients.get(i).getNutrition().getNutrients().get(j).getName();
 				double nutrientAmount = extendedIngredients.get(i).getNutrition().getNutrients().get(j).getAmount();
 				String nutrientUnit =  extendedIngredients.get(i).getNutrition().getNutrients().get(j).getUnit();
@@ -151,5 +152,22 @@ public class RecipeResponse {
 		this.setFat(new NutrientEntity("fat", totalFat, fatUnit));
 		this.setCarbs(new NutrientEntity("Net Carbohydrates", totalCarbs, carbsUnit));
 		this.setProtein(new NutrientEntity("protein", totalProtein, proteinUnit));
+	}
+
+	public RecipeResponse RemoveIngredientAndCaculate(int ingredientId) {
+		Iterator<IngredientEntity> iterator = extendedIngredients.iterator();
+		while (iterator.hasNext()) {
+			IngredientEntity ingredient = iterator.next();
+			// Check if the ingredient ID matches the desired ID
+			if (ingredient.getId() == ingredientId) {
+				// Remove the ingredient from the list
+				iterator.remove();
+				// Exit the loop since the ingredient is found and removed
+				break;
+			}
+		}
+		calculate();
+		return this;		
+
 	}
 }

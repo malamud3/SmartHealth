@@ -252,7 +252,7 @@ public class SuperAppObjectEntity {
 			throw new RuntimeException("cannot add ingredient, there are no recipes!");
 		}
 		RecipeResponse theRecipe = recipes.stream()
-		        .filter(recipe -> recipe.getId() == recipeId)
+		        .filter(recipe -> recipe.getId().equals(recipeId))
 		        .findFirst()
 		        .orElse(null);
 		if (theRecipe == null) {
@@ -261,6 +261,23 @@ public class SuperAppObjectEntity {
 		theRecipe.addIngredientAndCaculate(ingredient);
 		return theRecipe;
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	public RecipeResponse removeIngredientFromRecipe(String recipeId, int ingredientId) {
+		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
+		if (recipes == null) {
+			throw new RuntimeException("cannot add ingredient, there are no recipes!");
+		}
+		RecipeResponse theRecipe = recipes.stream()
+		        .filter(recipe -> recipe.getId().equals(recipeId))
+		        .findFirst()
+		        .orElse(null);
+		if (theRecipe == null) {
+			throw new RuntimeException("there is no recipe with this Id");
+		}
+		theRecipe.RemoveIngredientAndCaculate(ingredientId);
+		return theRecipe;
 	}
 	
 	
