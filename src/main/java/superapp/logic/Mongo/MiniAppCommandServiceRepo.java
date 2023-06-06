@@ -112,12 +112,11 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 
 			if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
-
-				createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
-
+				
 				MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
 				entity = this.commandRepository.save(entity);
-				return this.entityToBoundary(entity);
+				return createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
+
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -172,11 +171,10 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 
 		if(userEntity.getRole().equals(UserRole.MINIAPP_USER) && isObjectActive(miniAppCommandBoundary.getTargetObject().getObjectId())) {
 
-			createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
 
 			MiniAppCommandEntity entity = boundaryToEntity(miniAppCommandBoundary);
 			entity = this.commandRepository.save(entity);
-			return this.entityToBoundary(entity);
+			return createCommand(CommandsEnum.valueOf(miniAppCommandBoundary.getCommand()), miniAppCommandBoundary);
 		}
 		throw new ObjectBadRequest("Can't invoke");
 	}

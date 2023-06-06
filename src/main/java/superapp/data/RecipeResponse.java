@@ -3,6 +3,7 @@ package superapp.data;
 
 public class RecipeResponse {
     private int id;
+    private String recipeName;
     private String title;
     private String image;
     private double calories;
@@ -78,4 +79,12 @@ public class RecipeResponse {
                 ", protein='" + protein + '\'' +
                 '}';
     }
+
+	public String getRecipeName() {
+		return recipeName;
+	}
+
+	public void setRecipeName(String recipeName) {
+		this.recipeName = recipeName;
+	}
 }

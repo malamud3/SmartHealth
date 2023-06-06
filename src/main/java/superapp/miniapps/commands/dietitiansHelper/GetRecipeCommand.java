@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
+import superapp.Boundary.SuperAppObjectBoundary;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.service.SpoonaculerService;
 import superapp.logic.utilitys.RecipeApiClient;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
@@ -17,29 +19,40 @@ import java.util.Map;
 
 @Component("GET_RECIPE")
 public class GetRecipeCommand implements Command {
-    //private final  SpoonaculerService spoonaculerService;
+    private SpoonaculerService spoonaculerService;
     private SuperAppObjectUtility superAppObjectUtility;
 
     private SuperAppObjectCrud objectRepository;
 
     @Autowired
-    public GetRecipeCommand(SuperAppObjectCrud objectRepository) {
+    public GetRecipeCommand(SuperAppObjectCrud objectRepository, SpoonaculerService spoonaculerService) {
         //  this.spoonaculerService = spoonaculerService;
         this.objectRepository = objectRepository;
         this.superAppObjectUtility = new SuperAppObjectUtility(objectRepository);
+        this.spoonaculerService = spoonaculerService;
     }
 
     @Override
     public Object execute(MiniAppCommandBoundary miniAppCommandBoundary) {
         // 1. find the dietitian object
         // 2. add new recipe to the dietitian object
-        ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
+        SuperAppObjectEntity dietitianObject =  superAppObjectUtility
+        		.checkSuperAppObjectEntityExist(miniAppCommandBoundary.getTargetObject().getObjectId());
+        
+        
 
-        List<RecipeResponse> recipes = RecipeApiClient.fetchRecipesWithParams(1);
-        Map<String, Object> map = new HashMap<>();
-        map.put("recipes", recipes.toArray());
-        miniAppCommandBoundary.setCommandAttributes(map);
+        RecipeResponse recipe = spoonaculerService
+        		.getRecipeByName((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
+        
+        //List<RecipeResponse> recipe = RecipeApiClient.fetchRecipesWithParams(1);
+        
+        dietitianObject.insertNewRecipeToObjectDetails(recipe);
+        objectRepository.save(dietitianObject);
+        
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("recipes", recipes.toArray());
+//        miniAppCommandBoundary.setCommandAttributes(map);
         //entity to boundary
-        return recipes;
+        return recipe;
     }
 }

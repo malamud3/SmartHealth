@@ -1,6 +1,7 @@
 package superapp.logic.service;
 
 import superapp.data.IngredientEntity;
+import superapp.data.RecipeResponse;
 
 public interface SpoonaculerService {
 
@@ -8,6 +9,8 @@ public interface SpoonaculerService {
 	
 	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, int amountInGrams);
 
-	IngredientEntity getIngredientDataByName(String ingredientName, int amountInGrams);
+	public IngredientEntity getIngredientDataByName(String ingredientName, int amountInGrams);
+	
+	public RecipeResponse getRecipeByName(String recipeName);
 	
 }

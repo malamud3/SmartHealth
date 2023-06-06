@@ -11,83 +11,84 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import superapp.Boundary.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Document(collection = "SUPER_APP_OBJECTS")
 public class SuperAppObjectEntity {
 
 	@Id
-    private ObjectId objectId;
-    private String type; //todo- define types
-    private String alias;
-    private Boolean active;
-    private Date creationTimestamp;
+	private ObjectId objectId;
+	private String type; //todo- define types
+	private String alias;
+	private Boolean active;
+	private Date creationTimestamp;
 
 
-    //private Location location;
+	//private Location location;
 
-    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-    private Point location;//using Point for distance calculations
+	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+	private Point location;//using Point for distance calculations
 
-    private CreatedBy createdBy;
-    private Map<String, Object> objectDetails;
+	private CreatedBy createdBy;
+	private Map<String, Object> objectDetails;
 
-    @DBRef
-    @Field("parentObjects")
-    private Set<SuperAppObjectEntity> parentObjects;
-    @DBRef
-    @Field("childObjects")
-    private Set<SuperAppObjectEntity> childObjects;
+	@DBRef
+	@Field("parentObjects")
+	private Set<SuperAppObjectEntity> parentObjects;
+	@DBRef
+	@Field("childObjects")
+	private Set<SuperAppObjectEntity> childObjects;
 
-    public SuperAppObjectEntity(String superapp,String internalObjectId) {
-        objectId = new ObjectId(superapp, internalObjectId);
-    }
+	public SuperAppObjectEntity(String superapp,String internalObjectId) {
+		objectId = new ObjectId(superapp, internalObjectId);
+	}
 
-    public SuperAppObjectEntity() {
+	public SuperAppObjectEntity() {
 
-    }
+	}
 
-    public ObjectId getObjectId() {
-        return objectId;
-    }
-    public void setObjectId(ObjectId objectId) {
-        this.objectId = objectId;
-    }
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-    public String getAlias() {
-        return alias;
-    }
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-    public Boolean getActive() {
-        return active;
-    }
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-    public Date getCreationTimestamp() {
-        return creationTimestamp;
-    }
-    public void setCreationTimestamp(Date creationTimestamp) {
-        this.creationTimestamp = creationTimestamp;
-    }
-    public Point getLocation() {
-        return location;
-    }
-    public void setLocation(Point location) {
-        this.location = location;
-    }
-    public CreatedBy getCreatedBy() {
-        return this.createdBy;
-    }
-    public void setCreatedBy(CreatedBy createdBy) {
-        this.createdBy = createdBy;
-    }
+	public ObjectId getObjectId() {
+		return objectId;
+	}
+	public void setObjectId(ObjectId objectId) {
+		this.objectId = objectId;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getAlias() {
+		return alias;
+	}
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+	public Boolean getActive() {
+		return active;
+	}
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+	public Date getCreationTimestamp() {
+		return creationTimestamp;
+	}
+	public void setCreationTimestamp(Date creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
+	}
+	public Point getLocation() {
+		return location;
+	}
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+	public CreatedBy getCreatedBy() {
+		return this.createdBy;
+	}
+	public void setCreatedBy(CreatedBy createdBy) {
+		this.createdBy = createdBy;
+	}
 
 
 	public Map<String, Object> getObjectDetails() {
@@ -98,87 +99,101 @@ public class SuperAppObjectEntity {
 		this.objectDetails = objectDetails;
 	}
 
-    public Set<SuperAppObjectEntity> getParentObjects() {
-        if (parentObjects == null) {
-            parentObjects = new HashSet<SuperAppObjectEntity>();
-        }
-        return parentObjects;
-    }
+	public Set<SuperAppObjectEntity> getParentObjects() {
+		if (parentObjects == null) {
+			parentObjects = new HashSet<SuperAppObjectEntity>();
+		}
+		return parentObjects;
+	}
 
-    public void setParentObjects(Set<SuperAppObjectEntity> parentObjects) {
-        this.parentObjects = parentObjects;
-    }
+	public void setParentObjects(Set<SuperAppObjectEntity> parentObjects) {
+		this.parentObjects = parentObjects;
+	}
 
-    public Set<SuperAppObjectEntity> getChildObjects() {
-        if (childObjects == null) {
-            childObjects = new HashSet<SuperAppObjectEntity>();
-        }
-        return childObjects;
-    }
+	public Set<SuperAppObjectEntity> getChildObjects() {
+		if (childObjects == null) {
+			childObjects = new HashSet<SuperAppObjectEntity>();
+		}
+		return childObjects;
+	}
 
-    public void setChildObjects(Set<SuperAppObjectEntity> childObjects) {
-        this.childObjects = childObjects;
-    }
+	public void setChildObjects(Set<SuperAppObjectEntity> childObjects) {
+		this.childObjects = childObjects;
+	}
 
-    public void addParentObject(SuperAppObjectEntity parentObject) {
-        if (parentObjects == null) {
-            parentObjects = new HashSet<>();
-        }
-        parentObjects.add(parentObject);
-        parentObject.addChildObject(this);
-    }
+	public void addParentObject(SuperAppObjectEntity parentObject) {
+		if (parentObjects == null) {
+			parentObjects = new HashSet<>();
+		}
+		parentObjects.add(parentObject);
+		parentObject.addChildObject(this);
+	}
 
-    public void addChildObject(SuperAppObjectEntity childObject) {
-        if (childObjects == null) {
-            childObjects = new HashSet<>();
-        }
-        childObjects.add(childObject);
-        childObject.addParentObject(this);
-    }
+	public void addChildObject(SuperAppObjectEntity childObject) {
+		if (childObjects == null) {
+			childObjects = new HashSet<>();
+		}
+		childObjects.add(childObject);
+		childObject.addParentObject(this);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(objectId);
-    }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        SuperAppObjectEntity other = (SuperAppObjectEntity) obj;
-        return objectId.equals(other.getObjectId());
-    }
-    
-    public void insertToObjectDetails(String key, Object obj) {
-        if (objectDetails.isEmpty()){
-            objectDetails = new HashMap<>();
-        }
-        objectDetails.put(key, obj);
-    }
-    
-    public void deleteFromObjectDetails(String key) {
-    	if (objectDetails.isEmpty()){
-            objectDetails = new HashMap<>();
-        }
-    	objectDetails.remove(key);;
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(objectId);
+	}
 
-    public void removeParentObject(SuperAppObjectEntity parentObject) {
-        if (parentObjects != null) {
-            parentObjects.remove(parentObject);
-            parentObject.removeChildObject(this);
-        }
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SuperAppObjectEntity other = (SuperAppObjectEntity) obj;
+		return objectId.equals(other.getObjectId());
+	}
 
-    public void removeChildObject(SuperAppObjectEntity childObject) {
-        if (childObjects != null) {
-            childObjects.remove(childObject);
-            childObject.removeParentObject(this);
-        }
-    }
+	@SuppressWarnings("unchecked")
+	public void insertNewRecipeToObjectDetails(RecipeResponse recipe) {
+		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
+		if (recipes == null) {
+			recipes = new ArrayList<>();
+		}
+		recipes.add(recipe);
+		objectDetails.put("recipes", recipes);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void deleteRecipeFromObjectDetails(String recipeName) {
+		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
+		 if (recipes == null) {
+		        recipes = new ArrayList<>();
+		    }
+		    recipes = recipes.stream()
+		            .filter(recipe -> !recipe.getRecipeName().equals(recipeName))
+		            .toList();
+		    objectDetails.put("recipes", recipes);
+	}
+
+	public void removeParentObject(SuperAppObjectEntity parentObject) {
+		if (parentObjects != null) {
+			parentObjects.remove(parentObject);
+			parentObject.removeChildObject(this);
+		}
+	}
+
+	public void removeChildObject(SuperAppObjectEntity childObject) {
+		if (childObjects != null) {
+			childObjects.remove(childObject);
+			childObject.removeParentObject(this);
+		}
+	}
+
+	public void deleteAllRecipes() {
+		List<RecipeResponse> recipes =  new ArrayList<>();
+		objectDetails.put("recipes", recipes);		
+	}
 
 }

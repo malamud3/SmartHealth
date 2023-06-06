@@ -32,7 +32,7 @@ public class DeleteRecipeCommand implements Command{
         // 2. remove the recipe from the dietitian object
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        dietitian.deleteFromObjectDetails(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
+        dietitian.deleteRecipeFromObjectDetails(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
         objectRepository.save(dietitian);
 
         //entity to boundary
