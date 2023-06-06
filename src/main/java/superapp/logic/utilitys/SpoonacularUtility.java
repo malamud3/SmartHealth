@@ -88,6 +88,22 @@ public class SpoonacularUtility implements SpoonacularService{
 			return calculateRecipseDetails(response);
 	}
 	
+	@Override
+	public RecipeResponse getRecipeByNameAndDiet(String recipeName, String diet) {
+		RecipeResponse response = new RecipeResponse();
+		response.setRecipeName(recipeName);
+			String recipeObjectString =  this.restTemplate
+		.getForObject(API_BASE_URL + "/recipes/complexSearch?apiKey={apiKey}&query={query}&diet={diet}",
+				String.class,API_KEY, recipeName, diet);
+			System.err.println(recipeObjectString);
+			JSONObject recipeObject = new JSONObject(recipeObjectString); 
+			JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
+			response.setId(firstResult.getInt("id"));
+			response.setImage(firstResult.getString("image"));
+			response.setTitle(firstResult.getString("title"));
+			return calculateRecipseDetails(response);
+	}
+	
 	private RecipeResponse calculateRecipseDetails(RecipeResponse recipeObject) {
 		String nutrientsString = this.restTemplate.
 				getForObject(API_BASE_URL + "/recipes/{id}/nutritionWidget.json/?apiKey=4484a885c6ed4e6281e94718c241a20e", String.class, recipeObject.getId());
@@ -134,9 +150,5 @@ public class SpoonacularUtility implements SpoonacularService{
 		}
 		return -1;//can change to throw a new resultemptyException
 	}
-
-
-
-
 
 }

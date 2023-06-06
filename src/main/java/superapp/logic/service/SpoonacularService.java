@@ -12,5 +12,7 @@ public interface SpoonacularService {
 	public IngredientEntity getIngredientDataByName(String ingredientName, int amountInGrams);
 	
 	public RecipeResponse getRecipeByName(String recipeName);
+
+	public RecipeResponse getRecipeByNameAndDiet(String recipeName, String diet);
 	
 }

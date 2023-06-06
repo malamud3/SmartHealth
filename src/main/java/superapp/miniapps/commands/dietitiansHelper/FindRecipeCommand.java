@@ -39,11 +39,15 @@ public class FindRecipeCommand implements Command {
         SuperAppObjectEntity dietitianObject =  superAppObjectUtility
         		.checkSuperAppObjectEntityExist(miniAppCommandBoundary.getTargetObject().getObjectId());
         
-        
+        RecipeResponse recipe = new RecipeResponse();
 
-        RecipeResponse recipe = spoonacularService
-        		.getRecipeByName((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
-        
+        if(miniAppCommandBoundary.getCommandAttributes().get("diet") == null) {
+        	recipe = spoonacularService
+            		.getRecipeByName((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
+        }else {
+        	recipe = spoonacularService.getRecipeByNameAndDiet((String)miniAppCommandBoundary.getCommandAttributes().get("recipeName"),
+        			(String)miniAppCommandBoundary.getCommandAttributes().get("diet"));
+        }    
         //List<RecipeResponse> recipe = RecipeApiClient.fetchRecipesWithParams(1);
         
         dietitianObject.insertNewRecipeToObjectDetails(recipe);
