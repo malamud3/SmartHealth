@@ -6,7 +6,10 @@ import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectCrud;
+import superapp.data.IngredientEntity;
+import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.service.SpoonacularService;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
 
@@ -15,11 +18,13 @@ public class ModifyRecipeCommand  implements Command  {
 
 	private SuperAppObjectUtility superAppObjectUtility;
 	private SuperAppObjectCrud objectRepository;
+	private SpoonacularService spoonacularService;
 
 	@Autowired
-	public ModifyRecipeCommand(SuperAppObjectCrud objectRepository) {
+	public ModifyRecipeCommand(SuperAppObjectCrud objectRepository, SpoonacularService spoonacularService) {
 		this.objectRepository = objectRepository;
 		this.superAppObjectUtility = new SuperAppObjectUtility(objectRepository);
+		this.spoonacularService = spoonacularService;
 	}
 
 
@@ -31,12 +36,18 @@ public class ModifyRecipeCommand  implements Command  {
         // 2. add new recipe to the dietitian object
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        dietitian.insertToObjectDetails(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString(),
-        		miniAppCommandBoundary.getCommandAttributes().get("recipeDetails"));
+        
+        String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
+        double amount = (double) miniAppCommandBoundary.getCommandAttributes().get("amount");
+        String ingredientName = (String) miniAppCommandBoundary.getCommandAttributes().get("ingredientName");
+        
+        IngredientEntity ingredient = spoonacularService.getIngredientDataByNameAndAmount(ingredientName, amount);
+        
+        RecipeResponse updatedRecipe = dietitian.addIngredientToRecipe(recipeId, ingredient);
         objectRepository.save(dietitian);
         
         //entity to boundary
-        return dietitian;
+        return updatedRecipe;
 	}
 
 }

@@ -157,23 +157,24 @@ public class SuperAppObjectEntity {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void insertNewRecipeToObjectDetails(RecipeResponse recipe) {
+	public RecipeResponse insertNewRecipeToObjectDetails(RecipeResponse recipe) {
 		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
 		if (recipes == null) {
 			recipes = new ArrayList<>();
 		}
 		recipes.add(recipe);
 		objectDetails.put("recipes", recipes);
+		return recipe;
 	}
 
 	@SuppressWarnings("unchecked")
-	public void deleteRecipeFromObjectDetails(String recipeName) {
+	public void deleteRecipeFromObjectDetails(String recipeId) {
 		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
 		if (recipes == null) {
 			recipes = new ArrayList<>();
 		}
 		recipes = recipes.stream()
-				.filter(recipe -> !recipe.getRecipeName().equals(recipeName))
+				.filter(recipe -> !recipe.getId().equals(recipeId))
 				.toList();
 		objectDetails.put("recipes", recipes);
 	}
@@ -222,5 +223,46 @@ public class SuperAppObjectEntity {
 		objectDetails.put("followers", followers);
 	}
 
+	@SuppressWarnings("unchecked")
+	public RecipeResponse createRecipe(String recipeName) {
+		
+		RecipeResponse newRecipeResponse = initRecipe(recipeName);
+		return insertNewRecipeToObjectDetails(newRecipeResponse);
+	}
+
+	private RecipeResponse initRecipe(String recipeName) {
+		RecipeResponse newRecipeResponse = new RecipeResponse();
+		newRecipeResponse.setRecipeName(recipeName);
+		newRecipeResponse.setId(UUID.randomUUID().toString());
+		newRecipeResponse.setCalories(new NutrientEntity());
+		newRecipeResponse.setCarbs(new NutrientEntity());
+		newRecipeResponse.setExtendedIngredients(new ArrayList<IngredientEntity>());
+		newRecipeResponse.setFat(new NutrientEntity());
+		newRecipeResponse.setImage("");
+		newRecipeResponse.setProtein(new NutrientEntity());
+		newRecipeResponse.setTitle(recipeName);
+		return newRecipeResponse;
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public RecipeResponse addIngredientToRecipe(String recipeId, IngredientEntity ingredient) {
+		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
+		if (recipes == null) {
+			throw new RuntimeException("cannot add ingredient, there are no recipes!");
+		}
+		RecipeResponse theRecipe = recipes.stream()
+		        .filter(recipe -> recipe.getId() == recipeId)
+		        .findFirst()
+		        .orElse(null);
+		if (theRecipe == null) {
+			throw new RuntimeException("there is no recipe with this Id");
+		}
+		theRecipe.addIngredientAndCaculate(ingredient);
+		return theRecipe;
+		
+	}
+	
+	
 
 }

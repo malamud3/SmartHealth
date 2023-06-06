@@ -7,9 +7,9 @@ public interface SpoonacularService {
 
 	public IngredientEntity getIngredientDataByName(String ingredientName);
 	
-	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, int amountInGrams);
+	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, double amountInGrams);
 
-	public IngredientEntity getIngredientDataByName(String ingredientName, int amountInGrams);
+	public IngredientEntity getIngredientDataByNameAndAmount(String ingredientName, double amountInGrams);
 	
 	public RecipeResponse getRecipeByName(String recipeName);
 

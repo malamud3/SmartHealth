@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectCrud;
+import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
@@ -29,11 +30,10 @@ public class CreateRecipeCommand implements Command {
         // 2. add new recipe to the dietitian object
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
-        dietitian.insertToObjectDetails(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString(),
-        		miniAppCommandBoundary.getCommandAttributes().get("recipeDetails"));
+        RecipeResponse newRecipe = dietitian.createRecipe(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
         objectRepository.save(dietitian);
 
         //entity to boundary
-        return dietitian;
+        return newRecipe;
     }
 }

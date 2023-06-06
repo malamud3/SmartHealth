@@ -4,11 +4,17 @@ public class NutrientEntity {
 	public String name;
     public double amount;
     public String unit;
-    public double percentOfDailyNeeds;
+    //public double percentOfDailyNeeds;
 	
     
     public NutrientEntity() {
 		super();
+	}
+    
+    public NutrientEntity(String name, double amount, String unit) {
+		this.name = name;
+		this.amount = amount;
+		this.unit = unit;
 	}
     
     
@@ -30,12 +36,12 @@ public class NutrientEntity {
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
-	public double getPercentOfDailyNeeds() {
-		return percentOfDailyNeeds;
-	}
-	public void setPercentOfDailyNeeds(double percentOfDailyNeeds) {
-		this.percentOfDailyNeeds = percentOfDailyNeeds;
-	}
+//	public double getPercentOfDailyNeeds() {
+//		return percentOfDailyNeeds;
+//	}
+//	public void setPercentOfDailyNeeds(double percentOfDailyNeeds) {
+//		this.percentOfDailyNeeds = percentOfDailyNeeds;
+//	}
     
     
 }

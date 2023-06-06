@@ -2,10 +2,11 @@ package superapp.data;
 
 public class IngredientEntity {
 	private int id;
-	private String aisle;
+	private String name;
 	private float amount;
 	private String unit;
 	private String image;
+	private NutritionEntity nutrition;
 	
 	public IngredientEntity() {}
 	
@@ -41,12 +42,20 @@ public class IngredientEntity {
 		return this.image;
 	}
 	
-	public void setAisle(String aisle){
-		this.aisle = aisle;
+	public void setName(String name){
+		this.name = name;
 	}
 
-	public String getAisle(){
-		return this.aisle;
+	public String getName(){
+		return this.name;
+	}
+
+	public NutritionEntity getNutrition() {
+		return nutrition;
+	}
+
+	public void setNutrition(NutritionEntity nutrition) {
+		this.nutrition = nutrition;
 	}
 
 }

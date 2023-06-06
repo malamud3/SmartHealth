@@ -9,10 +9,10 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-
-
+import com.fasterxml.jackson.databind.deser.Deserializers.Base;
 
 import superapp.data.IngredientEntity;
+import superapp.data.NutrientEntity;
 import superapp.data.RecipeResponse;
 import superapp.logic.service.SpoonacularService;
 
@@ -38,8 +38,8 @@ public class SpoonacularUtility implements SpoonacularService{
 	@Override
 	public IngredientEntity getIngredientDataByName(String ingredientName) {
 		String resultJSON = this.restTemplate
-				.getForObject(API_BASE_URL + "/food/ingredients/search" +
-						"?query=" + ingredientName + "&apiKey=" + API_KEY, String.class);
+				.getForObject(API_BASE_URL + "/food/ingredients/search?query={query}&apiKey={apiKey}"
+						, String.class, ingredientName, API_KEY);
 
 		Integer id = getIdOfTheFirstResult(resultJSON);
 		System.err.println(resultJSON);
@@ -48,27 +48,23 @@ public class SpoonacularUtility implements SpoonacularService{
 	}
 
 	@Override
-	public IngredientEntity getIngredientDataByName(String ingredientName, int amountInGrams) {
+	public IngredientEntity getIngredientDataByNameAndAmount(String ingredientName, double amountInGrams) {
 		String resultJSON = this.restTemplate
-				.getForObject(API_BASE_URL + "/food/ingredients/search" +
-						"?query=" + ingredientName + "&apiKey=" + API_KEY, String.class);
+				.getForObject(API_BASE_URL + "/food/ingredients/search?query={query}&apiKey={apiKey}"
+					, String.class, ingredientName, API_KEY);
 
 		Integer id = getIdOfTheFirstResult(resultJSON);
 		System.err.println(resultJSON);
-		return getIngredientDataByIdAndAmountInGrams(id, 100);
+		return getIngredientDataByIdAndAmountInGrams(id, amountInGrams);
 	}
 
 
 	@Override
-	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, int amountInGrams) {
-		System.err.println(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY 
-				+ "&amount=" + amountInGrams +"&unit=grams");
-		System.err.println(this.restTemplate
-				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=" + amountInGrams +"&unit=grams",
-						String.class, id));
+	public IngredientEntity getIngredientDataByIdAndAmountInGrams(Integer id, double amountInGrams) {
+		
 		return this.restTemplate
-				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information" + "?apiKey=" + API_KEY + "&amount=" + amountInGrams +"&unit=grams",
-						IngredientEntity.class, id);
+				.getForObject(API_BASE_URL + "/food/ingredients/{id}/information?apiKey={apiKey}&amount={amount}&unit=grams",
+						IngredientEntity.class,id, API_KEY, amountInGrams);
 	}
 	
 	@Override
@@ -79,10 +75,10 @@ public class SpoonacularUtility implements SpoonacularService{
 			String recipeObjectString =  this.restTemplate
 		.getForObject(API_BASE_URL + "/recipes/complexSearch?apiKey={apiKey}&query={query}",
 				String.class,API_KEY, recipeName);
-			System.err.println(recipeObjectString);
+			//System.err.println(recipeObjectString);
 			JSONObject recipeObject = new JSONObject(recipeObjectString); 
 			JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
-			response.setId(firstResult.getInt("id"));
+			response.setId(String.valueOf(firstResult.getInt("id")));
 			response.setImage(firstResult.getString("image"));
 			response.setTitle(firstResult.getString("title"));
 			return calculateRecipseDetails(response);
@@ -98,7 +94,7 @@ public class SpoonacularUtility implements SpoonacularService{
 			System.err.println(recipeObjectString);
 			JSONObject recipeObject = new JSONObject(recipeObjectString); 
 			JSONObject firstResult = recipeObject.getJSONArray("results").getJSONObject(0);
-			response.setId(firstResult.getInt("id"));
+			response.setId(String.valueOf(firstResult.getInt("id")));
 			response.setImage(firstResult.getString("image"));
 			response.setTitle(firstResult.getString("title"));
 			return calculateRecipseDetails(response);
@@ -106,7 +102,8 @@ public class SpoonacularUtility implements SpoonacularService{
 	
 	private RecipeResponse calculateRecipseDetails(RecipeResponse recipeObject) {
 		String nutrientsString = this.restTemplate.
-				getForObject(API_BASE_URL + "/recipes/{id}/nutritionWidget.json/?apiKey=4484a885c6ed4e6281e94718c241a20e", String.class, recipeObject.getId());
+				getForObject(API_BASE_URL + "/recipes/{id}/nutritionWidget.json/?apiKey={apiKey}", String.class, recipeObject.getId(),
+						API_KEY);
 		
 		JSONArray nutrients = new JSONObject(nutrientsString).getJSONArray("nutrients");
 		
@@ -117,24 +114,31 @@ public class SpoonacularUtility implements SpoonacularService{
 
             switch (nutrientName) {
                 case "Calories":
-                    recipeObject.setCalories(nutrientAmount);
+                    recipeObject.setCalories(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
                     break;
                 case "Fat":
-                    recipeObject.setFat(nutrientAmount + nutrientUnit);
+                    recipeObject.setFat(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
                     break;
                 case "Net Carbohydrates":
-                    recipeObject.setCarbs(nutrientAmount + nutrientUnit);
+                    recipeObject.setCarbs(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
                     break;
                 case "Protein":
-                    recipeObject.setProtein(nutrientAmount + nutrientUnit);
+                    recipeObject.setProtein(new NutrientEntity(nutrientName,nutrientAmount, nutrientUnit));
                     break;
                 default:
                     break;
             }
 		}
-		return recipeObject;
+		return fetchIngredients(recipeObject);
 	}
 
+
+	private RecipeResponse fetchIngredients(RecipeResponse recipeObject) {
+		RecipeResponse temp = this.restTemplate.getForObject(API_BASE_URL + "/recipes/{id}/information?apiKey={apiKey}",
+				RecipeResponse.class, recipeObject.getId(), API_KEY);
+		recipeObject.setExtendedIngredients(temp.getExtendedIngredients());
+		return recipeObject;
+	}
 
 	private int getIdOfTheFirstResult (String result) {
 		//can add an index of a result
