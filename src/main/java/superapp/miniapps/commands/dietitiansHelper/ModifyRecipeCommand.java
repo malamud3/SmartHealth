@@ -38,12 +38,15 @@ public class ModifyRecipeCommand  implements Command  {
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
         
         String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
-        double amount = (double) miniAppCommandBoundary.getCommandAttributes().get("amount");
-        String ingredientName = (String) miniAppCommandBoundary.getCommandAttributes().get("ingredientName");
+        String updatedRecipeName = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeName");
+        String updatedRecipeImage = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeImage");
+        String updatedRecipeTitle = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeTitle");
         
-        IngredientEntity ingredient = spoonacularService.getIngredientDataByNameAndAmount(ingredientName, amount);
-        
-        RecipeResponse updatedRecipe = dietitian.addIngredientToRecipe(recipeId, ingredient);
+        if (recipeId == null) {
+            throw new IllegalArgumentException("you need to enter recipeId");
+        }
+                
+        RecipeResponse updatedRecipe = dietitian.modifyRecipe(recipeId, updatedRecipeName, updatedRecipeImage, updatedRecipeTitle);
         objectRepository.save(dietitian);
         
         //entity to boundary

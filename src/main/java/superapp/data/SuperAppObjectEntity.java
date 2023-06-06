@@ -279,6 +279,35 @@ public class SuperAppObjectEntity {
 		theRecipe.RemoveIngredientAndCaculate(ingredientId);
 		return theRecipe;
 	}
+
+	@SuppressWarnings("unchecked")
+	public RecipeResponse modifyRecipe(String recipeId, String updatedRecipeName, String updatedRecipeImage,
+			String updatedRecipeTitle) {
+		
+		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
+		RecipeResponse theRecipe = recipes.stream()
+		        .filter(recipe -> recipe.getId().equals(recipeId))
+		        .findFirst()
+		        .orElse(null);
+		if (theRecipe == null) {
+			throw new RuntimeException("there is no recipe with this Id");
+		}
+		
+		if (updatedRecipeName != null) {
+			theRecipe.setRecipeName(updatedRecipeName);
+	    }
+	    
+	    if (updatedRecipeImage != null) {
+	    	theRecipe.setImage(updatedRecipeImage);
+	    }
+	    
+	    if (updatedRecipeTitle != null) {
+	    	theRecipe.setTitle(updatedRecipeTitle);
+	    }
+	    
+	    return theRecipe;
+		
+	}
 	
 	
 
