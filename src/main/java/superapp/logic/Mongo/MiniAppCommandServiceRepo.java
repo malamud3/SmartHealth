@@ -202,18 +202,18 @@ public class MiniAppCommandServiceRepo implements MiniAppCommandServiceWithAdmin
 	private void validateMiniappCommand(MiniAppCommandBoundary miniAppCommandBoundary) throws RuntimeException {
 		GeneralUtility generalUtility = new GeneralUtility();
 		if (miniAppCommandBoundary.getCommandAttributes() == null) {
-			throw new RuntimeException("Command attributes are missing");
+			throw new CommandBadRequest("Command attributes are missing");
 		}
 		if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getCommand())) {
-			throw new RuntimeException("Command details are missing");
+			throw new CommandBadRequest("Command details are missing");
 		}
 		if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getSuperapp()) ||
 				generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getInvokedBy().getUserId().getEmail())) {
-			throw new RuntimeException("Invoked by is missing");
+			throw new CommandBadRequest("Invoked by is missing");
 		}
 		if (generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getInternalObjectId()) ||
 				generalUtility.isStringEmptyOrNull(miniAppCommandBoundary.getTargetObject().getObjectId().getSuperapp())) {
-			throw new RuntimeException("Target object is missing");
+			throw new CommandBadRequest("Target object is missing");
 		}
 	}
 

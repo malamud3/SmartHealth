@@ -1,6 +1,8 @@
 package superapp.miniapps.commands.dietitiansHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Component;
 
 import superapp.Boundary.MiniAppCommandBoundary;
@@ -41,6 +43,6 @@ public class DeleteRecipeCommand implements Command {
         objectRepository.save(dietitian);
 
         // Convert the remaining recipes to a boundary object and return it
-        return dietitian.getObjectDetails().get("recipes");
+        return new ArrayList<>();
     }
 }

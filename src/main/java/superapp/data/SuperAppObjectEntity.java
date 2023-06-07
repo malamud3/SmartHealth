@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import superapp.Boundary.*;
 import superapp.Boundary.User.UserId;
+import superapp.logic.Exceptions.RecipeNotExistException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -306,6 +307,21 @@ public class SuperAppObjectEntity {
 	    }
 	    
 	    return theRecipe;
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	public Object getRecipeById(String recipeId) {
+		List<RecipeResponse> recipes =  (List<RecipeResponse>) objectDetails.get("recipes");
+		
+		RecipeResponse theRecipe = recipes.stream()
+		        .filter(recipe -> recipe.getId().equals(recipeId))
+		        .findFirst()
+		        .orElse(null);
+		if (theRecipe == null) {
+			throw new RecipeNotExistException("there is no recipe with this Id");
+		}
+		return theRecipe;
 		
 	}
 	
