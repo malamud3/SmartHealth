@@ -7,6 +7,7 @@ import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.Exceptions.CommandBadRequest;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
 
@@ -29,8 +30,12 @@ public class DeleteRecipeCommand implements Command {
         ObjectId idObject = miniAppCommandBoundary.getTargetObject().getObjectId();
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
 
-        // 2. Remove the recipe from the dietitian object using the recipe name
-        dietitian.deleteRecipeFromObjectDetails(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
+        // 2. Remove the recipe from the dietitian object using the recipe ID
+        String recipeId = miniAppCommandBoundary.getCommandAttributes().get("recipeId").toString();
+        if (recipeId == null) {
+        	throw new CommandBadRequest("you need to enter the desired recipe Id");
+        }
+        dietitian.deleteRecipeFromObjectDetails(recipeId);
 
         // 3. Save the updated dietitian object
         objectRepository.save(dietitian);

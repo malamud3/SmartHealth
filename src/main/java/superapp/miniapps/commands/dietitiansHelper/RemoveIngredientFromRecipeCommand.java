@@ -8,6 +8,7 @@ import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.Exceptions.CommandBadRequest;
 import superapp.logic.service.SpoonacularService;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
@@ -33,7 +34,11 @@ public class RemoveIngredientFromRecipeCommand implements Command {
 
 		// 2. Retrieve the necessary attributes from the command attributes
 		String recipeId = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeId");
-		int ingredientId = (int) miniAppCommandBoundary.getCommandAttributes().get("ingredientId");
+		Integer ingredientId = (int) miniAppCommandBoundary.getCommandAttributes().get("ingredientId");
+		
+		if (recipeId == null || ingredientId == null) {
+			throw new CommandBadRequest("enter the full parameters needed");
+		}
 
 		// 3. Remove the ingredient from the recipe in the dietitian's object details
 		RecipeResponse updatedRecipe = dietitian.removeIngredientFromRecipe(recipeId, ingredientId);

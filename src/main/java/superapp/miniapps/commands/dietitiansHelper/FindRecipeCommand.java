@@ -6,6 +6,7 @@ import superapp.Boundary.MiniAppCommandBoundary;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.Exceptions.CommandBadRequest;
 import superapp.logic.service.SpoonacularService;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
@@ -33,13 +34,18 @@ public class FindRecipeCommand implements Command {
         RecipeResponse recipe = new RecipeResponse();
 
         // 3. Check if the "diet" attribute is provided in the command attributes
-        if (miniAppCommandBoundary.getCommandAttributes().get("diet") == null) {
+        String diet = (String)miniAppCommandBoundary.getCommandAttributes().get("diet");
+        String recipeName = (String) miniAppCommandBoundary.getCommandAttributes().get("recipeName");
+        
+        if(recipeName == null) {
+        	throw new CommandBadRequest("you need to enter recipe name to find");
+        }
+        if ( diet == null) {
             // If no "diet" attribute is provided, retrieve the recipe by name only
-            recipe = spoonacularService.getRecipeByName((String) miniAppCommandBoundary.getCommandAttributes().get("recipeName"));
+            recipe = spoonacularService.getRecipeByName(recipeName);
         } else {
             // If the "diet" attribute is provided, retrieve the recipe by name and diet
-            recipe = spoonacularService.getRecipeByNameAndDiet((String) miniAppCommandBoundary.getCommandAttributes().get("recipeName"),
-                    (String) miniAppCommandBoundary.getCommandAttributes().get("diet"));
+            recipe = spoonacularService.getRecipeByNameAndDiet(recipeName,diet);
         }
 
         // 4. Insert the new recipe into the dietitian's object details

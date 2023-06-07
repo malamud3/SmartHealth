@@ -7,6 +7,7 @@ import superapp.Boundary.ObjectId;
 import superapp.dal.SuperAppObjectCrud;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.Exceptions.CommandBadRequest;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
 
@@ -31,7 +32,11 @@ public class CreateRecipeCommand implements Command {
         SuperAppObjectEntity dietitian = superAppObjectUtility.checkSuperAppObjectEntityExist(idObject);
 
         // 2. Create a new recipe using the recipe name from the command attributes
-        RecipeResponse newRecipe = dietitian.createRecipe(miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString());
+        String recipeName = miniAppCommandBoundary.getCommandAttributes().get("recipeName").toString();
+        if(recipeName == null) {
+        	throw new CommandBadRequest("you need to enter recipeName to create recipe");
+        }
+        RecipeResponse newRecipe = dietitian.createRecipe(recipeName);
 
         // Save the updated dietitian object with the new recipe
         objectRepository.save(dietitian);

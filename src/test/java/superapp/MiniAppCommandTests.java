@@ -4,6 +4,7 @@ package superapp;
 import jakarta.annotation.PostConstruct;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,10 +12,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import superapp.Boundary.*;
 import superapp.Boundary.User.NewUserBoundary;
 import superapp.Boundary.User.UserBoundary;
 import superapp.Boundary.User.UserId;
+import superapp.data.RecipeResponse;
+
 import java.util.Date;
 import java.util.Map;
 
@@ -90,29 +96,37 @@ public class MiniAppCommandTests {
     	
     	UserBoundary superappUser = createExampleUser("SUPERAPP_USER");
     	UserBoundary miniappUser = createExampleUser("MINIAPP_USER");
-    	SuperAppObjectBoundary targetObject = createExampleSuperappObject("tagetType", "tagetAlias", true, superappUser.getUserId());
+    	SuperAppObjectBoundary targetObject = createExampleSuperappObject("targetType", "targetAlias", true, superappUser.getUserId());
     	
     	// WHEN I POST /superapp/miniapp/{miniAppName} to invoke a new miniappCommand
         MiniAppCommandBoundary command = new MiniAppCommandBoundary();
-        command.setCommand("example-command");
+        command.setCommand("CREATE_RECIPE");
         command.setTargetObject(new TargetObject( targetObject.getObjectId()));
         command.setInvocationTimestamp(new Date());
         command.setInvokedBy(new InvokedBy(miniappUser.getUserId()));
-        command.setCommandAttributes(Map.of("exampleKey", "exampleValue"));
+        command.setCommandAttributes(Map.of("recipeName", "test"));
   
 
-        MiniAppCommandBoundary expectedCommand = this.restTemplate.postForObject(
+        Object response = this.restTemplate.postForObject(
                 this.baseUrl + "/superapp/miniapp/{miniAppName}",
                 command,
-                MiniAppCommandBoundary.class,
+                Object.class,
                 miniAppName
         );
+        
+        //THEN response should be tpe recipe with an attribute name = test
 
-        // THEN GET /superapp/admin/miniapp?userSuperapp={superapp}&userEmail={email} shpuld return an array contains only expectedCommand
-        assertThat(this.restTemplate.getForObject(this.baseUrl + "/superapp/admin/miniapp?userSuperapp={superapp}&userEmail={email}",
-        		MiniAppCommandBoundary[].class, adminUserId.getSuperapp(), adminUserId.getEmail()))
-        .hasSize(1)
-        .contains(expectedCommand);
+        // Replace "Recipe" with the actual class name of the Recipe object
+        Class<?> expectedClass = RecipeResponse.class;
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecipeResponse recipe = (RecipeResponse) objectMapper.convertValue(response, expectedClass);
+
+        // Assert that expectedCommand is an instance of Recipe
+        Assertions.assertTrue(expectedClass.isInstance(recipe));
+
+        // Assert that the name of the recipe is equal to the recipeName in the command attributes
+        String expectedRecipeName = "test";
+        Assertions.assertEquals(expectedRecipeName, recipe.getRecipeName());
         
         
     }

@@ -9,6 +9,7 @@ import superapp.dal.SuperAppObjectCrud;
 import superapp.data.IngredientEntity;
 import superapp.data.RecipeResponse;
 import superapp.data.SuperAppObjectEntity;
+import superapp.logic.Exceptions.CommandBadRequest;
 import superapp.logic.service.SpoonacularService;
 import superapp.logic.utilitys.SuperAppObjectUtility;
 import superapp.miniapps.commands.Command;
@@ -40,7 +41,7 @@ public class ModifyRecipeCommand implements Command {
 
         // 3. Validate that the recipeId is provided
         if (recipeId == null) {
-            throw new IllegalArgumentException("You need to enter recipeId");
+            throw new CommandBadRequest("You need to enter recipeId");
         }
 
         // 4. Modify the recipe in the dietitian's object details
