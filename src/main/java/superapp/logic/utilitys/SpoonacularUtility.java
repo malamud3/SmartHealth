@@ -30,7 +30,7 @@ public class SpoonacularUtility implements SpoonacularService{
 
 	public SpoonacularUtility() {
 		//TODO - find a way to inject the API key
-		API_KEY = "4484a885c6ed4e6281e94718c241a20e";
+		API_KEY = "837f9584e1af42d2a8255fca1f40e6c9";
 
 		API_BASE_URL = "https://api.spoonacular.com";
 		//this.jackson = new ObjectMapper();
