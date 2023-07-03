@@ -1,4 +1,4 @@
-# Project Requirements Document
+# SmartHealth Super App
 
 ## 1. Introduction
 “SmartHealth” is a super app that connects professional dietitians with potential clients. It offers two mini-applications to cater to different user needs: "DietitiansHelper" and "Healthy."
