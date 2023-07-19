@@ -140,7 +140,7 @@ public class ObjectServiceRepo implements SuperAppObjectRelationshipService {
         throw new DepreacatedOpterationException("do not use this operation any more, as it is deprecated");
     }
 
-    //pagination Support
+    //Pagination Support
 
     @Override
     public List<SuperAppObjectBoundary> getAllObjects(String userSuperApp, String userEmail, int size, int page) {
