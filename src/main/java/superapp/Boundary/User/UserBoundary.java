@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import java.util.Objects;
 
 public class UserBoundary {
-	@Id
+@Id
     private UserId userId;
     private String role;
     private String username;
@@ -19,12 +19,12 @@ public class UserBoundary {
 		this.avatar = avatar;
 	}
 
-	public UserBoundary() {
+	public UserBoundary(){}
+	
 
-	}
-
-	public UserBoundary(UserId userId) {
-	}
+	public UserBoundary(UserId userId) {}
+	
+	
 	public UserBoundary(NewUserBoundary newUser, String springAppName) {
 		this.userId = new UserId(springAppName,newUser.getEmail());
 		this.role = newUser.getRole();
