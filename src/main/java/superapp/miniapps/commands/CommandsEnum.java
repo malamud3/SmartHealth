@@ -14,4 +14,5 @@ public enum CommandsEnum {
 	REMOVE_INGREDIENT,
 	GET_RANDOM_RECIPE,
 	GET_RECIPE
+	
 }
