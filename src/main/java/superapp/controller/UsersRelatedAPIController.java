@@ -17,7 +17,7 @@ public class UsersRelatedAPIController {
 	private String springAppName;
 
 
-	// this method injects a configuration value of spring
+	// This method injects a configuration value of spring
 	@Value("${spring.application.name:iAmTheDefaultNameOfTheApplication}")
 	public void setSpringApplicationName(String springApplicationName) {
 		this.springAppName = springApplicationName;
