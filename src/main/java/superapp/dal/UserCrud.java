@@ -6,7 +6,6 @@ import superapp.data.UserEntity;
 
 import java.util.Optional;
 
-
 public interface UserCrud
         extends MongoRepository<UserEntity, UserId> {
 
